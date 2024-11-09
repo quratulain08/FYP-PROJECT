@@ -1,5 +1,34 @@
 "use client";
+
 import React, { useState } from 'react';
+import { useRouter, useSearchParams,useParams } from "next/navigation";
+
+
+
+interface FacultyData {
+    departmentId: string;
+    honorific: string;
+    name: string;
+    cnic: string;
+    gender: string;
+    address: string;
+    province: string;
+    city: string;
+    contractType: string;
+    academicRank: string;
+    joiningDate: string;
+    leavingDate?: string;
+    isCoreComputingTeacher: boolean;
+    lastAcademicQualification: {
+      degreeName: string;
+      degreeType: string;
+      fieldOfStudy: string;
+      degreeAwardingCountry: string;
+      degreeAwardingInstitute: string;
+      degreeStartDate: string;
+      degreeEndDate: string;
+    };
+  }
 
 const provinces = [
     { name: 'Punjab', cities: ['Lahore', 'Faisalabad', 'Rawalpindi', 'Multan'] },
@@ -11,8 +40,14 @@ const provinces = [
 ];
 
 export default function FacultyForm() {
+    const router = useRouter();
+     const params = useParams();
+  const departmentId = params.slug as string;
+
+
     const [selectedProvince, setSelectedProvince] = useState<string>('');
     const [selectedCity, setSelectedCity] = useState<string>('');
+    const [honorific, setHonorific] = useState<string>('Mr');
     const [name, setName] = useState<string>('');
     const [cnic, setCnic] = useState<string>('');
     const [gender, setGender] = useState<string>('Male');
@@ -31,18 +66,26 @@ export default function FacultyForm() {
     const [degreeEndDate, setDegreeEndDate] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
-
+  
     const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedProvince(event.target.value);
-        setSelectedCity(''); // Reset city selection
+        setSelectedCity('');
     };
 
-    const handleSubmit = async (event: React.FormEvent) => {
+    async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
         setLoading(true);
         setMessage('');
+      
+        if (!departmentId) {
+          setMessage('Department ID is missing');
+          setLoading(false);
+          return;
+        }
 
         const facultyData = {
+            departmentId,
+            honorific,
             name,
             cnic,
             gender,
@@ -65,34 +108,42 @@ export default function FacultyForm() {
             }
         };
 
-        try {
-            const response = await fetch('/api/faculty', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(facultyData),
-            });
+      
+  try {
+    const response = await fetch(`/api/faculty/department/${departmentId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(facultyData),
+    });
 
-            if (!response.ok) {
-                throw new Error('Failed to create faculty member');
-            }
-
-            const data = await response.json();
-            setMessage(`Faculty member ${data.name} created successfully!`);
-            // Clear the form or reset state here if needed
-        } catch (error: unknown) {
-    if (error instanceof Error) {
-        setMessage(`Error: ${error.message}`);
-    } else {
-        setMessage('An unknown error occurred.');
+    if (!response.ok) {
+      throw new Error('Failed to create faculty member');
     }
-}
 
+    const data = await response.json();
+    setMessage('Faculty member created successfully!');
+            
+            // Navigate back to department detail page after successful submission
+            setTimeout(() => {
+                router.push(`/Department/${departmentId}`);
+            }, 1500);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setMessage(`Error: ${error.message}`);
+            } else {
+                setMessage('An unknown error occurred.');
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
+   
     return (
         <div className="max-w-8xl mx-auto w-full">
+            <p>{departmentId}</p>
             <form className="p-2 text-sm" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
                     {/* Right Side (Instructions Box) */}

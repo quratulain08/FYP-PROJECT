@@ -1,4 +1,3 @@
-// models/faculty.ts
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 interface LastAcademicQualification {
@@ -12,6 +11,7 @@ interface LastAcademicQualification {
 }
 
 interface Faculty extends Document {
+  departmentId: mongoose.Types.ObjectId; // Explicitly define it as ObjectId
   name: string;
   cnic: string;
   gender: string;
@@ -37,6 +37,11 @@ const lastAcademicQualificationSchema = new Schema<LastAcademicQualification>({
 });
 
 const facultySchema = new Schema<Faculty>({
+  departmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Department',
+    required: true,
+  },
   name: { type: String, required: true },
   cnic: { type: String, required: true, unique: true },
   gender: { type: String, required: true },

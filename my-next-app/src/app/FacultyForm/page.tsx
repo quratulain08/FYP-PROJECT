@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams,useParams } from "next/navigation";
 
 const provinces = [
     { name: 'Punjab', cities: ['Lahore', 'Faisalabad', 'Rawalpindi', 'Multan'] },
@@ -14,9 +14,7 @@ const provinces = [
 
 export default function FacultyForm() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-        const departmentId = searchParams.get('departmentId');
-        const departmentName = searchParams.get('departmentName');
+    
 
     const [selectedProvince, setSelectedProvince] = useState<string>('');
     const [selectedCity, setSelectedCity] = useState<string>('');
@@ -39,6 +37,9 @@ export default function FacultyForm() {
     const [degreeEndDate, setDegreeEndDate] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
+    const params = useParams();
+    const id = params.slug as string;
+    const departmentId = id; 
 
     const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedProvince(event.target.value);

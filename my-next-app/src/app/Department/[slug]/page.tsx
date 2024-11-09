@@ -115,8 +115,7 @@ export default function DepartmentDetail() {
   const handleAddFaculty = () => {
     if (department) {
       // Correctly encode parameters for Next.js routing
-      const queryString = `departmentId=${encodeURIComponent(id)}&departmentName=${encodeURIComponent(department.name)}`;
-      router.push(`/FacultyForm?${queryString}`);
+      router.push(`/FacultyForm/${id}`);
     } else {
       setError({ message: "Department information is not available" });
     }
@@ -227,7 +226,9 @@ export default function DepartmentDetail() {
           <p className="text-gray-500 text-center py-4">No faculty members found</p>
         ) : (
           <div className="grid grid-cols-1 gap-6">
-            {facultyMembers.map((faculty) => (
+            {facultyMembers
+                .filter((faculty) => faculty.departmentId === id) // Add this line to filter by department ID
+                .map((faculty) => (
               <div key={faculty.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>

@@ -1,39 +1,40 @@
-// app/api/faculty/department/[id]/route.ts
 import { NextResponse } from 'next/server';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import FacultyModel from '@/models/faculty';
+import connectToDatabase from '@/lib/mongodb';
 
-// Connect to MongoDB (you should move this to a separate utility file)
-const connectDB = async () => {
-  if (mongoose.connections[0].readyState) return;
-  try {
-    await mongoose.connect(process.env.MONGODB_URI!);
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    throw new Error('Failed to connect to MongoDB');
-  }
-};
+// Utility to check if a string is a valid MongoDB ObjectId
+const isValidObjectId = (id: string) => Types.ObjectId.isValid(id);
 
 // GET - Fetch all faculty members for a department
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
+  const departmentId = params.slug;
+
+  if (!isValidObjectId(departmentId)) {
+    return NextResponse.json(
+      { message: `Invalid department ID: ${departmentId}` },
+      { status: 400 }
+    );
+  }
+
   try {
-    await connectDB();
-    const departmentId = params.id;
+    await connectToDatabase();
     const facultyMembers = await FacultyModel.find({ departmentId });
-    
-    if (!facultyMembers || facultyMembers.length === 0) {
-      return NextResponse.json(
-        { message: 'No faculty members found for this department' },
-        { status: 404 }
-      );
-    }
+
+    // if (!facultyMembers || facultyMembers.length === 0) {
+    //   return NextResponse.json(
+    //     { message: 'No faculty members found for this department' },
+    //     { status: 404 }
+    //   );
+    // }
 
     return NextResponse.json(facultyMembers);
   } catch (error) {
-    console.error('Faculty fetch error:', error);
+    const err = error as Error;
+    console.error('Error fetching faculty:', err);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
@@ -44,14 +45,21 @@ export async function GET(
 // POST - Create a new faculty member
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
-  try {
-    await connectDB();
-    const body = await request.json();
-    const departmentId = params.id;
+  const departmentId = params.slug;
 
-    // Validate CNIC uniqueness
+  if (!isValidObjectId(departmentId)) {
+    return NextResponse.json(
+      { message: `Invalid department ID: ${departmentId}` },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
+    const body = await request.json();
+
     const existingFaculty = await FacultyModel.findOne({ cnic: body.cnic });
     if (existingFaculty) {
       return NextResponse.json(
@@ -68,7 +76,14 @@ export async function POST(
     const savedFaculty = await newFaculty.save();
     return NextResponse.json(savedFaculty, { status: 201 });
   } catch (error) {
-    console.error('Faculty creation error:', error);
+    const err = error as Error;
+    if (err.name === 'ValidationError') {
+      return NextResponse.json(
+        { message: 'Validation error', details: (err as any).errors },
+        { status: 400 }
+      );
+    }
+    console.error('Error creating faculty:', err);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
@@ -79,14 +94,21 @@ export async function POST(
 // PUT - Update a faculty member
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
-  try {
-    await connectDB();
-    const body = await request.json();
-    const facultyId = params.id;
+  const facultyId = params.slug;
 
-    // Check if CNIC is being updated and ensure it's unique
+  if (!isValidObjectId(facultyId)) {
+    return NextResponse.json(
+      { message: `Invalid faculty ID: ${facultyId}` },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
+    const body = await request.json();
+
     if (body.cnic) {
       const existingFaculty = await FacultyModel.findOne({
         cnic: body.cnic,
@@ -115,7 +137,14 @@ export async function PUT(
 
     return NextResponse.json(updatedFaculty);
   } catch (error) {
-    console.error('Faculty update error:', error);
+    const err = error as Error;
+    if (err.name === 'ValidationError') {
+      return NextResponse.json(
+        { message: 'Validation error', details: (err as any).errors },
+        { status: 400 }
+      );
+    }
+    console.error('Error updating faculty:', err);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
@@ -123,15 +152,23 @@ export async function PUT(
   }
 }
 
+
 // DELETE - Remove a faculty member
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
-  try {
-    await connectDB();
-    const facultyId = params.id;
+  const facultyId = params.slug;
 
+  if (!isValidObjectId(facultyId)) {
+    return NextResponse.json(
+      { message: `Invalid faculty ID: ${facultyId}` },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await connectToDatabase();
     const deletedFaculty = await FacultyModel.findByIdAndDelete(facultyId);
 
     if (!deletedFaculty) {
@@ -145,10 +182,12 @@ export async function DELETE(
       { message: 'Faculty member deleted successfully' }
     );
   } catch (error) {
-    console.error('Faculty deletion error:', error);
+    const err = error as Error;
+    console.error('Error deleting faculty:', err);
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
