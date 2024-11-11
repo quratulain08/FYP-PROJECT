@@ -45,9 +45,27 @@ interface Faculty {
   };
 }
 
+interface Program {
+  name: string;
+  departmentId: string;
+  startDate: string;
+  category: string;
+  durationYears: number;
+  description?: string;
+  contactEmail: string;
+  contactPhone?: string;
+  programHead: string;
+  programHeadContact?: {
+    email?: string;
+    phone?: string;
+  };
+  programObjectives?: string[];
+}
+
 export default function DepartmentDetail() {
   const [department, setDepartment] = useState<Department | null>(null);
   const [facultyMembers, setFacultyMembers] = useState<Faculty[]>([]);
+  const [program, setProgram] = useState<Program | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ message: string; details?: string } | null>(null);
   const params = useParams();
@@ -89,6 +107,9 @@ export default function DepartmentDetail() {
         const facultyData = await fetchWithErrorHandling(`/api/faculty/department/${id}`);
         setFacultyMembers(facultyData);
 
+        const programData = await fetchWithErrorHandling(`/api/program/${id}`);
+        setProgram(programData);
+
         setError(null);
       } catch (err) {
         console.error('Error:', err);
@@ -112,35 +133,35 @@ export default function DepartmentDetail() {
     fetchData();
   }, [id]);
 
- 
-const handleEdit = (id: string): void => {
-  // Navigate to the edit page for the selected faculty member
-  router.push(`/faculty/edit/${id}`);
-};
+  const handleEdit = (id: string): void => {
+    // Navigate to the edit page for the selected faculty member
+    router.push(`/faculty/edit/${id}`);
+  };
 
-const handleDelete = async (id: string): Promise<void> => {
-  // Confirm deletion with the user
-  const confirmed = confirm('Are you sure you want to delete this faculty member?');
-  if (!confirmed) return;
+  const handleDelete = async (id: string): Promise<void> => {
+    // Confirm deletion with the user
+    const confirmed = confirm('Are you sure you want to delete this faculty member?');
+    if (!confirmed) return;
 
-  try {
-    // Make a DELETE request to the API endpoint
-    const response = await fetch(`/api/faculty/${id}`, {
-      method: 'DELETE',
-    });
+    try {
+      // Make a DELETE request to the API endpoint
+      const response = await fetch(`/api/faculty/${id}`, {
+        method: 'DELETE',
+      });
 
-    if (response.ok) {
-      alert('Faculty member deleted successfully');
-      // Optionally refresh the page or update state to remove the deleted member
-    } else {
-      const data = await response.json();
-      alert(`Failed to delete faculty member: ${data.message}`);
+      if (response.ok) {
+        alert('Faculty member deleted successfully');
+        // Optionally refresh the page or update state to remove the deleted member
+      } else {
+        const data = await response.json();
+        alert(`Failed to delete faculty member: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error deleting faculty member:', error);
+      alert('An error occurred while trying to delete the faculty member.');
     }
-  } catch (error) {
-    console.error('Error deleting faculty member:', error);
-    alert('An error occurred while trying to delete the faculty member.');
-  }
-};
+  };
+
   const handleAddFaculty = () => {
     if (department) {
       // Correctly encode parameters for Next.js routing
@@ -248,76 +269,72 @@ const handleDelete = async (id: string): Promise<void> => {
         </div>
       </div>
 
-      {/* Faculty Members Section */}
-<div className="bg-white rounded-lg shadow-lg p-8 border border-green-500">
-  <h2 className="text-xl font-semibold text-green-600 mb-6">Faculty Members</h2>
-  {facultyMembers.length === 0 ? (
-    <p className="text-gray-500 text-center py-4">No faculty members found</p>
-  ) : (
-    <div className="grid grid-cols-1 gap-6">
-      {facultyMembers
-        .filter((faculty) => faculty.departmentId === id) // Filter by department ID
-        .map((faculty) => (
-          <div
-            key={faculty.id}
-            className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
+        <h2 className="text-xl font-semibold text-green-600 mb-4">Program Details</h2>
+        {program ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <p><span className="font-bold">Program Name:</span> {program.name}</p>
+            <p><span className="font-bold">Start Date:</span> {program.startDate}</p>
+            <p><span className="font-bold">Category:</span> {program.category}</p>
+            <p><span className="font-bold">Duration:</span> {program.durationYears} years</p>
+            {program.description && <p><span className="font-bold">Description:</span> {program.description}</p>}
+            <p><span className="font-bold">Contact Email:</span> {program.contactEmail}</p>
+            {program.contactPhone && <p><span className="font-bold">Contact Phone:</span> {program.contactPhone}</p>}
+            <p><span className="font-bold">Program Head:</span> {program.programHead}</p>
+            {program.programHeadContact && (
               <div>
-                <p className="font-semibold">
-                  {faculty.honorific} {faculty.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Academic Rank: {faculty.academicRank}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Contract: {faculty.contractType}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm">Joining Date: {faculty.joiningDate}</p>
-                {faculty.leavingDate && (
-                  <p className="text-sm">Leaving Date: {faculty.leavingDate}</p>
+                {program.programHeadContact.email && (
+                  <p><span className="font-bold">Program Head Email:</span> {program.programHeadContact.email}</p>
                 )}
-                <p className="text-sm">
-                  Core Computing Teacher:{' '}
-                  {faculty.isCoreComputingTeacher ? 'Yes' : 'No'}
-                </p>
+                {program.programHeadContact.phone && (
+                  <p><span className="font-bold">Program Head Phone:</span> {program.programHeadContact.phone}</p>
+                )}
               </div>
+            )}
+            {program.programObjectives && program.programObjectives.length > 0 && (
               <div>
-                <p className="text-sm font-medium">Last Qualification:</p>
-                <p className="text-sm">
-                  {faculty.lastAcademicQualification.degreeName} in{' '}
-                  {faculty.lastAcademicQualification.fieldOfStudy}
-                </p>
-                <p className="text-sm">
-                  {faculty.lastAcademicQualification.degreeAwardingInstitute}
-                </p>
+                <span className="font-bold">Objectives:</span>
+                <ul className="list-disc pl-6">
+                  {program.programObjectives.map((objective, idx) => (
+                    <li key={idx}>{objective}</li>
+                  ))}
+                </ul>
               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={() => handleEdit(faculty.id)}
-              >
-                Edit
-              </button>
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={() => handleDelete(faculty.id)}
-              >
-                Delete
-              </button>
-            </div>
+            )}
           </div>
-        ))}
-    </div>
-  )}
-</div>
+        ) : (
+          <p>Program data not found.</p>
+        )}
+      </div>
 
-      
+      <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500">
+        <h2 className="text-xl font-semibold text-green-600 mb-4">Faculty Members</h2>
+        <div className="space-y-4">
+          {facultyMembers.length === 0 ? (
+            <p>No faculty members available.</p>
+          ) : (
+            facultyMembers.map((faculty) => (
+              <div key={faculty.id} className="flex justify-between items-center">
+                <p className="font-semibold">{faculty.honorific} {faculty.name}</p>
+                <div>
+                  <button 
+                    onClick={() => handleEdit(faculty.id)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(faculty.id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors ml-2"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
