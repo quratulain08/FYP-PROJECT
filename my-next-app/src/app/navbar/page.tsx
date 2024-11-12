@@ -5,9 +5,8 @@ import { FaHome, FaUniversity, FaFolder, FaUsers, FaChalkboardTeacher, FaUser } 
 import { MdKeyboardArrowDown } from 'react-icons/md';
 
 const Navbar: React.FC = () => {
-  const [email, setEmail] = useState<string | null>(null); // State to hold email
+  const [email, setEmail] = useState<string | null>(null);
 
-  // Get email from localStorage when component mounts
   useEffect(() => {
     const storedEmail = localStorage.getItem('email');
     setEmail(storedEmail);
@@ -16,7 +15,7 @@ const Navbar: React.FC = () => {
   const handleLogout = () => {
     localStorage.clear();
     setTimeout(() => {
-      window.location.href = '/Login'; // Redirect to login
+      window.location.href = '/Login';
     }, 0);
   };
 
@@ -44,31 +43,31 @@ const Navbar: React.FC = () => {
         <div className="container mx-auto px-2 py-1 flex justify-between items-center">
           <div className="flex space-x-8">
             <Link href="/dashboard" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <FaHome className="text-2xl text-blue-500 mb-2" />
+              <span className="text-2xl text-blue-500 mb-2"><FaHome /></span>
               <span className="text-sm">Dashboard</span>
             </Link>
             <Link href="/profile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <FaUser className="text-2xl text-black mb-2" />
+              <span className="text-2xl text-black mb-2"><FaUser /></span>
               <span className="text-sm">Your Profile</span>
             </Link>
             <Link href="/InstituteProfile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <FaUniversity className="text-2xl text-green-500 mb-2" />
+              <span className="text-2xl text-green-500 mb-2"><FaUniversity /></span>
               <span className="text-sm">Institute Profile</span>
-              <MdKeyboardArrowDown className="text-sm text-gray-700 ml-1" />
+              <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
             <Link href="/Department" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <FaFolder className="text-2xl text-red-500 mb-2" />
+              <span className="text-2xl text-red-500 mb-2"><FaFolder /></span>
               <span className="text-sm">Departments & Programs</span>
-              <MdKeyboardArrowDown className="text-sm text-gray-700 ml-1" />
+              <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
             <Link href="/Faculty" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <FaChalkboardTeacher className="text-2xl text-purple-500 mb-2" />
+              <span className="text-2xl text-purple-500 mb-2"><FaChalkboardTeacher /></span>
               <span className="text-sm">Faculty Directory</span>
             </Link>
             <Link href="/students-directory" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <FaUsers className="text-2xl text-black mb-2" />
+              <span className="text-2xl text-black mb-2"><FaUsers /></span>
               <span className="text-sm">Students Directory</span>
-              <MdKeyboardArrowDown className="text-sm text-gray-700 ml-1" />
+              <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
           </div>
         </div>
@@ -78,3 +77,4 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+

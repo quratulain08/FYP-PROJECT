@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter, useSearchParams,useParams } from "next/navigation";
-
-
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 
 interface FacultyData {
     departmentId: string;
@@ -20,15 +18,15 @@ interface FacultyData {
     leavingDate?: string;
     isCoreComputingTeacher: boolean;
     lastAcademicQualification: {
-      degreeName: string;
-      degreeType: string;
-      fieldOfStudy: string;
-      degreeAwardingCountry: string;
-      degreeAwardingInstitute: string;
-      degreeStartDate: string;
-      degreeEndDate: string;
+        degreeName: string;
+        degreeType: string;
+        fieldOfStudy: string;
+        degreeAwardingCountry: string;
+        degreeAwardingInstitute: string;
+        degreeStartDate: string;
+        degreeEndDate: string;
     };
-  }
+}
 
 const provinces = [
     { name: 'Punjab', cities: ['Lahore', 'Faisalabad', 'Rawalpindi', 'Multan'] },
@@ -41,9 +39,11 @@ const provinces = [
 
 export default function FacultyForm() {
     const router = useRouter();
-     const params = useParams();
-  const departmentId = params.slug as string;
-
+    const params = useParams();
+    const departmentId = params.slug as string;
+    const searchParams = useSearchParams();
+    const isEdit = searchParams.get('edit') === 'true';
+    const facultyId = searchParams.get('facultyId');
 
     const [selectedProvince, setSelectedProvince] = useState<string>('');
     const [selectedCity, setSelectedCity] = useState<string>('');
@@ -66,22 +66,77 @@ export default function FacultyForm() {
     const [degreeEndDate, setDegreeEndDate] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
-  
+
     const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedProvince(event.target.value);
         setSelectedCity('');
     };
 
+    const fetchFacultyData = async () => {
+        try {
+            setLoading(true);
+            setMessage('');
+
+            if (!facultyId || facultyId === 'undefined') {
+                setMessage('Invalid faculty ID provided');
+                return;
+            }
+
+            const response = await fetch(`/api/faculty/${facultyId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || `Failed to fetch faculty data. Status: ${response.status}`);
+            }
+
+            const facultyData: FacultyData = await response.json();
+
+            setHonorific(facultyData.honorific);
+            setName(facultyData.name);
+            setCnic(facultyData.cnic);
+            setGender(facultyData.gender);
+            setAddress(facultyData.address);
+            setSelectedProvince(facultyData.province);
+            setSelectedCity(facultyData.city);
+            setContractType(facultyData.contractType);
+            setAcademicRank(facultyData.academicRank);
+            setJoiningDate(facultyData.joiningDate);
+            setLeavingDate(facultyData.leavingDate || '');
+            setIsCoreComputingTeacher(facultyData.isCoreComputingTeacher);
+
+            const qual = facultyData.lastAcademicQualification;
+            setDegreeName(qual.degreeName);
+            setDegreeType(qual.degreeType);
+            setFieldOfStudy(qual.fieldOfStudy);
+            setDegreeAwardingCountry(qual.degreeAwardingCountry);
+            setDegreeAwardingInstitute(qual.degreeAwardingInstitute);
+            setDegreeStartDate(qual.degreeStartDate);
+            setDegreeEndDate(qual.degreeEndDate);
+
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch faculty data';
+            console.error('Error fetching faculty data:', errorMessage);
+            setMessage(errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isEdit && facultyId && facultyId !== 'undefined') {
+            fetchFacultyData();
+        }
+    }, [isEdit, facultyId]);
+
     async function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
         setLoading(true);
         setMessage('');
-      
-        if (!departmentId) {
-          setMessage('Department ID is missing');
-          setLoading(false);
-          return;
-        }
 
         const facultyData = {
             departmentId,
@@ -108,24 +163,27 @@ export default function FacultyForm() {
             }
         };
 
-      
-  try {
-    const response = await fetch(`/api/faculty/department/${departmentId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(facultyData),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create faculty member');
-    }
-
-    const data = await response.json();
-    setMessage('Faculty member created successfully!');
+        try {
+            const url = isEdit 
+                ? `/api/faculty/${facultyId}`
+                : `/api/faculty/department/${departmentId}`;
             
-            // Navigate back to department detail page after successful submission
+            const method = isEdit ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(facultyData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to ${isEdit ? 'update' : 'create'} faculty member`);
+            }
+
+            setMessage(`Faculty member ${isEdit ? 'updated' : 'created'} successfully!`);
+            
             setTimeout(() => {
                 router.push(`/Department/${departmentId}`);
             }, 1500);
@@ -138,9 +196,8 @@ export default function FacultyForm() {
         } finally {
             setLoading(false);
         }
-    };
+    }
 
-   
     return (
         <div className="max-w-8xl mx-auto w-full">
             <p>{departmentId}</p>
@@ -164,7 +221,7 @@ export default function FacultyForm() {
                             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-semibold mb-1">Honorific</label>
-                                    <select className="w-full p-4 border rounded-md text-sm min-h-[50px]">
+                                    <select className="w-full p-4 border rounded-md text-sm min-h-[50px]" value={honorific} onChange={(e) => setHonorific(e.target.value)}>
                                         <option>Mr</option>
                                         <option>Ms</option>
                                         <option>Mrs</option>
@@ -177,6 +234,7 @@ export default function FacultyForm() {
                                         type="text" 
                                         className="w-full p-4 border rounded-md text-sm min-h-[50px]" 
                                         value={name}
+                                        disabled={isEdit}
                                         onChange={(e) => setName(e.target.value)} 
                                     />
                                 </div>
@@ -199,7 +257,8 @@ export default function FacultyForm() {
                                         type="text" 
                                         className="w-full p-4 border rounded-md text-sm min-h-[50px]" 
                                         value={cnic}
-                                        onChange={(e) => setCnic(e.target.value)} 
+                                        onChange={(e) => setCnic(e.target.value)}
+                                        disabled={isEdit}
                                     />
                                 </div>
                             </div>
@@ -288,7 +347,8 @@ export default function FacultyForm() {
                                     <label className="block text-xs font-semibold mb-1">Joining Date</label>
                                     <input 
                                         type="date" 
-                                        className="w-full p-4 border rounded-md text-sm min-h-[50px]" 
+                                        className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+
                                         value={joiningDate}
                                         onChange={(e) => setJoiningDate(e.target.value)} 
                                     />
@@ -394,18 +454,22 @@ export default function FacultyForm() {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="col-span-2">
+                    <div className="lg:col-span-2">
                         <button 
                             type="submit" 
-                            className={`w-full p-4 bg-green-500 text-white rounded-md ${loading ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                            className={`w-full p-4 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`} 
                             disabled={loading}
                         >
-                            {loading ? 'Submitting...' : 'Add Faculty'}
+                            {loading ? 'Submitting...' : isEdit ? 'Update Faculty' : 'Add Faculty'}
                         </button>
+                        {message && (
+                            <div className={`mt-4 p-4 rounded-md ${message.includes('successfully') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                {message}
+                            </div>
+                        )}
                     </div>
                 </div>
             </form>
-            {message && <div className="mt-4 text-red-500">{message}</div>}
         </div>
     );
 }

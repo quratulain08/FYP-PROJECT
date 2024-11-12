@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter, useSearchParams,useParams } from "next/navigation";
+import Layout from '../components/Layout';
 
 const provinces = [
     { name: 'Punjab', cities: ['Lahore', 'Faisalabad', 'Rawalpindi', 'Multan'] },
@@ -116,6 +117,7 @@ export default function FacultyForm() {
 
    
     return (
+        <Layout>
         <div className="max-w-8xl mx-auto w-full">
             <form className="p-2 text-sm" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -380,5 +382,6 @@ export default function FacultyForm() {
             </form>
             {message && <div className="mt-4 text-red-500">{message}</div>}
         </div>
+        </Layout>
     );
 }
