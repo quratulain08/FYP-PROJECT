@@ -35,41 +35,62 @@ export async function GET(req: Request) {
 
 // POST: Add a new student to the database.
 export async function POST(req: Request) {
-    try {
-      const studentData = await req.json(); // Correctly declared here
-      await connectToDatabase();
-  
-      const { name, department, batch, didInternship } = studentData;
-  
-      // Validate the required fields
-      if (!name || !department || !batch || didInternship === undefined) {
-        return NextResponse.json(
-          {
-            error: 'Missing required fields',
-            missingFields: { name, department, batch, didInternship },
-          },
-          { status: 400 }
-        );
-      }
-  
-      const newStudent = new Student(studentData);
-      await newStudent.save();
-  
-      return NextResponse.json({ message: 'Student added successfully!' });
-    } catch (error) {
-      console.error('Error adding student:', getErrorMessage(error));
-      // Explicitly include studentData here to avoid the scope issue.
+  try {
+    console.log("POST request received");
+
+    const studentData = await req.json();
+    console.log("Parsed student data:", studentData);
+
+    // Check if the studentData object is properly structured
+    if (!studentData || typeof studentData !== 'object') {
       return NextResponse.json(
-        {
-          error: 'Failed to add student',
-          details: getErrorMessage(error),
-          data: req.body, // Or replace with `studentData` if declared earlier.
-        },
-        { status: 500 }
+        { error: 'Invalid student data format' },
+        { status: 400 }
       );
     }
+
+    await connectToDatabase();
+    console.log("Connected to the database");
+
+    const { name, department, batch, didInternship, registrationNumber } = studentData;
+    
+    // Log each field
+    console.log("Received student data fields:");
+    console.log(`Name: ${name}, Department: ${department}, Batch: ${batch}, Internship Status: ${didInternship}, Registration Number: ${registrationNumber}`);
+
+    // Validate the required fields
+    if (!name || !department || !batch || didInternship === undefined || !registrationNumber) {
+      console.log("Missing required fields");
+      return NextResponse.json(
+        {
+          error: 'Missing required fields',
+          missingFields: { name, department, batch, didInternship, registrationNumber },
+        },
+        { status: 400 }
+      );
+    }
+
+    const newStudent = new Student(studentData);
+    console.log("Creating new student:", newStudent);
+
+    await newStudent.save();
+    console.log("Student added to the database");
+
+    return NextResponse.json({ message: 'Student added successfully!' });
+  } catch (error) {
+    console.error("Error occurred while adding student:", error);
+
+    return NextResponse.json(
+      {
+        error: 'Failed to add student',
+        details: getErrorMessage(error),
+        data: req.body, // Or replace with `studentData` if declared earlier
+      },
+      { status: 500 }
+    );
   }
-  
+}
+
 
 // PUT: Update a student’s details by ID.
 export async function PUT(req: Request) {

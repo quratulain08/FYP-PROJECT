@@ -12,17 +12,16 @@ interface VocalPersonData {
 
 const VocalPerson: React.FC = () => {
   const [profile, setProfile] = useState<VocalPersonData | null>(null);
-  const [editMode, setEditMode] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch profile data using the email from localStorage
   useEffect(() => {
-    const email = localStorage.getItem('email'); // Get email from localStorage
+    const email = localStorage.getItem("email");
     if (email) {
-      fetchProfile(email); // Call the fetch function with the email
+      fetchProfile(email);
     } else {
-      setError('Email not found in localStorage.');
+      setError("Email not found in localStorage.");
       setLoading(false);
     }
   }, []);
@@ -31,20 +30,15 @@ const VocalPerson: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/vocalPersonProfile?email=${email}`, {
-        method: "GET",
-      });
+      const response = await fetch(`/api/vocalPersonProfile?email=${email}`);
       if (response.ok) {
         const data: VocalPersonData = await response.json();
-        console.log("Fetched Profile Data:", data);
         setProfile(data);
       } else {
         const errorData = await response.json();
-        console.error("Failed to fetch profile:", errorData);
         setError(errorData.error || "Failed to fetch profile.");
       }
-    } catch (error) {
-      console.error("Error fetching vocal person profile:", error);
+    } catch {
       setError("An error occurred while fetching the profile.");
     } finally {
       setLoading(false);
@@ -52,9 +46,7 @@ const VocalPerson: React.FC = () => {
   };
 
   const handleChange = (field: keyof VocalPersonData, value: string) => {
-    if (profile) {
-      setProfile({ ...profile, [field]: value });
-    }
+    if (profile) setProfile({ ...profile, [field]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,24 +63,19 @@ const VocalPerson: React.FC = () => {
       });
 
       if (response.ok) {
-        const data: VocalPersonData = await response.json();
-        console.log("Updated Vocal Person Profile:", data);
+        fetchProfile(email);
         setEditMode(false);
-        fetchProfile(email); // Refresh profile after update
       } else {
-        const errorData = await response.json();
-        console.error("Failed to update profile:", errorData);
-        alert(`Failed to update profile: ${errorData.error || "Unknown error"}`);
+        alert("Failed to update profile.");
       }
-    } catch (error) {
-      console.error("Error updating vocal person profile:", error);
+    } catch {
       alert("An error occurred while updating the profile.");
     }
   };
 
   const renderDisplay = () => (
-    <div className="p-6 bg-gray-100 shadow-md rounded-md">
-      <h2 className="text-xl font-semibold mb-4">Vocal Person Profile</h2>
+    <div className="p-6 bg-white shadow-lg rounded-lg">
+      <h2 className="text-2xl font-semibold text-green-600 mb-4 ">Vocal Person Profile</h2>
       {profile ? (
         <>
           <p><strong>Name:</strong> {profile.name}</p>
@@ -98,7 +85,7 @@ const VocalPerson: React.FC = () => {
           <p><strong>Designation:</strong> {profile.designation}</p>
           <button
             onClick={() => setEditMode(true)}
-            className="mt-4 bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 transition"
+            className="mt-6 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-all"
           >
             Edit Profile
           </button>
@@ -110,67 +97,51 @@ const VocalPerson: React.FC = () => {
   );
 
   const renderForm = () => (
-    <form onSubmit={handleSubmit} className="p-6 bg-white shadow-md rounded-md">
-      <h2 className="text-xl font-semibold mb-4">Edit Vocal Person Profile</h2>
-      {profile && (
-        <>
-          <input
-            type="text"
-            placeholder="Name"
-            value={profile.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            className="w-full p-3 border mb-3 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={profile.email}
-            className="w-full p-3 border mb-3 rounded-md bg-gray-200 cursor-not-allowed"
-            readOnly
-            required
-          />
-          <input
-            type="text"
-            placeholder="Phone"
-            value={profile.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
-            className="w-full p-3 border mb-3 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <input
-            type="text"
-            placeholder="CNIC"
-            value={profile.cnic}
-            className="w-full p-3 border mb-3 rounded-md bg-gray-200 cursor-not-allowed"
-            readOnly
-            required
-          />
-          <input
-            type="text"
-            placeholder="Designation"
-            value={profile.designation}
-            onChange={(e) => handleChange("designation", e.target.value)}
-            className="w-full p-3 border mb-3 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition"
-          >
-            Save Profile
-          </button>
-        </>
-      )}
+    <form onSubmit={handleSubmit} className="p-6 bg-gray-50 shadow-lg rounded-lg">
+      <h2 className="text-2xl font-semibold text-blue-700 mb-4">Edit Profile</h2>
+      <input
+        type="text"
+        placeholder="Name"
+        value={profile?.name || ""}
+        onChange={(e) => handleChange("name", e.target.value)}
+        className="w-full p-3 border mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+      />
+      <input
+        type="email"
+        placeholder="Email"
+        value={profile?.email || ""}
+        readOnly
+        className="w-full p-3 border mb-3 rounded-lg bg-gray-200 cursor-not-allowed"
+      />
+      <input
+        type="text"
+        placeholder="Phone"
+        value={profile?.phone || ""}
+        onChange={(e) => handleChange("phone", e.target.value)}
+        className="w-full p-3 border mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Designation"
+        value={profile?.designation || ""}
+        onChange={(e) => handleChange("designation", e.target.value)}
+        className="w-full p-3 border mb-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+      />
+      <button
+        type="submit"
+        className="w-full mt-4 bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition-all"
+      >
+        Save Profile
+      </button>
     </form>
   );
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
-
   return (
-    <div className="max-w-3xl mx-auto p-8">
-      {editMode ? renderForm() : renderDisplay()}
+    <div className="max-w-3xl mx-auto p-6">
+      {loading ? <p>Loading...</p> : error ? <p className="text-red-500">{error}</p> : editMode ? renderForm() : renderDisplay()}
     </div>
   );
 };
