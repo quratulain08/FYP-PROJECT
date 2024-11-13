@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
               <span className="text-2xl text-purple-500 mb-2"><FaChalkboardTeacher /></span>
               <span className="text-sm">Faculty Directory</span>
             </Link>
-            <Link href="/students-directory" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+            <Link href="/student" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-black mb-2"><FaUsers /></span>
               <span className="text-sm">Students Directory</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>

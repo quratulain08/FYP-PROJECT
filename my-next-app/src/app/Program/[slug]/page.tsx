@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Program from "@/models/Program";
 
 interface Department {
   id: string;
@@ -17,32 +18,6 @@ interface Department {
   address: string;
   province: string;
   city: string;
-}
-
-interface Faculty {
-  id: string;
-  departmentId: string;
-  honorific: string;
-  name: string;
-  gender: string;
-  cnic: string;
-  address: string;
-  province: string;
-  city: string;
-  contractType: string;
-  academicRank: string;
-  joiningDate: string;
-  leavingDate?: string;
-  isCoreComputingTeacher: boolean;
-  lastAcademicQualification: {
-    degreeName: string;
-    degreeType: string;
-    fieldOfStudy: string;
-    degreeAwardingCountry: string;
-    degreeAwardingInstitute: string;
-    degreeStartDate: string;
-    degreeEndDate: string;
-  };
 }
 
 interface Program {
@@ -64,8 +39,7 @@ interface Program {
 
 export default function DepartmentDetail() {
   const [department, setDepartment] = useState<Department | null>(null);
-  const [facultyMembers, setFacultyMembers] = useState<Faculty[]>([]);
-  const [program, setProgram] = useState<Program | null>(null);
+  const [programs, setPrograms] = useState<Program[]>([]); // Change to an array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ message: string; details?: string } | null>(null);
   const params = useParams();
@@ -100,27 +74,30 @@ export default function DepartmentDetail() {
           setError({ message: "Department ID is missing" });
           return;
         }
-
-        const deptData = await fetchWithErrorHandling(`/api/department/${id}`);
+    
+        // Fetch department data
+        const deptData: Department = await fetchWithErrorHandling(`/api/department/${id}`);
+        console.log("Department Data:", deptData); // Debugging log
         setDepartment(deptData);
-
-        const facultyData = await fetchWithErrorHandling(`/api/faculty/department/${id}`);
-        setFacultyMembers(facultyData);
-
-        const programData = await fetchWithErrorHandling(`/api/program/${id}`);
-        setProgram(programData);
-
+    
+        // Fetch program data
+        const programData: Program[] = await fetchWithErrorHandling(`/api/program/${id}`);
+        console.log("Program Data:", programData); // Debugging log
+    
+        // Set multiple programs if available
+        setPrograms(programData);
+    
         setError(null);
       } catch (err) {
         console.error('Error:', err);
         let errorMessage = 'Error fetching data';
         let errorDetails = '';
-
+    
         if (err instanceof Error) {
           errorMessage = err.message;
           errorDetails = err.stack || '';
         }
-
+    
         setError({
           message: errorMessage,
           details: errorDetails
@@ -133,50 +110,15 @@ export default function DepartmentDetail() {
     fetchData();
   }, [id]);
 
-  const handleEdit = (id: string): void => {
-    // Navigate to the edit page for the selected faculty member
-    router.push(`/faculty/edit/${id}`);
-  };
-
-  const handleDelete = async (id: string): Promise<void> => {
-    // Confirm deletion with the user
-    const confirmed = confirm('Are you sure you want to delete this faculty member?');
-    if (!confirmed) return;
-
-    try {
-      // Make a DELETE request to the API endpoint
-      const response = await fetch(`/api/faculty/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        alert('Faculty member deleted successfully');
-        // Optionally refresh the page or update state to remove the deleted member
-      } else {
-        const data = await response.json();
-        alert(`Failed to delete faculty member: ${data.message}`);
-      }
-    } catch (error) {
-      console.error('Error deleting faculty member:', error);
-      alert('An error occurred while trying to delete the faculty member.');
-    }
-  };
-
-  const handleAddFaculty = () => {
-    if (department) {
-      // Correctly encode parameters for Next.js routing
-      router.push(`/FacultyForm/${id}`);
-    } else {
-      setError({ message: "Department information is not available" });
-    }
-  };
-
   const handleRetry = () => {
     setLoading(true);
     setError(null);
     window.location.reload();
   };
-
+  const handleAddNewProgram = () => {
+    // Navigate to a page or open a modal for adding a new program
+    router.push(`/Add-program`);
+  };
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -226,14 +168,7 @@ export default function DepartmentDetail() {
           <h1 className="text-2xl font-semibold text-green-600">
             {department.honorific} {department.hodName} - {department.name}
           </h1>
-          <button
-            onClick={handleAddFaculty}
-            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
-          >
-            Add New Faculty
-          </button>
         </div>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <p className="mb-3">
@@ -269,72 +204,58 @@ export default function DepartmentDetail() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
-        <h2 className="text-xl font-semibold text-green-600 mb-4">Program Details</h2>
-        {program ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <p><span className="font-bold">Program Name:</span> {program.name}</p>
-            <p><span className="font-bold">Start Date:</span> {program.startDate}</p>
-            <p><span className="font-bold">Category:</span> {program.category}</p>
-            <p><span className="font-bold">Duration:</span> {program.durationYears} years</p>
-            {program.description && <p><span className="font-bold">Description:</span> {program.description}</p>}
-            <p><span className="font-bold">Contact Email:</span> {program.contactEmail}</p>
-            {program.contactPhone && <p><span className="font-bold">Contact Phone:</span> {program.contactPhone}</p>}
-            <p><span className="font-bold">Program Head:</span> {program.programHead}</p>
-            {program.programHeadContact && (
-              <div>
-                {program.programHeadContact.email && (
-                  <p><span className="font-bold">Program Head Email:</span> {program.programHeadContact.email}</p>
-                )}
-                {program.programHeadContact.phone && (
-                  <p><span className="font-bold">Program Head Phone:</span> {program.programHeadContact.phone}</p>
-                )}
-              </div>
+      <h2 className="text-xl font-semibold text-green-600 mb-4">Program Details</h2>
+      {/* Add New Program Button */}
+      <button 
+        onClick={handleAddNewProgram}
+        className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition-colors mb-8"
+      >
+        Add New Program
+      </button>
+     {programs.length > 0 ? (
+  programs.map((program, index) => (
+    <div key={index} className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
+      <h2 className="text-xl font-semibold text-green-600 mb-4">Program {index+1}</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <p><span className="font-bold">Program Name:</span> {program.name}</p>  
+        <p><span className="font-bold">Start Date:</span> {program.startDate}</p>
+        <p><span className="font-bold">Category:</span> {program.category}</p>
+        <p><span className="font-bold">Duration:</span> {program.durationYears} years</p>
+        {program.description && <p><span className="font-bold">Description:</span> {program.description}</p>}
+        <p><span className="font-bold">Contact Email:</span> {program.contactEmail}</p>
+        {program.contactPhone && <p><span className="font-bold">Contact Phone:</span> {program.contactPhone}</p>}
+        <p><span className="font-bold">Program Head:</span> {program.programHead}</p>
+
+        {program.programHeadContact && (
+          <div>
+            {program.programHeadContact.email && (
+              <p><span className="font-bold">Program Head Email:</span> {program.programHeadContact.email}</p>
             )}
-            {program.programObjectives && program.programObjectives.length > 0 && (
-              <div>
-                <span className="font-bold">Objectives:</span>
-                <ul className="list-disc pl-6">
-                  {program.programObjectives.map((objective, idx) => (
-                    <li key={idx}>{objective}</li>
-                  ))}
-                </ul>
-              </div>
+            {program.programHeadContact.phone && (
+              <p><span className="font-bold">Program Head Phone:</span> {program.programHeadContact.phone}</p>
             )}
           </div>
-        ) : (
-          <p>Program data not found.</p>
+        )}
+
+        {/* Objectives */}
+        {program.programObjectives && program.programObjectives.length > 0 && (
+          <div>
+            <span className="font-bold">Objectives:</span>
+            <ul className="list-disc pl-6">
+              {program.programObjectives.map((objective, i) => (
+                <li key={i}>{objective}</li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
+    </div>
+  ))
+) : (
+  <p>No programs available for this department.</p>
+)}
 
-      <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500">
-        <h2 className="text-xl font-semibold text-green-600 mb-4">Faculty Members</h2>
-        <div className="space-y-4">
-          {facultyMembers.length === 0 ? (
-            <p>No faculty members available.</p>
-          ) : (
-            facultyMembers.map((faculty) => (
-              <div key={faculty.id} className="flex justify-between items-center">
-                <p className="font-semibold">{faculty.honorific} {faculty.name}</p>
-                <div>
-                  <button 
-                    onClick={() => handleEdit(faculty.id)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(faculty.id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors ml-2"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+     
     </div>
   );
 }
