@@ -62,43 +62,22 @@ const DepartmentList: React.FC = () => {
           departments.map((dept) => (
             <div
               key={dept._id}
-              onClick={() => handleDepartmentClick(dept._id)}
-              role="button"
-              tabIndex={0}
-              className="p-4 bg-white border rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleDepartmentClick(dept._id);
-                }
-              }}
+              className="p-4 bg-white border rounded-lg"
             >
               <h2 className="text-green-600 font-semibold text-lg mb-2">
-                {dept.honorific} {dept.hodName} - {dept.name}
+                {dept.name}
               </h2>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Category:</span> {dept.category}
+              <p className="text-sm text-gray-600 mb-4">
+                <span className="font-bold">HOD:</span> {dept.honorific} {dept.hodName}
               </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Start Date:</span> {dept.startDate}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">CNIC:</span> {dept.cnic}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Email:</span> {dept.email}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Phone:</span> {dept.phone}
-              </p>
-              {dept.landLine && (
-                <p className="text-sm text-gray-600">
-                  <span className="font-bold">Land Line:</span> {dept.landLine}
-                </p>
-              )}
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Address:</span> {dept.address},{" "}
-                {dept.city}, {dept.province}
-              </p>
+              <div className="flex justify-center">
+                <button
+                  onClick={() => handleDepartmentClick(dept._id)}
+                  className="bg-green-600 text-white px-3 py-1 text-sm rounded shadow-md hover:bg-green-700 transition-colors"
+                >
+                  View Details
+                </button>
+              </div>
             </div>
           ))
         )}
