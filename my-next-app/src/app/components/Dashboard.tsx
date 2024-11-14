@@ -120,26 +120,31 @@ const StudentDashboard: React.FC = () => {
           <option value="2020">2020</option>
           <option value="2021">2021</option>
           <option value="2022">2022</option>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
         </select>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Bar Chart */}
-        <div className="bg-white p-4 shadow-md rounded-md">
-          <h2 className="text-xl font-bold mb-4">Department-wise Breakdown</h2>
-          <Bar data={barChartData} />
-        </div>
+  {/* Bar Chart */}
+  <div className="bg-white p-4 shadow-md rounded-md">
+    <h2 className="text-xl font-bold mb-4">Department-wise Breakdown</h2>
+    <Bar data={barChartData} />
+  </div>
 
-        {/* Pie Chart */}
-        <div className="bg-white p-4 shadow-md rounded-md">
-          <h2 className="text-xl font-bold mb-4">Internship Status</h2>
-          <Pie data={pieChartData} />
-          <p className="text-center mt-4 text-lg font-semibold">
-            Total Students: {totalStudents}
-          </p>
-        </div>
-      </div>
+  {/* Pie Chart */}
+  <div className="bg-white p-4 shadow-md rounded-md">
+    <h2 className="text-xl font-bold mb-4">Internship Status</h2>
+    <div className="h-64">
+      <Pie data={pieChartData} />
     </div>
+    <p className="text-center mt-4 text-lg font-semibold">
+      Total Students: {totalStudents}
+    </p>
+  </div>
+</div>
+
+      </div>
   );
 };
 

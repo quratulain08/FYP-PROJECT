@@ -71,9 +71,8 @@ const DepartmentInfo: React.FC = () => {
     router.push(`/Program/${id}`);
   };
 
-  const handleEdit = (department: Department) => {
-    localStorage.setItem('editingDepartment', JSON.stringify(department));
-    router.push('/DepartmentForm');
+  const handleEdit = (id: string) => {
+    router.push(`/editDepartment/${id}`);
   };
 
   const handleAddNewDepartment = () => {
@@ -124,7 +123,7 @@ const DepartmentInfo: React.FC = () => {
             </h2>
             <div className="flex space-x-2">
               <button
-                onClick={(e) => { e.stopPropagation(); handleEdit(dept); }}
+                onClick={(e) => { e.stopPropagation(); handleEdit(dept._id); }}
                 className="text-yellow-500 hover:text-yellow-600 p-2"
                 title="Edit"
               >

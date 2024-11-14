@@ -1,8 +1,25 @@
 "use client";
 
-import { useState } from 'react';
-import DepartmentInfo from './DepartmentInfo';
+import { useEffect,useState } from 'react';
 import Layout from "@/app/components/Layout";
+import { useParams, useRouter } from "next/navigation";
+
+interface Department {
+    _id: string;
+    name: string;
+    startDate: string;
+    category: string;
+    hodName: string;
+    honorific: string;
+    cnic: string;
+    email: string;
+    phone: string;
+    landLine?: string;
+    address: string;
+    province: string;
+    city: string;
+  }
+  
 
 const DepartmentDashboard: React.FC = () => {
   const [department, setDepartment] = useState({
@@ -20,6 +37,32 @@ const DepartmentDashboard: React.FC = () => {
     city: '',
   });
 
+    const [departments, setDepartments] = useState<Department[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const params = useParams();
+    const router = useRouter();
+    const DepartmentID = params.slug as string;
+
+    useEffect(() => {
+      fetchDepartments();
+    }, []);
+  
+    const fetchDepartments = async () => {
+        try {
+            const response = await fetch(`/api/department/${DepartmentID}`);
+            if (!response.ok) throw new Error("Failed to fetch department");
+    
+            const data = await response.json();
+            setDepartment(data);  // Assume data contains a single department object
+        } catch (err) {
+            setError("Error fetching department information.");
+        } finally {
+            setLoading(false);
+        }
+    };
+  
+
   const [statusMessage, setStatusMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,6 +72,8 @@ const DepartmentDashboard: React.FC = () => {
     'Management Sciences',
     'Mathematics & Natural Sciences',
   ];
+  
+
 
   const provinces = ['Sindh', 'Punjab', 'KPK', 'Balochistan'];
   const cities = ['Karachi', 'Lahore', 'Islamabad', 'Peshawar'];
@@ -42,52 +87,36 @@ const DepartmentDashboard: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true); // Start submission process
-    setStatusMessage(''); // Reset status message
+    setIsSubmitting(true);
+    setStatusMessage('');
 
     try {
-      const response = await fetch('/api/department', {
-        method: 'POST',
+      const response = await fetch(`/api/department/${DepartmentID}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(department),
       });
-      
-      if (!response.ok) {
-        throw new Error('Error creating department');
-      }
-  
+
+      if (!response.ok) throw new Error('Error updating department');
+
       const result = await response.json();
-      console.log('Department created:', result);
-      setStatusMessage('Department created successfully!');
-      setDepartment({
-        name: '',
-        startDate: '',
-        category: '',
-        hodName: '',
-        honorific: 'Mr.',
-        cnic: '',
-        email: '',
-        phone: '',
-        landLine: '',
-        address: '',
-        province: '',
-        city: '',
-      }); // Reset the form after successful submission
+      setStatusMessage('Department updated successfully!');
     } catch (error) {
       console.error(error);
-      setStatusMessage('Failed to create department. Please try again.');
+      setStatusMessage('Failed to update department. Please try again.');
     } finally {
-      setIsSubmitting(false); // End submission process
+      setIsSubmitting(false);
     }
-  };
+};
+
 
   return (
     <Layout>
     <div className="max-w-8xl mx-auto w-full">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-lg font-semibold">Add new Department</h1>
+        <h1 className=" text-lg font-semibold text-green-600">Edit The Department</h1>
       </div>
 
       <form className="p-2 text-sm" onSubmit={handleSubmit}>

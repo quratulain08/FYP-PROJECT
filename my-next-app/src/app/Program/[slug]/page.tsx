@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Program from "@/models/Program";
+import Layout from "@/app/components/Layout";
+import { FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
 
 interface Department {
   id: string;
@@ -21,6 +23,7 @@ interface Department {
 }
 
 interface Program {
+  _id: string;
   name: string;
   departmentId: string;
   startDate: string;
@@ -115,10 +118,35 @@ export default function DepartmentDetail() {
     setError(null);
     window.location.reload();
   };
+
   const handleAddNewProgram = () => {
     // Navigate to a page or open a modal for adding a new program
     router.push(`/Add-program`);
   };
+
+  const handleEdit = (programId: string) => {
+    router.push(`/Edit-program/${programId}`);
+  };
+
+  const handleDelete = async (programId: string) => {
+    const confirmation = window.confirm("Are you sure you want to delete this program?");
+    if (confirmation) {
+      try {
+        const response = await fetch(`/api/program/${programId}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Error deleting program");
+        }
+        setPrograms((prevPrograms) => prevPrograms.filter((program) => program._id !== programId));
+        alert("Program deleted successfully!");
+      } catch (error) {
+        alert("Error deleting program: " + error.message);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -161,101 +189,94 @@ export default function DepartmentDetail() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1>{id}</h1>
-      <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-green-600">
-            {department.honorific} {department.hodName} - {department.name}
-          </h1>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <p className="mb-3">
-              <span className="font-bold">Category:</span> {department.category}
-            </p>
-            <p className="mb-3">
-              <span className="font-bold">Start Date:</span> {department.startDate}
-            </p>
-            <p className="mb-3">
-              <span className="font-bold">CNIC:</span> {department.cnic}
-            </p>
-            <p className="mb-3">
-              <span className="font-bold">Email:</span> {department.email}
-            </p>
+    <Layout>
+      <div className="max-w-6xl mx-auto p-6">
+        <h1>{id}</h1>
+        <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-semibold text-green-600">
+              {department.honorific} {department.hodName} - {department.name}
+            </h1>
           </div>
-          
-          <div>
-            <p className="mb-3">
-              <span className="font-bold">Phone:</span> {department.phone}
-            </p>
-            {department.landLine && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
               <p className="mb-3">
-                <span className="font-bold">Land Line:</span> {department.landLine}
+                <span className="font-bold">Category:</span> {department.category}
               </p>
-            )}
-            <p className="mb-3">
-              <span className="font-bold">Address:</span> {department.address}
-            </p>
-            <p className="mb-3">
-              <span className="font-bold">Location:</span> {department.city}, {department.province}
-            </p>
+              <p className="mb-3">
+                <span className="font-bold">Start Date:</span> {department.startDate}
+              </p>
+              <p className="mb-3">
+                <span className="font-bold">CNIC:</span> {department.cnic}
+              </p>
+              <p className="mb-3">
+                <span className="font-bold">Email:</span> {department.email}
+              </p>
+            </div>
+            <div>
+              <p className="mb-3">
+                <span className="font-bold">Phone:</span> {department.phone}
+              </p>
+              {department.landLine && (
+                <p className="mb-3">
+                  <span className="font-bold">Land Line:</span> {department.landLine}
+                </p>
+              )}
+              <p className="mb-3">
+                <span className="font-bold">Address:</span> {department.address}
+              </p>
+              <p className="mb-3">
+                <span className="font-bold">Location:</span> {department.city}, {department.province}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <h2 className="text-xl font-semibold text-green-600 mb-4">Program Details</h2>
-      {/* Add New Program Button */}
-      <button 
-        onClick={handleAddNewProgram}
-        className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition-colors mb-8"
-      >
-        Add New Program
-      </button>
-     {programs.length > 0 ? (
-  programs.map((program, index) => (
-    <div key={index} className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
-      <h2 className="text-xl font-semibold text-green-600 mb-4">Program {index+1}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <p><span className="font-bold">Program Name:</span> {program.name}</p>  
-        <p><span className="font-bold">Start Date:</span> {program.startDate}</p>
-        <p><span className="font-bold">Category:</span> {program.category}</p>
-        <p><span className="font-bold">Duration:</span> {program.durationYears} years</p>
-        {program.description && <p><span className="font-bold">Description:</span> {program.description}</p>}
-        <p><span className="font-bold">Contact Email:</span> {program.contactEmail}</p>
-        {program.contactPhone && <p><span className="font-bold">Contact Phone:</span> {program.contactPhone}</p>}
-        <p><span className="font-bold">Program Head:</span> {program.programHead}</p>
-
-        {program.programHeadContact && (
-          <div>
-            {program.programHeadContact.email && (
-              <p><span className="font-bold">Program Head Email:</span> {program.programHeadContact.email}</p>
-            )}
-            {program.programHeadContact.phone && (
-              <p><span className="font-bold">Program Head Phone:</span> {program.programHeadContact.phone}</p>
-            )}
-          </div>
+        <h2 className="text-xl font-semibold text-green-600 mb-4">Program Details</h2>
+        <button 
+          onClick={handleAddNewProgram}
+          className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition-colors mb-8"
+        >
+          Add New Program
+        </button>
+        {programs.length > 0 ? (
+          programs.map((program, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
+              <h2 className="text-xl font-semibold text-green-600 mb-4">Program {index+1}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <p><span className="font-bold">Program Name:</span> {program.name}</p>  
+                <p><span className="font-bold">Start Date:</span> {program.startDate}</p>
+                <p><span className="font-bold">Category:</span> {program.category}</p>
+                <p><span className="font-bold">Duration:</span> {program.durationYears} years</p>
+                {program.description && (
+                  <p><span className="font-bold">Description:</span> {program.description}</p>
+                )}
+                <p><span className="font-bold">Contact Email:</span> {program.contactEmail}</p>
+                {program.contactPhone && (
+                  <p><span className="font-bold">Contact Phone:</span> {program.contactPhone}</p>
+                )}
+                <p><span className="font-bold">Program Head:</span> {program.programHead}</p>
+                {program.programHeadContact && (
+                  <div>
+                    <p><span className="font-bold">Program Head Email:</span> {program.programHeadContact.email}</p>
+                    <p><span className="font-bold">Program Head Phone:</span> {program.programHeadContact.phone}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-4">
+                <button onClick={() => handleEdit(program._id)} className="text-blue-500 hover:underline">
+                  <FaEdit className="inline mr-2" /> Edit
+                </button>
+                <button onClick={() => handleDelete(program._id)} className="text-red-500 hover:underline">
+                  <FaTrash className="inline mr-2" /> Delete
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No programs found.</p>
         )}
-
-        {/* Objectives */}
-        {program.programObjectives && program.programObjectives.length > 0 && (
-          <div>
-            <span className="font-bold">Objectives:</span>
-            <ul className="list-disc pl-6">
-              {program.programObjectives.map((objective, i) => (
-                <li key={i}>{objective}</li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
-    </div>
-  ))
-) : (
-  <p>No programs available for this department.</p>
-)}
-
-     
-    </div>
+    </Layout>
   );
 }

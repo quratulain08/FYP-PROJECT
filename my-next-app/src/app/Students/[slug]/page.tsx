@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
+import Layout from "@/app/components/Layout";
 
 interface Student {
   _id: string;
@@ -253,6 +254,8 @@ const StudentsPage: React.FC = () => {
   if (error) return <p>{error}</p>;
 
   return (
+    <Layout>
+
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-semibold text-green-600 mb-8">
         Students in Department: {department?.name}
@@ -262,13 +265,13 @@ const StudentsPage: React.FC = () => {
           <Filter
             label="Internship Status"
             value={selectedInternshipStatus}
-            options={["All", "Yes", "No"]}
+            options={[ "Yes", "No"]}
             onChange={(e) => setSelectedInternshipStatus(e.target.value)}
           />
           <Filter
             label="Batch"
             value={selectedBatch}
-            options={["All", ...batches]}
+            options={[ ...batches]}
             onChange={(e) => setSelectedBatch(e.target.value)}
           />
         </div>
@@ -283,6 +286,7 @@ const StudentsPage: React.FC = () => {
       <table className="min-w-full table-auto border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
+          <th className="py-2 px-4 text-left">Reg.No</th>
             <th className="py-2 px-4 text-left">Name</th>
             <th className="py-2 px-4 text-left">Batch</th>
             <th className="py-2 px-4 text-left">Internship</th>
@@ -292,6 +296,7 @@ const StudentsPage: React.FC = () => {
         <tbody>
           {filteredStudents.map((student) => (
             <tr key={student._id} className="border-b border-gray-300">
+              <td className="py-2 px-4">{student.registrationNumber}</td>
               <td className="py-2 px-4">{student.name}</td>
               <td className="py-2 px-4">{student.batch}</td>
               <td className="py-2 px-4">
@@ -350,7 +355,10 @@ const StudentsPage: React.FC = () => {
         </div>
       )}
     </div>
+    </Layout>
+
   );
+ 
 };
 
 export default StudentsPage;
