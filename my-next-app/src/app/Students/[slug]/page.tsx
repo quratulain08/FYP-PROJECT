@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import * as XLSX from "xlsx";
 
 interface Student {
   _id: string;
@@ -81,6 +82,9 @@ const StudentsPage: React.FC = () => {
   });
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -192,19 +196,57 @@ const StudentsPage: React.FC = () => {
     }
   };
 
-  const handelAddStudent = () => {
-    router.push(`/UploadPage`); // Navigate to department detail page
-
-  };
-
-  const openEditModal = (student: Student) => {
-    setEditingStudent(student);
+  const openUploadModal = () => {
     setShowModal(true);
   };
 
   const closeModal = () => {
-    setEditingStudent(null);
     setShowModal(false);
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) setFile(selectedFile);
+  };
+
+  const handleUpload = async () => {
+    if (!file) return alert("Please select an Excel file.");
+  
+    setUploading(true);
+  
+    try {
+      // Parse the Excel file to JSON
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: "array" });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+  
+      // Prepare form data to send with file
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      // Attach the student data (jsonData) as JSON in the form data
+      formData.append("students", JSON.stringify(jsonData));
+  
+      // Upload the formData
+      const response = await fetch("/api/upload-students", {
+        method: "POST",
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        console.error(`Failed to upload students: ${error.message}`);
+      } else {
+        alert("Data uploaded successfully.");
+        setShowModal(false);  // Close the modal after successful upload
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload data.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -231,37 +273,43 @@ const StudentsPage: React.FC = () => {
           />
         </div>
         <button
-          onClick={handelAddStudent}
+          onClick={openUploadModal}
           className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
         >
           Add New Student
         </button>
       </div>
 
-      <table className="w-full bg-white shadow-lg rounded-lg">
-        <thead className="bg-green-100">
-          <tr>
-            <th className="py-2 px-4">Name</th>
-            <th className="py-2 px-4">Department</th>
-            <th className="py-2 px-4">Batch</th>
-            <th className="py-2 px-4">Internship Status</th>
-            <th className="py-2 px-4">Actions</th>
+      <table className="min-w-full table-auto border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="py-2 px-4 text-left">Name</th>
+            <th className="py-2 px-4 text-left">Batch</th>
+            <th className="py-2 px-4 text-left">Internship</th>
+            <th className="py-2 px-4 text-left">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredStudents.map((student) => (
-            <tr key={student._id}>
+            <tr key={student._id} className="border-b border-gray-300">
               <td className="py-2 px-4">{student.name}</td>
-              <td className="py-2 px-4">{student.department}</td>
               <td className="py-2 px-4">{student.batch}</td>
               <td className="py-2 px-4">
                 {student.didInternship ? "Yes" : "No"}
               </td>
-              <td className="py-2 px-4 flex space-x-2">
-                <button onClick={() => openEditModal(student)}>Edit</button>
+              <td className="py-2 px-4 space-x-4">
+                <button
+                  onClick={() => {
+                    setEditingStudent(student);
+                    setShowModal(true);
+                  }}
+                  className="text-blue-500"
+                >
+                  Edit
+                </button>
                 <button
                   onClick={() => deleteStudent(student._id)}
-                  className="text-red-600"
+                  className="text-red-500"
                 >
                   Delete
                 </button>
@@ -271,7 +319,36 @@ const StudentsPage: React.FC = () => {
         </tbody>
       </table>
 
-     
+      {showModal && (
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
+            <h2 className="text-2xl font-semibold text-green-600 mb-4">
+              Upload Students Data
+            </h2>
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileChange}
+              className="mb-4"
+            />
+            <div className="flex justify-between">
+              <button
+                onClick={handleUpload}
+                disabled={uploading}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+              >
+                {uploading ? "Uploading..." : "Upload"}
+              </button>
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
