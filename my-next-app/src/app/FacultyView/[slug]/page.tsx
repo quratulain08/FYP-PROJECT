@@ -30,6 +30,10 @@ interface Faculty {
   };
 }
 
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString();
+}
+
 export default function FacultyView() {
   const [faculty, setFaculty] = useState<Faculty | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,7 +109,7 @@ export default function FacultyView() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Honorific</label>
                                 <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
-                                    {faculty.honorific ? faculty.honorific : 'N/A'}
+                                    {faculty.honorific || 'N/A'}
                                 </div>
                             </div>
 
@@ -180,7 +184,7 @@ export default function FacultyView() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Joining Date</label>
                                 <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
-                                    {faculty.joiningDate}
+                                    {formatDate(faculty.joiningDate)}
                                 </div>
                             </div>
 
@@ -188,7 +192,7 @@ export default function FacultyView() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Leaving Date</label>
                                     <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
-                                        {faculty.leavingDate}
+                                        {formatDate(faculty.leavingDate)}
                                     </div>
                                 </div>
                             )}
@@ -247,7 +251,7 @@ export default function FacultyView() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
                                 <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
-                                    {faculty.lastAcademicQualification.degreeStartDate} - {faculty.lastAcademicQualification.degreeEndDate}
+                                    {formatDate(faculty.lastAcademicQualification.degreeStartDate)} - {formatDate(faculty.lastAcademicQualification.degreeEndDate)}
                                 </div>
                             </div>
                         </div>

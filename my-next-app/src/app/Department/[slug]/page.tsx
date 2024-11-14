@@ -358,18 +358,23 @@ export default function DepartmentDetail() {
       />
 
       <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-            <h1 className="text-2xl font-semibold text-green-600 mb-4 md:mb-0">
-                {department.honorific} {department.hodName} - {department.name}
+        <div className="flex flex-col mb-4">
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={handleAddFaculty}
+              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors text-sm font-medium w-40"
+            >
+              Add New Faculty
+            </button>
+          </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-semibold text-green-600 mb-2">
+              {department.name}
             </h1>
-            <div className="flex justify-center w-full md:w-auto">
-                <button
-                    onClick={handleAddFaculty}
-                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors text-sm font-medium w-40"
-                >
-                    Add New Faculty
-                </button>
-            </div>
+            <p className="text-xl text-gray-600">
+              Head of Department: {department.honorific} {department.hodName}
+            </p>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -417,14 +422,18 @@ export default function DepartmentDetail() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
-                    Faculty Member
+                    Name
                   </th>
                   <th className="px-6 py-3 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
-                    Academic Details
+                    CNIC
                   </th>
                   <th className="px-6 py-3 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
-                    Last Qualification
+                    Contract Type
                   </th>
+                  <th className="px-6 py-3 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
+                    Academic Rank
+                  </th>
+                  
                   <th className="px-6 py-3 text-right text-base font-semibold text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -437,28 +446,20 @@ export default function DepartmentDetail() {
                       <div className="text-base font-semibold text-gray-900">
                         {faculty.honorific} {faculty.name}
                       </div>
-                      <div className="text-base text-gray-500">
-                        CNIC: {faculty.cnic}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-base text-gray-900">
+                        {faculty.cnic}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-base text-gray-900">
-                        {faculty.academicRank} - {faculty.contractType}
-                      </div>
-                      <div className="text-base text-gray-500">
-                        Joined: {faculty.joiningDate}
-                        {faculty.leavingDate && ` | Left: ${faculty.leavingDate}`}
-                      </div>
-                      <div className="text-base text-gray-500">
-                        Core Computing: {faculty.isCoreComputingTeacher ? 'Yes' : 'No'}
+                        {faculty.contractType}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-base text-gray-900">
-                        {faculty.lastAcademicQualification.degreeName} in {faculty.lastAcademicQualification.fieldOfStudy}
-                      </div>
-                      <div className="text-base text-gray-500">
-                        {faculty.lastAcademicQualification.degreeAwardingInstitute}
+                        {faculty.academicRank}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
