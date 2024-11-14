@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Layout from "@/app/components/Layout";
 
 interface Faculty {
   _id: string;
@@ -93,60 +94,177 @@ export default function FacultyView() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-green-600">
-            {faculty.honorific} {faculty.name}
-          </h1>
-          <button
-            onClick={() => router.back()}
-            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
-          >
-            Back to Department
-          </button>
-        </div>
+    <Layout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Personal Information */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-green-600">Personal Information</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Honorific</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.honorific ? faculty.honorific : 'N/A'}
+                                </div>
+                            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Personal Information</h2>
-            <div className="space-y-3">
-              <p><span className="font-medium">Gender:</span> {faculty.gender}</p>
-              <p><span className="font-medium">CNIC:</span> {faculty.cnic}</p>
-              <p><span className="font-medium">Address:</span> {faculty.address}</p>
-              <p><span className="font-medium">Location:</span> {faculty.city}, {faculty.province}</p>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.name}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.gender}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">CNIC</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.cnic}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Address Information */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-green-600">Address Information</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.address}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.province}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.city}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Employment Details */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-green-600">Employment Details</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Contract Type</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.contractType}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Academic Rank</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.academicRank}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Joining Date</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.joiningDate}
+                                </div>
+                            </div>
+
+                            {faculty.leavingDate && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Leaving Date</label>
+                                    <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                        {faculty.leavingDate}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    checked={faculty.isCoreComputingTeacher} 
+                                    disabled
+                                    className="mr-2"
+                                />
+                                <label className="text-sm font-medium text-gray-700">Core Computing Teacher</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Last Academic Qualification */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-green-600">Last Academic Qualification</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Degree Name</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.lastAcademicQualification.degreeName}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Degree Type</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.lastAcademicQualification.degreeType}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.lastAcademicQualification.fieldOfStudy}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Degree Awarding Country</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.lastAcademicQualification.degreeAwardingCountry}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Degree Awarding Institute</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.lastAcademicQualification.degreeAwardingInstitute}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                                <div className="w-full p-2.5 border rounded-lg text-sm bg-gray-50">
+                                    {faculty.lastAcademicQualification.degreeStartDate} - {faculty.lastAcademicQualification.degreeEndDate}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Back Button */}
+                    <div className="lg:col-span-2 flex justify-center">
+                        <button 
+                            onClick={() => router.back()}
+                            className="w-40 p-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-base font-medium"
+                        >
+                            Back to Department
+                        </button>
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-4">Professional Information</h2>
-            <div className="space-y-3">
-              <p><span className="font-medium">Academic Rank:</span> {faculty.academicRank}</p>
-              <p><span className="font-medium">Contract Type:</span> {faculty.contractType}</p>
-              <p><span className="font-medium">Joining Date:</span> {faculty.joiningDate}</p>
-              {faculty.leavingDate && (
-                <p><span className="font-medium">Leaving Date:</span> {faculty.leavingDate}</p>
-              )}
-              <p>
-                <span className="font-medium">Core Computing Teacher:</span>{" "}
-                {faculty.isCoreComputingTeacher ? "Yes" : "No"}
-              </p>
-            </div>
-          </div>
         </div>
-
-        <div className="mt-8">
-          <h2 className="text-lg font-semibold mb-4">Last Academic Qualification</h2>
-          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-            <p><span className="font-medium">Degree:</span> {faculty.lastAcademicQualification.degreeName}</p>
-            <p><span className="font-medium">Type:</span> {faculty.lastAcademicQualification.degreeType}</p>
-            <p><span className="font-medium">Field of Study:</span> {faculty.lastAcademicQualification.fieldOfStudy}</p>
-            <p><span className="font-medium">Country:</span> {faculty.lastAcademicQualification.degreeAwardingCountry}</p>
-            <p><span className="font-medium">Institute:</span> {faculty.lastAcademicQualification.degreeAwardingInstitute}</p>
-            <p><span className="font-medium">Duration:</span> {faculty.lastAcademicQualification.degreeStartDate} - {faculty.lastAcademicQualification.degreeEndDate}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </Layout>
   );
 }

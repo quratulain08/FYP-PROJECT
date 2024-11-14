@@ -1,4 +1,4 @@
-import FacultyForm from '../components/FacultyForm';
+
 import Layout from '../components/Layout';
 import DepartmentList from "@/app/components/DepartmentList"
 const FacultyPage = () => {

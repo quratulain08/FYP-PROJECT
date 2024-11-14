@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Eye, Pencil, Trash2 } from "lucide-react";
+import Layout from "@/app/components/Layout";
 
 // Custom notification component
 const Notification = ({ 
@@ -333,6 +334,7 @@ export default function DepartmentDetail() {
   }
 
   return (
+    <Layout>
     <div className="max-w-6xl mx-auto p-6">
       {notification && (
         <Notification
@@ -356,116 +358,144 @@ export default function DepartmentDetail() {
       />
 
       <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-green-600">
-            {department.honorific} {department.hodName} - {department.name}
-          </h1>
-          <button
-            onClick={handleAddFaculty}
-            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
-          >
-            Add New Faculty
-          </button>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+            <h1 className="text-2xl font-semibold text-green-600 mb-4 md:mb-0">
+                {department.honorific} {department.hodName} - {department.name}
+            </h1>
+            <div className="flex justify-center w-full md:w-auto">
+                <button
+                    onClick={handleAddFaculty}
+                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors text-sm font-medium w-40"
+                >
+                    Add New Faculty
+                </button>
+            </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="department-info">
-            <p className="mb-3">
-              <span className="font-bold">Category:</span> {department.category}
+            <p className="mb-3 text-base">
+              <span className="font-semibold">Category:</span> {department.category}
             </p>
-            <p className="mb-3">
-              <span className="font-bold">Start Date:</span> {department.startDate}
+            <p className="mb-3 text-base">
+              <span className="font-semibold">Start Date:</span> {department.startDate}
             </p>
-            <p className="mb-3">
-              <span className="font-bold">CNIC:</span> {department.cnic}
+            <p className="mb-3 text-base">
+              <span className="font-semibold">CNIC:</span> {department.cnic}
             </p>
-            <p className="mb-3">
-              <span className="font-bold">Email:</span> {department.email}
+            <p className="mb-3 text-base">
+              <span className="font-semibold">Email:</span> {department.email}
             </p>
           </div>
           
           <div className="department-info">
-            <p className="mb-3">
-              <span className="font-bold">Phone:</span> {department.phone}
+            <p className="mb-3 text-base">
+              <span className="font-semibold">Phone:</span> {department.phone}
             </p>
             {department.landLine && (
-              <p className="mb-3">
-                <span className="font-bold">Land Line:</span> {department.landLine}
+              <p className="mb-3 text-base">
+                <span className="font-semibold">Land Line:</span> {department.landLine}
               </p>
             )}
-            <p className="mb-3">
-              <span className="font-bold">Address:</span> {department.address}
+            <p className="mb-3 text-base">
+              <span className="font-semibold">Address:</span> {department.address}
             </p>
-            <p className="mb-3">
-              <span className="font-bold">Location:</span> {department.city}, {department.province}
+            <p className="mb-3 text-base">
+              <span className="font-semibold">Location:</span> {department.city}, {department.province}
             </p>
           </div>
         </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500">
-        <h2 className="text-xl font-semibold text-green-600 mb-6">Faculty Members</h2>
+        <h2 className="text-2xl font-semibold text-green-600 mb-6">Faculty Members</h2>
         {facultyMembers.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No faculty members found</p>
+          <p className="text-gray-500 text-center py-4 text-base">No faculty members found</p>
         ) : (
-          <div className="space-y-6">
-            {facultyMembers.map((faculty, index) => (
-              <div 
-                key={faculty._id || `faculty-${index}`}
-                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow">
-                    <div>
-                      <p className="font-semibold">{faculty.honorific} {faculty.name}</p>
-                      <p className="text-sm text-gray-600">Academic Rank: {faculty.academicRank}</p>
-                      <p className="text-sm text-gray-600">Contract: {faculty.contractType}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm">Joining Date: {faculty.joiningDate}</p>
-                      {faculty.leavingDate && (
-                        <p className="text-sm">Leaving Date: {faculty.leavingDate}</p>
-                      )}
-                      <p className="text-sm">Core Computing Teacher: {faculty.isCoreComputingTeacher ? 'Yes' : 'No'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Last Qualification:</p>
-                      <p className="text-sm">{faculty.lastAcademicQualification.degreeName} in {faculty.lastAcademicQualification.fieldOfStudy}</p>
-                      <p className="text-sm">{faculty.lastAcademicQualification.degreeAwardingInstitute}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2 ml-4">
-                    <button
-                      onClick={() => handleViewFaculty(faculty)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-                      title="View Details"
-                    >
-                      <Eye size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleEditFaculty(faculty)}
-                      className="p-2 text-green-600 hover:bg-green-50 rounded-full transition-colors"
-                      title="Edit"
-                      disabled={loading}
-                    >
-                      <Pencil size={20} />
-                    </button>
-                    <button
-                      onClick={() => confirmDelete(faculty._id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                      title="Delete"
-                      disabled={loading}
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
+                    Faculty Member
+                  </th>
+                  <th className="px-6 py-3 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
+                    Academic Details
+                  </th>
+                  <th className="px-6 py-3 text-left text-base font-semibold text-gray-500 uppercase tracking-wider">
+                    Last Qualification
+                  </th>
+                  <th className="px-6 py-3 text-right text-base font-semibold text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {facultyMembers.map((faculty, index) => (
+                  <tr key={faculty._id || `faculty-${index}`} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-base font-semibold text-gray-900">
+                        {faculty.honorific} {faculty.name}
+                      </div>
+                      <div className="text-base text-gray-500">
+                        CNIC: {faculty.cnic}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-base text-gray-900">
+                        {faculty.academicRank} - {faculty.contractType}
+                      </div>
+                      <div className="text-base text-gray-500">
+                        Joined: {faculty.joiningDate}
+                        {faculty.leavingDate && ` | Left: ${faculty.leavingDate}`}
+                      </div>
+                      <div className="text-base text-gray-500">
+                        Core Computing: {faculty.isCoreComputingTeacher ? 'Yes' : 'No'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-base text-gray-900">
+                        {faculty.lastAcademicQualification.degreeName} in {faculty.lastAcademicQualification.fieldOfStudy}
+                      </div>
+                      <div className="text-base text-gray-500">
+                        {faculty.lastAcademicQualification.degreeAwardingInstitute}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleViewFaculty(faculty)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="View Details"
+                        >
+                          <Eye size={20} />
+                        </button>
+                        <button
+                          onClick={() => handleEditFaculty(faculty)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Edit"
+                          disabled={loading}
+                        >
+                          <Pencil size={20} />
+                        </button>
+                        <button
+                          onClick={() => confirmDelete(faculty._id)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete"
+                          disabled={loading}
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
     </div>
+    </Layout>
   );
 }
