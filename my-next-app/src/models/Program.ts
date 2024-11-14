@@ -1,6 +1,4 @@
-// models/Program.ts
-
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Model } from "mongoose";
 
 // Define an interface for Program data structure
 export interface IProgram extends Document {
@@ -43,5 +41,8 @@ const programSchema = new Schema<IProgram>(
   }
 );
 
+// Ensure mongoose.models is checked properly for TypeScript
+const Program: Model<IProgram> = mongoose.models.Program || mongoose.model<IProgram>("Program", programSchema);
+
 // Export the Program model
-export default mongoose.models.Program || mongoose.model<IProgram>("Program", programSchema);
+export default Program;

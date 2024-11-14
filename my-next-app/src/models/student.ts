@@ -6,6 +6,7 @@ export interface IStudent extends Document {
   department: string;
   batch: string;
   didInternship: boolean;
+  registrationNumber: string; // New field for registration number
 }
 
 const studentSchema: Schema<IStudent> = new Schema({
@@ -13,6 +14,7 @@ const studentSchema: Schema<IStudent> = new Schema({
   department: { type: String, required: true },
   batch: { type: String, required: true },
   didInternship: { type: Boolean, required: true },
+  registrationNumber: { type: String, required: true }, // New field in schema
 });
 
 const Student: Model<IStudent> = mongoose.models.Student || mongoose.model<IStudent>("Student", studentSchema);
