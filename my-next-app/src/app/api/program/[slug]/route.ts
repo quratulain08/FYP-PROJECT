@@ -111,6 +111,7 @@ export async function POST(request: Request) {
   }
 }
 
+// PUT: Update a program by programId
 // PUT: Update a program by slug
 export async function PUT(
   request: Request,
@@ -125,18 +126,28 @@ export async function PUT(
   try {
     const updateData = await request.json();
     await connectToDatabase();
+    console.log(`Updating program with slug: ${slug}`);
 
-    const updatedProgram = await Program.findOneAndUpdate(
-      { slug },
+    // Find the program by slug to get the programId
+    const program = await Program.findOne({ slug });
+
+    if (!program) {
+      return NextResponse.json({ message: 'Program not found' }, { status: 404 });
+    }
+
+    const programId = program._id;
+
+    // Update the program by programId
+    const updatedProgram = await Program.findByIdAndUpdate(
+      programId,
       updateData,
       { new: true }
     );
 
-    if (!updatedProgram) {
-      return NextResponse.json({ message: 'Program not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ message: 'Program updated successfully!', program: updatedProgram });
+    return NextResponse.json({
+      message: 'Program updated successfully!',
+      program: updatedProgram,
+    });
   } catch (error) {
     console.error('Error updating program:', error);
     return NextResponse.json(
@@ -145,6 +156,7 @@ export async function PUT(
     );
   }
 }
+
 
 // DELETE: Delete a program by slug
 export async function DELETE(

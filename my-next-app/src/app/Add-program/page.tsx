@@ -1,11 +1,13 @@
 'use client'; // Add this line to mark the component as client-side
 
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useParams,useRouter } from "next/navigation";
 
 export default function AddProgram() {
   const router = useRouter();
-  const { slug } = router.query; // To capture the department ID from URL if needed
+  const params = useParams();
+  const slug = params.slug as string;
+ // To capture the department ID from URL if needed
 
   const [program, setProgram] = useState({
     name: "",

@@ -17,12 +17,7 @@ interface ProfileData {
 
 const InstituteProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<Record<string, ProfileData>>({});
-  const [editMode, setEditMode] = useState<Record<string, boolean>>({
-    dean: false,
-    vc: false,
-    chairman: false,
-    deputy: false,
-  });
+  const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [newProfile, setNewProfile] = useState<ProfileData>({
     role: "",
     name: "",
@@ -35,22 +30,23 @@ const InstituteProfile: React.FC = () => {
     tenureStart: "",
     tenureEnd: "",
   });
-  
   const [addingRole, setAddingRole] = useState<string | null>(null);
 
-  // Fetch profiles on component mount
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
         const response = await fetch("/api/instituteProfile");
         const data = await response.json();
-        const formattedData = data.reduce((acc: Record<string, ProfileData>, profile: ProfileData) => {
-          acc[profile.role] = profile;
-          return acc;
-        }, {});
+        const formattedData = data.reduce(
+          (acc: Record<string, ProfileData>, profile: ProfileData) => {
+            acc[profile.role] = profile;
+            return acc;
+          },
+          {}
+        );
         setProfileData(formattedData);
       } catch (error) {
-        console.error('Failed to fetch profiles:', error);
+        console.error("Failed to fetch profiles:", error);
       }
     };
 
@@ -61,13 +57,6 @@ const InstituteProfile: React.FC = () => {
     setProfileData((prevData) => ({
       ...prevData,
       [role]: { ...prevData[role], [field]: value },
-    }));
-  };
-
-  const handleNewProfileChange = (field: keyof ProfileData, value: string) => {
-    setNewProfile((prevData) => ({
-      ...prevData,
-      [field]: value,
     }));
   };
 
@@ -83,17 +72,42 @@ const InstituteProfile: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save profile');
+        throw new Error("Failed to save profile");
       }
 
       const result = await response.json();
       console.log(`${role} Profile Data saved:`, result);
       setEditMode((prev) => ({ ...prev, [role]: false }));
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error("Error saving profile:", error);
     }
   };
 
+  const handleDelete = async (role: string) => {
+    try {
+      const response = await fetch("/api/instituteProfile", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete profile");
+      }
+
+      const result = await response.json();
+      console.log(result.message);
+      setProfileData((prevData) => {
+        const newData = { ...prevData };
+        delete newData[role];
+        return newData;
+      });
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+    }
+  };
   const handleAddProfile = async (role: string) => {
     try {
       const response = await fetch("/api/instituteProfile", {
@@ -132,187 +146,164 @@ const InstituteProfile: React.FC = () => {
     }
   };
 
-  const handleDelete = async (role: string) => {
-    try {
-      const response = await fetch("/api/instituteProfile", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ role }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete profile');
-      }
-
-      const result = await response.json();
-      console.log(result.message);
-      setProfileData((prevData) => {
-        const newData = { ...prevData };
-        delete newData[role];
-        return newData;
-      });
-    } catch (error) {
-      console.error('Error deleting profile:', error);
-    }
-  };
-
-  const renderDisplay = (role: string, title: string) => {
+  const renderEditForm = (role: string, title: string) => {
     const profile = profileData[role];
-  
+
     return (
-      <div className="p-6 bg-gray-100 shadow-md rounded-lg border">
+      <form
+        className="space-y-4"
+        onSubmit={(e) => handleSubmit(e, role)}
+      >
         <h2 className="text-center text-xl font-bold text-green-600 mb-4">
-          {title}
+          Edit {title}
         </h2>
-        {profile ? (
-          <div className="space-y-2">
-            <p><strong>Name:</strong> {profile.name}</p>
-            <p><strong>Email:</strong> {profile.email}</p>
-            <p><strong>Phone:</strong> {profile.phone}</p>
-            <p><strong>CNIC:</strong> {profile.cnic}</p>
-            {profile.department && (
-              <p><strong>Department:</strong> {profile.department}</p>
-            )}
-            {profile.officeLocation && (
-              <p><strong>Office Location:</strong> {profile.officeLocation}</p>
-            )}
-            {profile.tenureStart && (
-              <p><strong>Tenure Start:</strong> {profile.tenureStart}</p>
-            )}
-            {profile.tenureEnd && (
-              <p><strong>Tenure End:</strong> {profile.tenureEnd}</p>
-            )}
-            <button
-              onClick={() => setEditMode((prev) => ({ ...prev, [role]: true }))}
-              className="mt-4 w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 transition"
-            >
-              Edit {title}
-            </button>
-            <button
-              onClick={() => handleDelete(role)}
-              className="mt-2 w-full bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition"
-            >
-              Delete {title}
-            </button>
-          </div>
-        ) : (
-          <p className="text-center text-gray-500">No data available for this role.</p>
-        )}
-      </div>
-    );
-  };
-  
-  const renderForm = (role: string, title: string) => (
-    <div className="p-6 bg-white shadow-md rounded-lg border">
-      <h2 className="text-center text-xl font-bold text-green-600 mb-4">
-        Edit {title}
-      </h2>
-      <form onSubmit={(e) => handleSubmit(e, role)} className="space-y-4">
         <input
           type="text"
-          placeholder="Name"
-          value={profileData[role]?.name}
+          value={profile.name}
           onChange={(e) => handleChange(role, "name", e.target.value)}
-          required
+          placeholder="Name"
           className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          required
         />
         <input
           type="email"
+          value={profile.email}
+          onChange={(e) => handleChange(role, "email", e.target.value)}
           placeholder="Email"
-          value={profileData[role]?.email}
-          disabled
-          className="w-full p-3 border bg-gray-100 rounded-md"
-        />
-        <input
-          type="text"
-          placeholder="Phone"
-          value={profileData[role]?.phone}
-          onChange={(e) => handleChange(role, "phone", e.target.value)}
+          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           required
-          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <input
           type="text"
+          value={profile.phone}
+          onChange={(e) => handleChange(role, "phone", e.target.value)}
+          placeholder="Phone"
+          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          required
+        />
+        <input
+          type="text"
+          value={profile.cnic}
+          onChange={(e) => handleChange(role, "cnic", e.target.value)}
           placeholder="CNIC"
-          value={profileData[role]?.cnic}
-          disabled
-          className="w-full p-3 border bg-gray-100 rounded-md"
+          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          required
         />
         <input
           type="text"
-          placeholder="Department"
-          value={profileData[role]?.department}
+          value={profile.department || ""}
           onChange={(e) => handleChange(role, "department", e.target.value)}
-          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        <input
-          type="text"
-          placeholder="Designation"
-          value={profileData[role]?.designation}
-          onChange={(e) => handleChange(role, "designation", e.target.value)}
-          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        <input
-          type="text"
-          placeholder="Office Location"
-          value={profileData[role]?.officeLocation}
-          onChange={(e) => handleChange(role, "officeLocation", e.target.value)}
-          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        <input
-          type="date"
-          placeholder="Tenure Start"
-          value={profileData[role]?.tenureStart}
-          onChange={(e) => handleChange(role, "tenureStart", e.target.value)}
-          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        <input
-          type="date"
-          placeholder="Tenure End"
-          value={profileData[role]?.tenureEnd}
-          onChange={(e) => handleChange(role, "tenureEnd", e.target.value)}
+          placeholder="Department"
           className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <button
           type="submit"
           className="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition"
         >
-          Save Changes
+          Save
         </button>
         <button
-          onClick={() => setEditMode((prev) => ({ ...prev, [role]: false }))}
           type="button"
-          className="w-full bg-gray-300 text-gray-700 p-3 rounded-md hover:bg-gray-400 transition"
+          onClick={() => setEditMode((prev) => ({ ...prev, [role]: false }))}
+          className="w-full bg-gray-400 text-white p-3 rounded-md hover:bg-gray-500 transition"
         >
           Cancel
         </button>
       </form>
-    </div>
-  );
+    );
+  };
+
+  const renderDisplay = (role: string, title: string) => {
+    const profile = profileData[role];
+
+    return (
+      <div className="p-6 bg-gray-100 shadow-md rounded-lg border">
+        {editMode[role] ? (
+          renderEditForm(role, title)
+        ) : (
+          <>
+            <h2 className="text-center text-xl font-bold text-green-600 mb-4">
+              {title}
+            </h2>
+            {profile ? (
+              <div className="space-y-2">
+                <p>
+                  <strong>Name:</strong> {profile.name}
+                </p>
+                <p>
+                  <strong>Email:</strong> {profile.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {profile.phone}
+                </p>
+                <p>
+                  <strong>CNIC:</strong> {profile.cnic}
+                </p>
+                <p>
+                  <strong>Department:</strong> {profile.department || "N/A"}
+                </p>
+                <button
+                  onClick={() => setEditMode((prev) => ({ ...prev, [role]: true }))}
+                  className="mt-4 w-full bg-blue-500 text-white p-3 rounded-md hover:bg-blue-600 transition"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(role)}
+                  className="mt-2 w-full bg-red-500 text-white p-3 rounded-md hover:bg-red-600 transition"
+                >
+                  Delete
+                </button>
+              </div>
+            ) : (
+              <p>No data available for this role.</p>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const handleNewProfileChange = (field: keyof ProfileData, value: string) => {
+    setNewProfile((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
 
   const renderAddProfileForm = () => (
     <div className="p-6 bg-white shadow-md rounded-lg border">
       <h2 className="text-center text-xl font-bold text-green-600 mb-4">
         Add New Profile
       </h2>
-      <form className="space-y-4" onSubmit={(e) => {
+      <form  className="space-y-4"
+      onSubmit={(e) => {
         e.preventDefault();
-        if (addingRole) handleAddProfile(addingRole);
-      }}>
-        <select
-          value={addingRole || ""}
-          onChange={(e) => setAddingRole(e.target.value)}
-          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          required
-        >
-          <option value="" disabled>Select Role</option>
-          <option value="vc">Vice Chancellor</option>
-          <option value="dean">Dean</option>
-          <option value="chairman">Chairman Academics</option>
-          <option value="deputy">Deputy Academics</option>
-        </select>
+        if (addingRole) {
+          handleAddProfile(addingRole);
+        } else {
+          alert("Please select a role.");
+        }
+      }}
+    >
+      <select
+        value={addingRole || ""}
+        onChange={(e) => {
+          const selectedRole = e.target.value;
+          setAddingRole(selectedRole); // Update the addingRole state
+          handleNewProfileChange("role", selectedRole); // Add the role to the newProfile object
+        }}
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+        required
+      >
+        <option value="" disabled>
+          Select Role
+        </option>
+        <option value="vc">Vice Chancellor</option>
+        <option value="dean">Dean</option>
+        <option value="chairman">Chairman Academics</option>
+        <option value="deputy">Deputy Academics</option>
+      </select>
         <input
           type="text"
           placeholder="Name"
@@ -389,17 +380,14 @@ const InstituteProfile: React.FC = () => {
       </form>
     </div>
   );
-
   return (
-    <div className="max-w-3xl mx-auto p-8">
-      {renderDisplay("vc", "Vice Chancellor")}
-      {editMode.vc && renderForm("vc", "Vice Chancellor")}
-      {renderDisplay("dean", "Dean")}
-      {editMode.dean && renderForm("dean", "Dean")}
-      {renderDisplay("chairman", "Chairman Academics")}
-      {editMode.chairman && renderForm("chairman", "Chairman Academics")}
-      {renderDisplay("deputy", "Deputy Academics")}
-      {editMode.deputy && renderForm("deputy", "Deputy Academics")}
+    <div className="max-w-5xl mx-auto p-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {renderDisplay("vc", "Vice Chancellor")}
+        {renderDisplay("dean", "Dean")}
+        {renderDisplay("chairman", "Chairman Academics")}
+        {renderDisplay("deputy", "Deputy Academics")}
+      </div>
       {renderAddProfileForm()}
     </div>
   );

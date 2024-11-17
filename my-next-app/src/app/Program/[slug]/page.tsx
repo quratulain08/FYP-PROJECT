@@ -125,7 +125,7 @@ export default function DepartmentDetail() {
   };
 
   const handleEdit = (programId: string) => {
-    router.push(`/Edit-program/${programId}`);
+    router.push(`/Edit-program/${programId}/${id}`);
   };
 
   const handleDelete = async (programId: string) => {

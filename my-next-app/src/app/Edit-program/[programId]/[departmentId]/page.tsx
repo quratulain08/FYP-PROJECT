@@ -1,25 +1,17 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useParams, useRouter } from "next/navigation";
 
 export default function EditProgram() {
   const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
+  const params = useParams();
+  const programId = params.programId as string;
+  const departmentId = params.departmentId as string;
 
-  // Ensure the component is mounted before accessing the router
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Guard to ensure useRouter is only used on the client-side
-  if (!isMounted) {
-    return null; // Or a loading spinner if needed
-  }
-
-  const { programId } = router.query;
 
   const [program, setProgram] = useState({
+    _id:"",
     name: "",
     startDate: "",
     category: "",
@@ -44,12 +36,33 @@ export default function EditProgram() {
       const fetchProgramData = async () => {
         setLoading(true);
         try {
-          const response = await fetch(`/api/program/${programId}`);
+          const response = await fetch(`/api/program/${departmentId}`);
           if (!response.ok) {
             throw new Error("Failed to fetch program data");
           }
+  
           const data = await response.json();
-          setProgram(data); // Pre-fill the form with the fetched data
+          let dataItemMatch = null;
+  
+          // Find the correct data item that matches the programId
+          for (const dataItem of data) {
+            if (dataItem._id === programId) {
+              dataItemMatch = dataItem;
+                
+              // Format the startDate to "YYYY-MM-DD"
+              if (dataItemMatch.startDate) {
+                dataItemMatch.startDate = new Date(dataItemMatch.startDate)
+                  .toISOString()
+                  .split("T")[0]; // "YYYY-MM-DD"
+              }
+              setProgram(dataItemMatch);
+              break;
+            }
+          }
+  
+          if (!dataItemMatch) {
+            setError("Program ID mismatch. Data does not match the selected program.");
+          }
         } catch (err) {
           setError("Error fetching program data. Please try again.");
           console.error(err);
@@ -57,11 +70,11 @@ export default function EditProgram() {
           setLoading(false);
         }
       };
-
+  
       fetchProgramData();
     }
   }, [programId]);
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProgram((prevProgram) => ({
