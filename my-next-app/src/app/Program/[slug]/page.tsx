@@ -120,8 +120,9 @@ export default function DepartmentDetail() {
   };
 
   const handleAddNewProgram = () => {
+    console.log(`${id}`);
     // Navigate to a page or open a modal for adding a new program
-    router.push(`/Add-program`);
+    router.push(`/Add-program/${id}`);
   };
 
   const handleEdit = (programId: string) => {

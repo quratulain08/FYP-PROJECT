@@ -1,13 +1,12 @@
 'use client'; // Add this line to mark the component as client-side
 
 import { useState } from "react";
-import { useParams,useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function AddProgram() {
   const router = useRouter();
   const params = useParams();
-  const slug = params.slug as string;
- // To capture the department ID from URL if needed
+  const departmentID = params.slug as string; // To capture the department ID from URL if needed
 
   const [program, setProgram] = useState({
     name: "",
@@ -30,12 +29,35 @@ export default function AddProgram() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setProgram((prevProgram) => ({
-      ...prevProgram,
-      [name]: value
-    }));
+  
+    switch (name) {
+      case "programHeadContact.email":
+        setProgram((prevProgram) => ({
+          ...prevProgram,
+          programHeadContact: {
+            ...prevProgram.programHeadContact,
+            email: value,
+          },
+        }));
+        break;
+  
+      case "programHeadContact.phone":
+        setProgram((prevProgram) => ({
+          ...prevProgram,
+          programHeadContact: {
+            ...prevProgram.programHeadContact,
+            phone: value,
+          },
+        }));
+        break;
+  
+      default:
+        setProgram((prevProgram) => ({
+          ...prevProgram,
+          [name]: value,
+        }));
+    }
   };
-
   const handleObjectiveChange = (index: number, value: string) => {
     const updatedObjectives = [...program.programObjectives];
     updatedObjectives[index] = value;
@@ -65,7 +87,8 @@ export default function AddProgram() {
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/program/${slug}`, {
+      console.log(departmentID);
+      const response = await fetch(`/api/program/${departmentID}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -78,7 +101,7 @@ export default function AddProgram() {
       }
 
       // Redirect to the department details page after adding the program
-      router.push(`/department/${slug}`);
+      router.push(`/Program/${departmentID}`);
     } catch (err) {
       setError("Error adding the program. Please try again.");
       console.error(err);
@@ -89,6 +112,7 @@ export default function AddProgram() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+      <p>{departmentID}</p>
       <h1 className="text-2xl font-semibold text-green-600 mb-6">Add New Program</h1>
       
       <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500">
@@ -239,6 +263,7 @@ export default function AddProgram() {
                   onChange={(e) => handleObjectiveChange(index, e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg"
                 />
+                
                 <button
                   type="button"
                   onClick={() => removeObjectiveField(index)}
@@ -267,6 +292,8 @@ export default function AddProgram() {
               {loading ? "Adding..." : "Add Program"}
             </button>
           </div>
+
+          {error && <p className="text-red-500 mt-4">{error}</p>}
         </form>
       </div>
     </div>
