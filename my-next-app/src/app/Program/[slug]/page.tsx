@@ -77,42 +77,45 @@ export default function DepartmentDetail() {
           setError({ message: "Department ID is missing" });
           return;
         }
-    
+  
         // Fetch department data
         const deptData: Department = await fetchWithErrorHandling(`/api/department/${id}`);
         console.log("Department Data:", deptData); // Debugging log
         setDepartment(deptData);
-    
-        // Fetch program data
-        const programData: Program[] = await fetchWithErrorHandling(`/api/program/${id}`);
-        console.log("Program Data:", programData); // Debugging log
-    
-        // Set multiple programs if available
-        setPrograms(programData);
-    
+  
+        // Attempt to fetch program data
+        try {
+          const programData: Program[] = await fetchWithErrorHandling(`/api/program/${id}`);
+          console.log("Program Data:", programData); // Debugging log
+          setPrograms(programData);
+        } catch (programError) {
+          console.warn("Failed to fetch programs:", programError);
+          setPrograms([]); // Ensure programs are an empty array if fetch fails
+        }
+  
         setError(null);
       } catch (err) {
-        console.error('Error:', err);
-        let errorMessage = 'Error fetching data';
-        let errorDetails = '';
-    
+        console.error("Error fetching department:", err);
+        let errorMessage = "Error fetching department data";
+        let errorDetails = "";
+  
         if (err instanceof Error) {
           errorMessage = err.message;
-          errorDetails = err.stack || '';
+          errorDetails = err.stack || "";
         }
-    
+  
         setError({
           message: errorMessage,
-          details: errorDetails
+          details: errorDetails,
         });
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, [id]);
-
+  
   const handleRetry = () => {
     setLoading(true);
     setError(null);

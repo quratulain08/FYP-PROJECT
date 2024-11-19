@@ -109,25 +109,34 @@ const InstituteProfile: React.FC = () => {
     }
   };
   const handleAddProfile = async (role: string) => {
+    if (!role) {
+      console.error("Role is required to add a profile");
+      return;
+    }
+  
+    const profileWithRole = { ...newProfile, role };
+  
     try {
       const response = await fetch("/api/instituteProfile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newProfile),
+        body: JSON.stringify(profileWithRole),
       });
-
+  
       if (!response.ok) {
-        throw new Error('Failed to add profile');
+        throw new Error("Failed to add profile");
       }
-
+  
       const result = await response.json();
       console.log("New Profile Data saved:", result);
+  
       setProfileData((prevData) => ({
         ...prevData,
-        [role]: newProfile,
+        [role]: profileWithRole,
       }));
+  
       setNewProfile({
         role: "",
         name: "",
@@ -140,12 +149,13 @@ const InstituteProfile: React.FC = () => {
         tenureStart: "",
         tenureEnd: "",
       });
+  
       setAddingRole(null);
     } catch (error) {
-      console.error('Error adding profile:', error);
+      console.error("Error adding profile:", error);
     }
   };
-
+  
   const renderEditForm = (role: string, title: string) => {
     const profile = profileData[role];
 
@@ -276,34 +286,29 @@ const InstituteProfile: React.FC = () => {
       <h2 className="text-center text-xl font-bold text-green-600 mb-4">
         Add New Profile
       </h2>
-      <form  className="space-y-4"
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (addingRole) {
-          handleAddProfile(addingRole);
-        } else {
-          alert("Please select a role.");
-        }
-      }}
-    >
-      <select
-        value={addingRole || ""}
-        onChange={(e) => {
-          const selectedRole = e.target.value;
-          setAddingRole(selectedRole); // Update the addingRole state
-          handleNewProfileChange("role", selectedRole); // Add the role to the newProfile object
-        }}
-        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-        required
-      >
-        <option value="" disabled>
-          Select Role
-        </option>
-        <option value="vc">Vice Chancellor</option>
-        <option value="dean">Dean</option>
-        <option value="chairman">Chairman Academics</option>
-        <option value="deputy">Deputy Academics</option>
-      </select>
+      <form
+  className="space-y-4"
+  onSubmit={(e) => {
+    e.preventDefault();
+    if (addingRole) {
+      handleAddProfile(addingRole);
+    } else {
+      console.error("Please select a role before adding a profile.");
+    }
+  }}
+>
+        <select
+          value={addingRole || ""}
+          onChange={(e) => setAddingRole(e.target.value)}
+          className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          required
+        >
+          <option value="" disabled>Select Role</option>
+          <option value="vc">Vice Chancellor</option>
+          <option value="dean">Dean</option>
+          <option value="chairman">Chairman Academics</option>
+          <option value="deputy">Deputy Academics</option>
+        </select>
         <input
           type="text"
           placeholder="Name"
