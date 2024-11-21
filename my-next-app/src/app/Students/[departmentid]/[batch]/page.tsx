@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import Layout from "@/app/components/Layout";
+import BatchSummary from "@/app/Batch/[slug]/page";
 
 interface Student {
   _id: string;
@@ -70,8 +71,10 @@ const StudentsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [department, setDepartment] = useState<Department | null>(null);
   const params = useParams();
-  const router = useRouter();
-  const DepartmentID = params.slug as string;
+  const DepartmentID = params.departmentid as string;
+  const batch = params.batch as string;
+
+
 
   const [newStudent, setNewStudent] = useState<Student>({
     _id: "",
@@ -111,7 +114,7 @@ const StudentsPage: React.FC = () => {
         );
         setBatches(uniqueBatches);
       } catch (err) {
-        setError("Error fetching data");
+        setError(`Error fetching data ${DepartmentID} `);
       } finally {
         setLoading(false);
       }
@@ -268,12 +271,7 @@ const StudentsPage: React.FC = () => {
             options={[ "Yes", "No"]}
             onChange={(e) => setSelectedInternshipStatus(e.target.value)}
           />
-          <Filter
-            label="Batch"
-            value={selectedBatch}
-            options={[ ...batches]}
-            onChange={(e) => setSelectedBatch(e.target.value)}
-          />
+          
         </div>
         <button
           onClick={openUploadModal}
@@ -294,7 +292,9 @@ const StudentsPage: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredStudents.map((student) => (
+          
+          {filteredStudents .filter((student) => student.batch === batch)
+          .map((student) => (
             <tr key={student._id} className="border-b border-gray-300">
               <td className="py-2 px-4">{student.registrationNumber}</td>
               <td className="py-2 px-4">{student.name}</td>
@@ -303,7 +303,7 @@ const StudentsPage: React.FC = () => {
                 {student.didInternship ? "Yes" : "No"}
               </td>
               <td className="py-2 px-4 space-x-4">
-                <button
+                {/* <button
                   onClick={() => {
                     setEditingStudent(student);
                     setShowModal(true);
@@ -311,7 +311,7 @@ const StudentsPage: React.FC = () => {
                   className="text-blue-500"
                 >
                   Edit
-                </button>
+                </button> */}
                 <button
                   onClick={() => deleteStudent(student._id)}
                   className="text-red-500"
