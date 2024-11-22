@@ -64,14 +64,8 @@ const Internships: React.FC = () => {
     }
   };
 
-  const handleEdit = (id: string) => {
-    router.push(`/admin/editInternship/${id}`);
-  };
 
-  const handleAddNewInternship = () => {
-    localStorage.removeItem("editingInternship");
-    router.push("/admin/InternshipForm");
-  };
+
 
   if (loading) return (
     <div className="flex justify-center items-center min-h-screen">
@@ -89,12 +83,7 @@ const Internships: React.FC = () => {
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Internships</h1>
-        <button
-          onClick={handleAddNewInternship}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition duration-300"
-        >
-          Add New Internship
-        </button>
+       
       </div>
 
       {internships.length === 0 ? (
@@ -113,13 +102,7 @@ const Internships: React.FC = () => {
                   {internship.title} - {internship.hostInstitution}
                 </h2>
                 <div className="flex space-x-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleEdit(internship._id); }}
-                    className="text-yellow-500 hover:text-yellow-600 p-2"
-                    title="Edit"
-                  >
-                    <FaEdit size={20} />
-                  </button>
+                 
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(internship._id); }}
                     className="text-red-500 hover:text-red-600 p-2"

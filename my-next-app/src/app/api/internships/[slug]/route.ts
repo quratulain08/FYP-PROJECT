@@ -1,36 +1,75 @@
-// pages/api/internships/[slug]/route.ts
-
-import type { NextApiRequest, NextApiResponse } from "next";
-import mongoose from "mongoose";
+import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import InternshipModel from '@/models/internship';
+import connectToDatabase from '@/lib/mongodb'; // Assuming you have a separate DB connection function
 
-const connectDb = async () => {
-  if (mongoose.connection.readyState >= 1) return;
-  await mongoose.connect(process.env.MONGODB_URI as string);
-};
+export async function DELETE(req: Request) {
+  try {
+    // Extracting the ID from the request URL
+    const url = new URL(req.url);
+    const parts = url.pathname.split('/');
+    const id = parts[parts.length - 1];
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  await connectDb();
+    await connectToDatabase(); // Ensure DB connection
 
-  const { id } = req.query;
-
-  if (req.method === "DELETE") {
-    try {
-      await InternshipModel.findByIdAndDelete(id);
-      res.status(200).json({ message: "Internship deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to delete internship" });
+    // Try deleting the internship by its ID
+    const deletedInternship = await InternshipModel.findByIdAndDelete(id);
+    if (!deletedInternship) {
+      return NextResponse.json(
+        { error: 'Internship not found' },
+        { status: 404 }
+      );
     }
-  } else if (req.method === "PUT") {
-    try {
-      const internship = await InternshipModel.findByIdAndUpdate(id, req.body, {
-        new: true,
-      });
-      res.status(200).json(internship);
-    } catch (error) {
-      res.status(500).json({ error: "Failed to update internship" });
+
+    // Return success message if internship deleted
+    return NextResponse.json({ message: 'Internship deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting internship:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete internship' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: Request, { params }: { params: { slug: string } }) {
+  try {
+    const { slug } = params; // Get the slug from params
+    console.log('Received slug:', slug);
+
+    // Extract updated data from the request body
+    const updatedData = await req.json();
+
+    await connectToDatabase(); // Ensure DB connection
+
+    // Check if the provided ID is valid
+    if (!mongoose.Types.ObjectId.isValid(slug)) {
+      return NextResponse.json(
+        { message: `Invalid internship ID: ${slug}` },
+        { status: 400 }
+      );
     }
-  } else {
-    res.status(405).json({ error: "Method not allowed" });
+
+    // Update the internship by ID with new data
+    const updatedInternship = await InternshipModel.findByIdAndUpdate(slug, updatedData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedInternship) {
+      return NextResponse.json(
+        { message: 'Internship not found' },
+        { status: 404 }
+      );
+    }
+
+    // Return the updated internship as JSON
+    return NextResponse.json(updatedInternship);
+  } catch (error) {
+    console.error('Error updating internship:', error);
+    return NextResponse.json(
+      { error: 'Failed to update internship' },
+      { status: 500 }
+    );
   }
 }
