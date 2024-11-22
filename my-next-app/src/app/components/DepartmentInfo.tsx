@@ -68,16 +68,16 @@ const DepartmentInfo: React.FC = () => {
     }
   };
   const handleDepartmentClick = (id: string) => {
-    router.push(`/Program/${id}`);
+    router.push(`/admin/Program/${id}`);
   };
 
   const handleEdit = (id: string) => {
-    router.push(`/editDepartment/${id}`);
+    router.push(`/admin/editDepartment/${id}`);
   };
 
   const handleAddNewDepartment = () => {
     localStorage.removeItem('editingDepartment');
-    router.push('/DepartmentForm');
+    router.push('/admin/DepartmentForm');
   };
 
   if (loading) return (

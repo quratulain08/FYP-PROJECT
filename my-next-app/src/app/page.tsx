@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Use Next.js router for redirects
 import Login from './Login/page'; // Login component
 import Dashboard from '@/app/components/Dashboard'; // Dashboard component
-import Navbar from './navbar/page';
+import Navbar from './admin/navbar/page';
 
 const Page: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
