@@ -42,9 +42,9 @@ export async function POST(req: Request) {
   
       // Iterate over each student row and save to the database
       for (const studentData of studentsFromForm) {
-        const { name, department, batch, didInternship, registrationNumber } = studentData;
+        const { name, department, batch, didInternship, registrationNumber ,section} = studentData;
         
-        if (!name || !department || !batch || didInternship === undefined || !registrationNumber) {
+        if (!name || !department || !batch || didInternship === undefined || !registrationNumber || !section) {
           console.log('Skipping invalid student data:', studentData);
           continue;
         }
@@ -55,6 +55,7 @@ export async function POST(req: Request) {
           batch,
           didInternship,
           registrationNumber,
+          section,
         });
   
         studentsToAdd.push(student);
