@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
       <nav className="bg-white border-b border-gray-300 shadow-sm">
         <div className="container mx-auto px-2 py-1 flex justify-between items-center">
           <div className="flex space-x-8">
-            <Link href="/InstituteProfile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+            <Link href="/Coordinator/Internships" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-green-500 mb-2"><FaUniversity /></span>
               <span className="text-sm">Internships</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
