@@ -40,12 +40,25 @@ export async function GET(
 }
 
 // POST: Create a new program
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  { params }: { params: { slug: string } }
+) {
+  
+  const departmentId = params.slug;
+  console.log('Slug received:', departmentId);
+
+  if (!isValidObjectId(departmentId)) {
+    return NextResponse.json(
+      { message: `Invalid department ID: ${departmentId}` },
+      { status: 400 }
+    );
+  }
+
   try {
     const body = await request.json(); // Get the request body data
     const {
       name,
-      departmentId,
       startDate,
       category,
       durationYears,
@@ -57,22 +70,31 @@ export async function POST(request: Request) {
       programObjectives,
     } = body;
 
-    // Validation for required fields
-    if (
-      !name ||
-      !departmentId ||
-      !startDate ||
-      !category ||
-      !durationYears ||
-      !contactEmail ||
-      !programHead
-    ) {
-      return NextResponse.json({ error: 'All required fields must be provided' }, { status: 400 });
+    // Detailed validation for each required field
+    const missingFields: string[] = [];
+
+    if (!name) missingFields.push('name');
+    if (!startDate) missingFields.push('startDate');
+    if (!category) missingFields.push('category');
+    if (!durationYears) missingFields.push('durationYears');
+    if (!contactEmail) missingFields.push('contactEmail');
+    if (!programHead) missingFields.push('programHead');
+    
+    // Check if programHeadContact fields are missing
+    if (!programHeadContact || !programHeadContact.email) missingFields.push('programHeadContact.email');
+    if (!programHeadContact || !programHeadContact.phone) missingFields.push('programHeadContact.phone');
+
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
     }
 
     // Validate departmentId (MongoDB ObjectId)
     if (!isValidObjectId(departmentId)) {
-      return NextResponse.json({ error: 'Invalid departmentId format' }, { status: 400 });
+    
+      return NextResponse.json({ error: `'Invalid departmentId format'${departmentId}`}, { status: 400 });
     }
 
     await connectToDatabase();
@@ -105,38 +127,46 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating program:', error);
     return NextResponse.json(
-      { error: 'Failed to create program', details: error.message },
+      { error: `Failed to create program ${departmentId}`, details: error.message },
       { status: 500 }
     );
   }
 }
 
+// PUT: Update a program by programId
 // PUT: Update a program by slug
 export async function PUT(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  const slug = params.slug;
+  const programId = params.slug;
 
-  if (!slug) {
-    return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
+  // Validate the programId as a MongoDB ObjectId
+  if (!programId || !Types.ObjectId.isValid(programId)) {
+    return NextResponse.json({ error: 'Invalid program ID' }, { status: 400 });
   }
 
   try {
     const updateData = await request.json();
     await connectToDatabase();
 
-    const updatedProgram = await Program.findOneAndUpdate(
-      { slug },
+    console.log(`Updating program with ID: ${programId}`);
+
+    // Update the program directly using the ID
+    const updatedProgram = await Program.findByIdAndUpdate(
+      programId,
       updateData,
-      { new: true }
+      { new: true } // Return the updated document
     );
 
     if (!updatedProgram) {
       return NextResponse.json({ message: 'Program not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Program updated successfully!', program: updatedProgram });
+    return NextResponse.json({
+      message: 'Program updated successfully!',
+      program: updatedProgram,
+    });
   } catch (error) {
     console.error('Error updating program:', error);
     return NextResponse.json(
@@ -146,21 +176,27 @@ export async function PUT(
   }
 }
 
+
+
 // DELETE: Delete a program by slug
 export async function DELETE(
   request: Request,
   { params }: { params: { slug: string } }
 ) {
-  const slug = params.slug;
+  const programId = params.slug;
 
-  if (!slug) {
-    return NextResponse.json({ error: 'Slug is required' }, { status: 400 });
+  // Validate programId as a MongoDB ObjectId
+  if (!programId || !Types.ObjectId.isValid(programId)) {
+    return NextResponse.json({ error: 'Invalid program ID' }, { status: 400 });
   }
 
   try {
     await connectToDatabase();
 
-    const deletedProgram = await Program.findOneAndDelete({ slug });
+    console.log(`Deleting program with ID: ${programId}`);
+
+    // Delete the program directly by its ID
+    const deletedProgram = await Program.findByIdAndDelete(programId);
 
     if (!deletedProgram) {
       return NextResponse.json({ message: 'Program not found' }, { status: 404 });
