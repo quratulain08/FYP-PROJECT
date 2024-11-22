@@ -42,29 +42,21 @@ const Navbar: React.FC = () => {
       <nav className="bg-white border-b border-gray-300 shadow-sm">
         <div className="container mx-auto px-2 py-1 flex justify-between items-center">
           <div className="flex space-x-8">
-            <Link href="/admin/dashboard" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-blue-500 mb-2"><FaHome /></span>
-              <span className="text-sm">Dashboard</span>
-            </Link>
-            <Link href="/admin/profile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-black mb-2"><FaUser /></span>
-              <span className="text-sm">Your Profile</span>
-            </Link>
-            <Link href="/admin/InstituteProfile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+            <Link href="/InstituteProfile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-green-500 mb-2"><FaUniversity /></span>
-              <span className="text-sm">Institute Profile</span>
+              <span className="text-sm">Internships</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
-            <Link href="/admin/Department" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+            <Link href="/Department" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-red-500 mb-2"><FaFolder /></span>
               <span className="text-sm">Departments & Programs</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
-            <Link href="/admin/Faculty" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+            <Link href="/Faculty" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-purple-500 mb-2"><FaChalkboardTeacher /></span>
               <span className="text-sm">Faculty Directory</span>
             </Link>
-            <Link href="/admin/student" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+            <Link href="/student" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-black mb-2"><FaUsers /></span>
               <span className="text-sm">Students Directory</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>

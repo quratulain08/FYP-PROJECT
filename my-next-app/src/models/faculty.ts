@@ -13,6 +13,7 @@ interface LastAcademicQualification {
 interface Faculty extends Document {
   departmentId: mongoose.Types.ObjectId; // Explicitly define it as ObjectId
   name: string;
+  honorific: string;
   cnic: string;
   gender: string;
   address: string;
@@ -43,6 +44,7 @@ const facultySchema = new Schema<Faculty>({
     required: true,
   },
   name: { type: String, required: true },
+  honorific: { type: String, required: true },
   cnic: { type: String, required: true, unique: true },
   gender: { type: String, required: true },
   address: { type: String, required: true },
