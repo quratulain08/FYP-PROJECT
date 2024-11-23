@@ -15,6 +15,8 @@ interface Internship {
   startDate: string;
   endDate: string;
   description: string;
+  assignedFaculty:string;
+  assignedStudents:string;
 }
 
 const Internships: React.FC = () => {
@@ -122,6 +124,8 @@ const Internships: React.FC = () => {
                 <div>
                   <p><span className="font-semibold">Location:</span> {internship.location}</p>
                   <p><span className="font-semibold">Description:</span> {internship.description}</p>
+                  <p><span className="font-semibold">Faculity Assigned:</span> {internship.assignedFaculty}</p>
+                  <p><span className="font-semibold">Students Assigned:</span> {internship.assignedStudents}</p>
                 </div>
               </div>
             </div>

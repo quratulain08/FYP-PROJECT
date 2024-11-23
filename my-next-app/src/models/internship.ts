@@ -9,6 +9,7 @@ export interface Internship extends Document {
   endDate: string;
   description: string;
   assignedFaculty: mongoose.Types.ObjectId[]; // Array of ObjectId references to Faculty
+  assignedStudents: mongoose.Types.ObjectId[]; // Array of ObjectId references to Students
 }
 
 const internshipSchema = new Schema<Internship>({
@@ -23,6 +24,12 @@ const internshipSchema = new Schema<Internship>({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Faculty", // Reference to the Faculty model
+    },
+  ],
+  assignedStudents: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student", // Reference to the Student model
     },
   ],
 });
