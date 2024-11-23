@@ -1,4 +1,3 @@
-// models/Internship.ts
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface Internship extends Document {
@@ -9,6 +8,7 @@ export interface Internship extends Document {
   startDate: string;
   endDate: string;
   description: string;
+  assignedFaculty: mongoose.Types.ObjectId[]; // Array of ObjectId references to Faculty
 }
 
 const internshipSchema = new Schema<Internship>({
@@ -19,8 +19,15 @@ const internshipSchema = new Schema<Internship>({
   startDate: { type: String, required: true },
   endDate: { type: String, required: true },
   description: { type: String, required: true },
+  assignedFaculty: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Faculty", // Reference to the Faculty model
+    },
+  ],
 });
 
-const InternshipModel = mongoose.models.Internship || mongoose.model<Internship>("Internship", internshipSchema);
+const InternshipModel =
+  mongoose.models.Internship || mongoose.model<Internship>("Internship", internshipSchema);
 
 export default InternshipModel;
