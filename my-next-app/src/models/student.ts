@@ -8,6 +8,7 @@ export interface IStudent extends Document {
   section: string; // New field for section
   didInternship: boolean;
   registrationNumber: string;
+  email: string;
 }
 
 // Define the schema for the student model
@@ -17,6 +18,7 @@ const studentSchema: Schema<IStudent> = new Schema({
   batch: { type: String, required: true },
   section: { type: String, required: true }, // Add section to schema
   didInternship: { type: Boolean, required: true },
+  email: { type: String, required: true, unique: true }, // Add email to schema
   registrationNumber: { type: String, required: true },
 });
 
