@@ -15,9 +15,11 @@ interface Department {
   email: string;
   phone: string;
   landLine?: string;
-  address: string;
-  province: string;
-  city: string;
+  focalPersonName: '',
+  focalPersonHonorific: 'Mr.',
+  focalPersonCnic: '',
+  focalPersonEmail: '',
+  focalPersonPhone: '',
 }
 
 const DepartmentListiInStudents: React.FC = () => {
@@ -96,9 +98,13 @@ const DepartmentListiInStudents: React.FC = () => {
                 </p>
               )}
               <p className="text-sm text-gray-600">
-                <span className="font-bold">Address:</span> {dept.address},{" "}
-                {dept.city}, {dept.province}
+                <span className="font-bold">Focal Person Name:</span>{dept.focalPersonHonorific} {dept.focalPersonName}
               </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-bold">Focal Person cnic:</span>{dept.focalPersonCnic}
+              </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-bold">Focal Person Email:</span>{dept.focalPersonEmail}</p>
             </div>
           ))
         )}

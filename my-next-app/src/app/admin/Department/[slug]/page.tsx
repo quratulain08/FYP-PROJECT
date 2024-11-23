@@ -51,9 +51,11 @@ interface Department {
   email: string;
   phone: string;
   landLine?: string;
-  address: string;
-  province: string;
-  city: string;
+  focalPersonName: '',
+  focalPersonHonorific: 'Mr.',
+  focalPersonCnic: '',
+  focalPersonEmail: '',
+  focalPersonPhone: '',
 }
 
 interface Faculty {
@@ -402,12 +404,15 @@ export default function DepartmentDetail() {
                 <span className="font-semibold">Land Line:</span> {department.landLine}
               </p>
             )}
-            <p className="mb-3 text-base">
-              <span className="font-semibold">Address:</span> {department.address}
-            </p>
-            <p className="mb-3 text-base">
-              <span className="font-semibold">Location:</span> {department.city}, {department.province}
-            </p>
+             <p className="mb-3">
+                <span className="font-bold">Focal Person Name:</span> {department.focalPersonHonorific} {department.focalPersonName}
+              </p>
+              <p className="mb-3">
+                <span className="font-bold">Focal Person cnic:</span>{department.focalPersonCnic}
+              </p>
+              <p className="mb-3">
+                <span className="font-bold">Focal Person Email:</span>{department.focalPersonEmail}
+              </p>
           </div>
         </div>
       </div>

@@ -15,9 +15,11 @@ interface Department {
   email: string;
   phone: string;
   landLine?: string;
-  address: string;
-  province: string;
-  city: string;
+  focalPersonName: '',
+  focalPersonHonorific: 'Mr.',
+  focalPersonCnic: '',
+  focalPersonEmail: '',
+  focalPersonPhone: '',
 }
 
 const DepartmentInfo: React.FC = () => {
@@ -151,8 +153,10 @@ const DepartmentInfo: React.FC = () => {
               {dept.landLine && (
                 <p><span className="font-semibold">Land Line:</span> {dept.landLine}</p>
               )}
-              <p><span className="font-semibold">Address:</span> {dept.address}</p>
-              <p><span className="font-semibold">Location:</span> {dept.city}, {dept.province}</p>
+              <p><span className="font-semibold">Focal Person Name:</span> {dept.focalPersonHonorific} {dept.focalPersonName}</p>
+              <p><span className="font-semibold">Focal Person cnic:</span> {dept.focalPersonCnic}</p>
+              <p><span className="font-semibold">Focal Person Email:</span> {dept.focalPersonEmail}</p>
+
             </div>
           </div>
         </div>

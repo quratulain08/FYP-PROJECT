@@ -15,9 +15,11 @@ const DepartmentDashboard: React.FC = () => {
     email: '',
     phone: '',
     landLine: '',
-    address: '',
-    province: '',
-    city: '',
+    focalPersonName: '',
+    focalPersonHonorific: 'Mr.',
+    focalPersonCnic: '',
+    focalPersonEmail: '',
+    focalPersonPhone: '',
   });
 
   const [statusMessage, setStatusMessage] = useState('');
@@ -71,9 +73,11 @@ const DepartmentDashboard: React.FC = () => {
         email: '',
         phone: '',
         landLine: '',
-        address: '',
-        province: '',
-        city: '',
+        focalPersonName: '',
+        focalPersonHonorific: 'Mr.',
+        focalPersonCnic: '',
+        focalPersonEmail: '',
+        focalPersonPhone: '',
       }); // Reset the form after successful submission
     } catch (error) {
       console.error(error);
@@ -227,58 +231,77 @@ const DepartmentDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Address Information */}
+            {/* Focal Person Information */}
             <div className="border border-green-500 p-4">
-              <h2 className="text-green-600 font-semibold mb-2">Address Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h2 className="text-green-600 font-semibold mb-2">Focal Person Information</h2>
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold mb-1">Address</label>
+                  <label className="block text-xs font-semibold mb-1">Honorific</label>
+                  <select
+                    name="honorific"
+                    value={department.focalPersonHonorific}
+                    onChange={handleChange}
+                    className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+                  >
+                    <option value="Mr.">Mr.</option>
+                    <option value="Ms.">Ms.</option>
+                    <option value="Dr.">Dr.</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold mb-1">HoD Name</label>
                   <input
                     type="text"
-                    name="address"
-                    value={department.address}
+                    name="hodName"
+                    value={department.focalPersonName}
                     onChange={handleChange}
-                    placeholder="Address"
+                    placeholder="HoD Name"
                     required
                     className="w-full p-4 border rounded-md text-sm min-h-[50px]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold mb-1">Province</label>
-                  <select
-                    name="province"
-                    value={department.province}
+                  <label className="block text-xs font-semibold mb-1">CNIC</label>
+                  <input
+                    type="text"
+                    name="cnic"
+                    value={department.focalPersonCnic}
                     onChange={handleChange}
+                    placeholder="CNIC"
                     required
                     className="w-full p-4 border rounded-md text-sm min-h-[50px]"
-                  >
-                    <option value="">Select Province</option>
-                    {provinces.map((province) => (
-                      <option key={province} value={province}>
-                        {province}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold mb-1">City</label>
-                  <select
-                    name="city"
-                    value={department.city}
+                  <label className="block text-xs font-semibold mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={department.focalPersonEmail}
                     onChange={handleChange}
+                    placeholder="Email"
                     required
                     className="w-full p-4 border rounded-md text-sm min-h-[50px]"
-                  >
-                    <option value="">Select City</option>
-                    {cities.map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
+
+                <div>
+                  <label className="block text-xs font-semibold mb-1">Phone No.</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={department.focalPersonPhone}
+                    onChange={handleChange}
+                    placeholder="Phone No."
+                    required
+                    className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+                  />
+                </div>
+
+                
               </div>
             </div>
           </div>

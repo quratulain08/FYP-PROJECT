@@ -12,9 +12,11 @@ export interface IDepartment extends Document {
   email: string;
   phone: string;
   landLine?: string; // Optional field
-  address: string;
-  province: string;
-  city: string;
+  focalPersonName: string;
+  focalPersonHonorific: string;
+  focalPersonCnic: string;
+  focalPersonEmail: string;
+  focalPersonPhone: string;
 }
 
 const DepartmentSchema: Schema = new Schema({
@@ -23,13 +25,15 @@ const DepartmentSchema: Schema = new Schema({
   category: { type: String, required: true },
   hodName: { type: String, required: true },
   honorific: { type: String, required: true, default: 'Mr.' },
-  cnic: { type: String, required: true },
+  cnic: { type: String, required: true ,unique: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
   landLine: { type: String },
-  address: { type: String, required: true },
-  province: { type: String, required: true },
-  city: { type: String, required: true },
+  focalPersonName: { type: String, required: true },
+  focalPersonHonorific: { type: String, required: true ,default: 'Mr.'},
+  focalPersonCnic: { type: String, required: true ,unique: true },
+  focalPersonEmail: { type: String, required: true , unique: true },
+  focalPersonPhone: { type: String, required: true },
 }, {
   timestamps: true,
 });

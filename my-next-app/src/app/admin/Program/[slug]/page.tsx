@@ -17,9 +17,11 @@ interface Department {
   email: string;
   phone: string;
   landLine?: string;
-  address: string;
-  province: string;
-  city: string;
+  focalPersonName: '',
+  focalPersonHonorific: 'Mr.',
+  focalPersonCnic: '',
+  focalPersonEmail: '',
+  focalPersonPhone: '',
 }
 
 interface Program {
@@ -227,10 +229,13 @@ export default function DepartmentDetail() {
                 </p>
               )}
               <p className="mb-3">
-                <span className="font-bold">Address:</span> {department.address}
+                <span className="font-bold">Focal Person Name:</span> {department.focalPersonHonorific} {department.focalPersonName}
               </p>
               <p className="mb-3">
-                <span className="font-bold">Location:</span> {department.city}, {department.province}
+                <span className="font-bold">Focal Person cnic:</span>{department.focalPersonCnic}
+              </p>
+              <p className="mb-3">
+                <span className="font-bold">Focal Person Email:</span>{department.focalPersonEmail}
               </p>
             </div>
           </div>
