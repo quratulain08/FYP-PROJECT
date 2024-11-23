@@ -27,7 +27,7 @@ const BatchSummary: React.FC = () => {
   >([]);
 
   const handleViewDetails = (batch: string) => {
-    router.push(`/admin/Students/${DepartmentID}/${batch}`);
+    router.push(`/Admin/Students/${DepartmentID}/${batch}`);
   };
   useEffect(() => {
     const fetchStudents = async () => {

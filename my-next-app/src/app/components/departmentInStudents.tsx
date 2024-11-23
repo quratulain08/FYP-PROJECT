@@ -45,7 +45,7 @@ const DepartmentListiInStudents: React.FC = () => {
   };
 
   const handleDepartmentClick = (id: string) => {
-    router.push(`/admin/Batch/${id}`); // Navigate to department detail page
+    router.push(`/Admin/Batch/${id}`); // Navigate to department detail page
   };
 
   if (loading) return <p>Loading...</p>;
