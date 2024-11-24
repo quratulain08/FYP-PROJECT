@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
-import Layout from "@/app/components/Layout";
 import BatchSummary from '@/app/admin/Batch/[slug]/page';
 
 interface Student {
@@ -72,12 +71,11 @@ const StudentsPage: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<string>("All");
   const [error, setError] = useState<string | null>(null);
   const [sections, setSections] = useState<string[]>([]); // Added state for sections
-
+  const DepartmentID='674179f1d751474776dc5bd5';
   const [department, setDepartment] = useState<Department | null>(null);
   const params = useParams();
-  const DepartmentID = params.departmentid as string;
-  const batch = params.batch as string;
-
+  const batch = params.slug as String;
+  const router = useRouter();
 
 
   const [newStudent, setNewStudent] = useState<Student>({
@@ -102,7 +100,7 @@ const StudentsPage: React.FC = () => {
         if (!res.ok) throw new Error("Failed to fetch data");
         const data: Student[] = await res.json();
 
-        const ress = await fetch(`/api/department/${DepartmentID}`);
+        const ress = await fetch(`/api/department/674179f1d751474776dc5bd5`);
         if (!ress.ok) throw new Error("Failed to fetch department data");
         const departmentData: Department = await ress.json();
         setDepartment(departmentData);
@@ -150,22 +148,12 @@ const StudentsPage: React.FC = () => {
     setFilteredStudents(filtered);
   }, [selectedInternshipStatus, selectedBatch, students]);
 
-  const deleteStudent = async (id: string) => {
-    try {
-      const response = await fetch(`/api/students`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-      if (response.ok) {
-        setStudents((prev) => prev.filter((student) => student._id !== id));
-      } else {
-        console.error("Failed to delete student");
-      }
-    } catch (error) {
-      console.error("Error deleting student:", error);
-    }
-  };
+  const handleAddInternship = async (id: string) => {
+    console.log('adding Student with id:', id);
+    
+    const editUrl = `/FocalPerson/InternshipsForStudent/${id}`;
+    router.push(editUrl);
+  }
 
   const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,30 +172,6 @@ const StudentsPage: React.FC = () => {
       }
     } catch (err) {
       console.error("Error adding student:", err);
-    }
-  };
-
-  const handleUpdateStudent = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingStudent) return;
-    try {
-      const res = await fetch(`/api/students`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: editingStudent._id, ...editingStudent }),
-      });
-      if (res.ok) {
-        setStudents((prev) =>
-          prev.map((student) =>
-            student._id === editingStudent._id ? editingStudent : student
-          )
-        );
-        setShowModal(false);
-      } else {
-        console.error("Failed to update student");
-      }
-    } catch (err) {
-      console.error("Error updating student:", err);
     }
   };
 
@@ -268,7 +232,7 @@ const StudentsPage: React.FC = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <Layout>
+    
 
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-semibold text-green-600 mb-8">
@@ -319,25 +283,27 @@ const StudentsPage: React.FC = () => {
                 {student.didInternship ? "Yes" : "No"}
               </td>
               <td className="py-2 px-4 space-x-4">
-                {/* <button
-                  onClick={() => {
-                    setEditingStudent(student);
-                    setShowModal(true);
-                  }}
-                  className="text-blue-500"
-                >
-                  Edit
-                </button> */}
-                <button
-                  onClick={() => deleteStudent(student._id)}
-                  className="text-red-500"
-                >
-                  Delete
-                </button>
+              {!student.didInternship && (
+  <button
+    onClick={() => handleAddInternship(student._id)}
+    className="text-green-500 hover:underline"
+  >
+    Add To Internship
+  </button>
+)}
+{student.didInternship && (
+  <button
+        className="text-Red-500 hover:underline"
+  >
+    Internship Done
+  </button>
+)}
+
+
               </td>
             </tr>
           ))}
-        </tbody>
+        </tbody> 
       </table>
 
       {showModal && (
@@ -371,7 +337,6 @@ const StudentsPage: React.FC = () => {
         </div>
       )}
     </div>
-    </Layout>
 
   );
 

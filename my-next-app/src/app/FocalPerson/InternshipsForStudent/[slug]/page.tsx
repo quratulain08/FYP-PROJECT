@@ -1,4 +1,4 @@
-// pages/admin/Internships.tsx
+
 
 "use client";
 
@@ -15,8 +15,8 @@ interface Internship {
   startDate: string;
   endDate: string;
   description: string;
-  assignedFaculty:string;
   assignedStudents:string;
+  assignedFaculty:string;
 }
 
 const Internships: React.FC = () => {
@@ -25,8 +25,7 @@ const Internships: React.FC = () => {
   const [error, setError] = useState("");
   const router = useRouter();
   const params = useParams();
-  const facultyId = params.slug as string;
-  
+  const StudnetId = params.slug as string;
   useEffect(() => {
     fetchInternships();
   }, []);
@@ -46,9 +45,10 @@ const Internships: React.FC = () => {
   };
 
   const handleAddToInternship = async (internshipId: string) => {
-    if (window.confirm('Are you sure you want to assign this faculty member to the internship?')) {
+    if (window.confirm('Are you sure you want to assign this Student member to the internship?')) {
       try {
-        const response = await fetch(`/api/internships/${facultyId}`, {
+
+        const response = await fetch(`/api/InternshipsForStudnet/${StudnetId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ internshipId }), // Send the facultyId in the request body
@@ -60,11 +60,11 @@ const Internships: React.FC = () => {
           alert(result.message);
           fetchInternships(); // Refresh internships after successful assignment
         } else {
-          alert(`Error: ${result.error || "Failed to assign faculty."}`);
+          alert(`Error: ${result.error || "Failed to assign Student."}`);
         }
       } catch (error) {
-        console.error("Error assigning faculty to internship:", error);
-        alert("Failed to assign faculty. Please try again.");
+        console.error("Error assigning Student to internship:", error);
+        alert("Failed to assign Student. Please try again.");
       }
     }
   };
