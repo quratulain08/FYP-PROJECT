@@ -15,9 +15,11 @@ interface Department {
   email: string;
   phone: string;
   landLine?: string;
-  address: string;
-  province: string;
-  city: string;
+  focalPersonName: string;
+  focalPersonHonorific: string;
+  focalPersonCnic: string;
+  focalPersonEmail: string;
+  focalPersonPhone: string;
 }
 
 const DepartmentList: React.FC = () => {

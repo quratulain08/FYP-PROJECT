@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, useParams } from "next/navigation";
-import Layout from '../../components/Layout';
+import Layout from '../../../components/Layout';
 
 interface FacultyData {
     departmentId: string;

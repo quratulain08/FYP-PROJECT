@@ -52,19 +52,19 @@ export async function POST(req: Request) {
     await connectToDatabase();
     console.log("Connected to the database");
 
-    const { name, department, batch, didInternship, registrationNumber } = studentData;
+    const { name, department, batch, didInternship, registrationNumber ,section } = studentData;
     
     // Log each field
     console.log("Received student data fields:");
     console.log(`Name: ${name}, Department: ${department}, Batch: ${batch}, Internship Status: ${didInternship}, Registration Number: ${registrationNumber}`);
 
     // Validate the required fields
-    if (!name || !department || !batch || didInternship === undefined || !registrationNumber) {
+    if (!name || !department || !batch || didInternship === undefined || !registrationNumber  || !section) {
       console.log("Missing required fields");
       return NextResponse.json(
         {
           error: 'Missing required fields',
-          missingFields: { name, department, batch, didInternship, registrationNumber },
+          missingFields: { name, department, batch, didInternship, registrationNumber,section},
         },
         { status: 400 }
       );

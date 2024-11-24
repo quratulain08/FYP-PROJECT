@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Layout from "../../../app/components/Layout";
+import Layout from "@/app/components/Layout";
 
 interface Faculty {
   _id: string;

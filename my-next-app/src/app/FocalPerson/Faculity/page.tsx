@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Eye, Pencil, Trash2 } from "lucide-react";
-import Layout from "@/app/components/Layout";
 
 // Custom notification component
 const Notification = ({ 
@@ -143,7 +141,8 @@ export default function DepartmentDetail() {
   
   const params = useParams();
   const router = useRouter();
-  const id = params.slug as string;
+  const id ='674179f1d751474776dc5bd5';
+//   = params.slug as string;
 
   const checkResponseType = async (response: Response) => {
     const contentType = response.headers.get("content-type");
@@ -212,13 +211,13 @@ export default function DepartmentDetail() {
 
   const handleAddFaculty = () => {
     if (department) {
-      router.push(`/Admin/FacultyForm/${id}`);
+      router.push(`/admin/FacultyForm/${id}`);
     } else {
       setError({ message: "Department information is not available" });
     }
   };
 
-  const handleEditFaculty = (faculty: Faculty) => {
+  const handleAddInternship = (faculty: Faculty) => {
     console.log('Editing faculty:', faculty);
 
     if (!faculty._id) {
@@ -229,65 +228,11 @@ export default function DepartmentDetail() {
       return;
     }
     
-    const editUrl = `/Admin/FacultyForm/${encodeURIComponent(id)}?edit=true&facultyId=${encodeURIComponent(faculty._id)}&readOnlyName=${encodeURIComponent(faculty.name)}&readOnlyCnic=${encodeURIComponent(faculty.cnic)}`;
+    const editUrl = `/FocalPerson/InternshipsForFaculty/${faculty._id}`;
     router.push(editUrl);
   };
 
-  const handleViewFaculty = (faculty: Faculty) => {
-    router.push(`/Admin/FacultyView/${faculty._id}`);
-  };
-
-  const confirmDelete = (facultyId: string) => {
-    setModalData({ isOpen: true, facultyId });
-  };
-
-  const handleDeleteFaculty = async (facultyId: string) => {
-    if (!facultyId) {
-      setNotification({
-        type: 'error',
-        message: 'Invalid faculty ID'
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      console.log('Deleting faculty with ID:', facultyId);
-
-      const response = await fetch(`/api/faculty/${facultyId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete faculty member');
-      }
-
-      const result = await response.json();
-      console.log('Delete result:', result);
-
-      setFacultyMembers(prevMembers => 
-        prevMembers.filter(member => member._id !== facultyId)
-      );
-
-      setNotification({
-        type: 'success',
-        message: 'Faculty member deleted successfully'
-      });
-
-    } catch (error) {
-      console.error('Error deleting faculty member:', error);
-      setNotification({
-        type: 'error',
-        message: error instanceof Error 
-          ? `Error: ${error.message}` 
-          : 'Failed to delete faculty member'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
+ 
   const handleRetry = () => {
     setLoading(true);
     setError(null);
@@ -336,7 +281,6 @@ export default function DepartmentDetail() {
   }
 
   return (
-    <Layout>
     <div className="max-w-6xl mx-auto p-6">
       {notification && (
         <Notification
@@ -346,18 +290,6 @@ export default function DepartmentDetail() {
         />
       )}
 
-      <ConfirmationModal
-        isOpen={modalData.isOpen}
-        onClose={() => setModalData({ isOpen: false })}
-        onConfirm={() => {
-          if (modalData.facultyId) {
-            handleDeleteFaculty(modalData.facultyId);
-          }
-          setModalData({ isOpen: false });
-        }}
-        title="Confirm Delete"
-        message="Are you sure you want to delete this faculty member? This action cannot be undone."
-      />
 
       <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
         <div className="flex flex-col mb-4">
@@ -470,28 +402,13 @@ export default function DepartmentDetail() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         <button
-                          onClick={() => handleViewFaculty(faculty)}
+                          onClick={() => handleAddInternship(faculty)}
                           className="text-blue-600 hover:text-blue-900"
                           title="View Details"
                         >
-                          <Eye size={20} />
+                            Add To Internship
                         </button>
-                        <button
-                          onClick={() => handleEditFaculty(faculty)}
-                          className="text-green-600 hover:text-green-900"
-                          title="Edit"
-                          disabled={loading}
-                        >
-                          <Pencil size={20} />
-                        </button>
-                        <button
-                          onClick={() => confirmDelete(faculty._id)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete"
-                          disabled={loading}
-                        >
-                          <Trash2 size={20} />
-                        </button>
+                     
                       </div>
                     </td>
                   </tr>
@@ -502,6 +419,5 @@ export default function DepartmentDetail() {
         )}
       </div>
     </div>
-    </Layout>
   );
 }
