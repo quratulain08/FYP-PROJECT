@@ -12,6 +12,7 @@ export interface IInternship extends Document {
   supervisorEmail: string;
   startDate: Date;
   endDate: Date;
+  category: string; 
   status: 'OPEN' | 'CLOSED';
   universityId: mongoose.Types.ObjectId;
   createdAt: Date;

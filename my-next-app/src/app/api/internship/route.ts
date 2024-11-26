@@ -23,6 +23,7 @@ export async function POST(request: Request) {
       'supervisorEmail',
       'startDate',
       'endDate',
+      'category', 
       'universityId',
     ];
 
