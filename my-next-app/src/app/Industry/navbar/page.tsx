@@ -42,9 +42,9 @@ const Navbar: React.FC = () => {
       <nav className="bg-white border-b border-gray-300 shadow-sm">
         <div className="container mx-auto px-2 py-1 flex justify-between items-center">
           <div className="flex space-x-8">
-            <Link href="/dashboard" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-blue-500 mb-2"><FaHome /></span>
-              <span className="text-sm">Dashboard</span>
+            <Link href="/Industry/university" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+            <span className="text-2xl text-green-500 mb-2"><FaUniversity /></span>
+              <span className="text-sm">Universities</span>
             </Link>
             <Link href="/profile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-black mb-2"><FaUser /></span>
@@ -60,10 +60,7 @@ const Navbar: React.FC = () => {
               <span className="text-sm">Departments & Programs</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
-            <Link href="/Faculty" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-purple-500 mb-2"><FaChalkboardTeacher /></span>
-              <span className="text-sm">Faculty Directory</span>
-            </Link>
+      
             <Link href="/student" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-black mb-2"><FaUsers /></span>
               <span className="text-sm">Students Directory</span>
