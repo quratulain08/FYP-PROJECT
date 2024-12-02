@@ -1,133 +1,127 @@
-// src/app/api/internship/route.ts
+import { NextResponse } from "next/server";
+import connectToDatabase from "@/lib/mongodb"; // Adjust the path if necessary
+import Internship from "@/models/internship"; // Adjust the path if necessary
 
-import { NextResponse } from 'next/server';
-import mongoose from 'mongoose';
-import { Internship } from '@/models/internship';
-import connectToDatabase from '@/lib/mongodb';
+// Helper to safely extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
 
-export async function POST(request: Request) {
+// GET: Fetch all internships.
+export async function GET(req: Request) {
   try {
     await connectToDatabase();
 
-    const data = await request.json();
-    console.log('Received POST data:', data);
+    const { searchParams } = new URL(req.url);
+    const category = searchParams.get("category");
+    const location = searchParams.get("location");
 
-    // Validate required fields
-    const requiredFields = [
-      'title',
-      'description',
-      'numberOfStudents',
-      'locationType',
-      'compensationType',
-      'supervisorName',
-      'supervisorEmail',
-      'startDate',
-      'endDate',
-      'category', 
-      'universityId',
-    ];
+    const filter: Record<string, any> = {};
+    if (category) filter.category = category;
+    if (location) filter.location = location;
 
-    for (const field of requiredFields) {
-      if (!data[field]) {
-        console.log(`Missing required field: ${field}`);
-        return NextResponse.json(
-          { error: `${field} is required` },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Validate universityId format
-    if (!mongoose.Types.ObjectId.isValid(data.universityId)) {
-      console.log('Invalid universityId format:', data.universityId);
-      return NextResponse.json(
-        { error: 'Invalid university ID format' },
-        { status: 400 }
-      );
-    }
-
-    // Create new internship with explicit type conversion
-    const internshipData = {
-      ...data,
-      numberOfStudents: parseInt(data.numberOfStudents, 10),
-      compensationAmount: data.compensationType === 'paid' 
-        ? parseFloat(data.compensationAmount) 
-        : undefined,
-      startDate: new Date(data.startDate),
-      endDate: new Date(data.endDate),
-      universityId: new mongoose.Types.ObjectId(data.universityId),
-    };
-
-    console.log('Creating internship with data:', internshipData);
-
-    const internship = new Internship(internshipData);
-    await internship.save();
-
-    console.log('Successfully created internship:', {
-      id: internship._id,
-      title: internship.title
-    });
-
-    return NextResponse.json(internship, { status: 201 });
+    const internships = await Internship.find(filter);
+    return NextResponse.json(internships);
   } catch (error) {
-    console.error('Detailed error in POST internship:', error);
+    console.error("Error fetching internships:", getErrorMessage(error));
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create internship' },
+      { error: "Failed to fetch internships", details: getErrorMessage(error) },
       { status: 500 }
     );
   }
 }
 
-export async function GET(request: Request) {
+// POST: Add a new internship.
+export async function POST(req: Request) {
   try {
+    const internshipData = await req.json();
+
+    if (!internshipData || typeof internshipData !== "object") {
+      return NextResponse.json(
+        { error: "Invalid internship data format" },
+        { status: 400 }
+      );
+    }
+
     await connectToDatabase();
-    
-    const { searchParams } = new URL(request.url);
-    const universityId = searchParams.get('universityId');
 
-    console.log('Attempting to fetch internships with params:', {
-      universityId,
-    });
+    const { title, hostInstitution, location, category, startDate, endDate, description } = internshipData;
 
-    // Check if universityId exists
-    if (!universityId) {
-      console.log('No universityId provided');
+    if (!title || !hostInstitution || !location || !category || !startDate || !endDate || !description) {
       return NextResponse.json(
-        { error: 'University ID is required' },
+        {
+          error: "Missing required fields",
+          missingFields: { title, hostInstitution, location, category, startDate, endDate, description },
+        },
         { status: 400 }
       );
     }
 
-    // Now we know universityId is not null, check if it's valid
-    if (!mongoose.Types.ObjectId.isValid(universityId)) {
-      console.log('Invalid universityId format:', universityId);
-      return NextResponse.json(
-        { error: 'Invalid university ID format' },
-        { status: 400 }
-      );
-    }
+    const newInternship = new Internship(internshipData);
+    await newInternship.save();
 
-    const query = { universityId: new mongoose.Types.ObjectId(universityId) };
-    console.log('MongoDB query:', JSON.stringify(query));
-
-    const internships = await Internship.find(query)
-      .sort({ createdAt: -1 })
-      .lean();
-
-    console.log('Query result:', {
-      count: internships.length,
-      firstInternship: internships[0] ? {
-        id: internships[0]._id,
-        title: internships[0].title,
-        universityId: internships[0].universityId
-      } : null
-    });
-
-    return NextResponse.json(internships);
+    return NextResponse.json({ message: "Internship added successfully!" });
   } catch (error) {
-    console.error('Detailed error in GET internships:', error);
+    console.error("Error adding internship:", getErrorMessage(error));
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch internships' },
+      { error: "Failed to add internship", details: getErrorMessage(error) },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT: Update an internship by ID.
+export async function PUT(req: Request) {
+  try {
+    const { id, ...updateData } = await req.json();
+    await connectToDatabase();
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing internship ID" }, { status: 400 });
+    }
+
+    const updatedInternship = await Internship.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    if (!updatedInternship) {
+      return NextResponse.json({ error: "Internship not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Internship updated successfully!" });
+  } catch (error) {
+    console.error("Error updating internship:", getErrorMessage(error));
+    return NextResponse.json(
+      { error: "Failed to update internship", details: getErrorMessage(error) },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE: Remove an internship by ID.
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json();
+    await connectToDatabase();
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing internship ID" }, { status: 400 });
+    }
+
+    const deletedInternship = await Internship.findByIdAndDelete(id);
+
+    if (!deletedInternship) {
+      return NextResponse.json({ error: "Internship not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Internship deleted successfully!" });
+  } catch (error) {
+    console.error("Error deleting internship:", getErrorMessage(error));
+    return NextResponse.json(
+      { error: "Failed to delete internship", details: getErrorMessage(error) },
       { status: 500 }
     );
   }

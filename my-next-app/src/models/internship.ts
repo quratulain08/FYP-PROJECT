@@ -1,67 +1,41 @@
-//models->internship.ts
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
-export interface IInternship extends Document {
+export interface Internship extends Document {
   title: string;
+  hostInstitution: string;
+  location: string;
+  category: string;
+  startDate: string;
+  endDate: string;
   description: string;
-  numberOfStudents: number;
-  locationType: 'onsite' | 'oncampus';
-  compensationType: 'paid' | 'unpaid';
-  compensationAmount?: number;
-  supervisorName: string;
-  supervisorEmail: string;
-  startDate: Date;
-  endDate: Date;
-  category: string; 
-  status: 'OPEN' | 'CLOSED';
-  universityId: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
+  assignedFaculty: mongoose.Types.ObjectId[]; // Array of ObjectId references to Faculty
+  assignedStudents: mongoose.Types.ObjectId[]; // Array of ObjectId references to Students
+  isApproved: boolean; // Indicates if the internship is approve
 }
 
-const InternshipSchema = new Schema<IInternship>({
+const internshipSchema = new Schema<Internship>({
   title: { type: String, required: true },
+  hostInstitution: { type: String, required: true },
+  location: { type: String, required: true },
+  category: { type: String, required: true },
+  startDate: { type: String, required: true },
+  endDate: { type: String, required: true },
   description: { type: String, required: true },
-  numberOfStudents: { type: Number, required: true },
-  locationType: { 
-    type: String, 
-    required: true,
-    enum: ['onsite', 'oncampus']
-  },
-  compensationType: { 
-    type: String, 
-    required: true,
-    enum: ['paid', 'unpaid']
-  },
-  compensationAmount: { 
-    type: Number,
-    required: function(this: IInternship) {
-      return this.compensationType === 'paid';
-    }
-  },
-  supervisorName: { type: String, required: true },
-  supervisorEmail: { type: String, required: true },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
-  status: { 
-    type: String, 
-    required: true,
-    enum: ['OPEN', 'CLOSED'],
-    default: 'OPEN'
-  },
-  universityId: { 
-    type: Schema.Types.ObjectId, 
-    ref: 'University',
-    required: true 
-  },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-}, {
-  timestamps: true
+  assignedFaculty: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "faculty", // Reference to the Student model
+    },
+  ],
+  assignedStudents: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student", // Reference to the Student model
+    },
+  ],
+  isApproved: { type: Boolean, default: false }, 
 });
 
-// Create indexes for better query performance
-InternshipSchema.index({ universityId: 1 });
-InternshipSchema.index({ createdAt: -1 });
+const InternshipModel = mongoose.models.Internship || mongoose.model<Internship>("Internship", internshipSchema);
 
-export const Internship = mongoose.models.Internship || mongoose.model<IInternship>('Internship', InternshipSchema);
+export default InternshipModel; 

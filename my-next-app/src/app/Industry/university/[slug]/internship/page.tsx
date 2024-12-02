@@ -27,6 +27,7 @@ interface InternshipForm {
   category: string;
 }
 
+
 const Internship = () => {
   const params = useParams();
   const universityId = params?.slug as string;
@@ -35,6 +36,7 @@ const Internship = () => {
   const [error, setError] = useState<string | null>(null);
   const [internships, setInternships] = useState<Internship[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
   const [formData, setFormData] = useState<InternshipForm>(() => ({
     title: '',
     description: '',
