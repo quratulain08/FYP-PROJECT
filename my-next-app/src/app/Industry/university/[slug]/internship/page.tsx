@@ -13,10 +13,11 @@ interface Internship {
 }
 
 interface InternshipForm {
+  hostInstitution: string;
   title: string;
   description: string;
   numberOfStudents: number;
-  locationType: 'onsite' | 'oncampus';
+  location: 'onsite' | 'oncampus';
   compensationType: 'paid' | 'unpaid';
   compensationAmount?: number;
   supervisorName: string;
@@ -37,11 +38,13 @@ const Internship = () => {
   const [internships, setInternships] = useState<Internship[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  
   const [formData, setFormData] = useState<InternshipForm>(() => ({
+    hostInstitution:'',
     title: '',
     description: '',
     numberOfStudents: 1,
-    locationType: 'onsite',
+    location: 'onsite',
     compensationType: 'paid',
     compensationAmount: 0,
     supervisorName: '',
@@ -88,9 +91,9 @@ const Internship = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
     try {
-      const res = await fetch('/api/internship', {
+      const res = await fetch('/api/internshipsForIndustories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,30 +104,32 @@ const Internship = () => {
           compensationAmount: formData.compensationType === 'paid' 
             ? Number(formData.compensationAmount) 
             : undefined,
+          universityId, // Pass universityId explicitly
         }),
       });
-
+  
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error || 'Failed to create internship');
       }
-
+  
       const newInternship = await res.json();
       setInternships((prev) => [newInternship, ...prev]);
-
+  
       // Reset form
       setFormData({
         title: '',
         description: '',
         numberOfStudents: 1,
-        locationType: 'onsite',
+        location: 'onsite',
         compensationType: 'paid',
         compensationAmount: 0,
         supervisorName: '',
         supervisorEmail: '',
         startDate: '',
+        hostInstitution: '',
         endDate: '',
-        universityId: universityId,
+        universityId: universityId, // Maintain universityId in the form
         category: 'frontend',
       });
     } catch (err) {
@@ -134,6 +139,7 @@ const Internship = () => {
       setLoading(false);
     }
   };
+  
 
   const internshipCategories = [
     // Technology
@@ -275,8 +281,8 @@ const Internship = () => {
                   Location Type <span className="text-red-500">*</span>
                 </label>
                 <select
-                  name="locationType"
-                  value={formData.locationType}
+                  name="location"
+                  value={formData.location}
                   onChange={handleChange}
                   className="w-full p-3 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
                   required
@@ -348,7 +354,22 @@ const Internship = () => {
                   required
                 />
               </div>
+              {/* hostInstitution */}
 
+              <div>
+                <label className="block text-sm font-medium text-gray-600">
+                hostInstitution Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="hostInstitution"
+                  value={formData.hostInstitution}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                  placeholder="hostInstitution Name"
+                  required
+                />
+              </div>
               {/* Supervisor Fields */}
               <div>
                 <label className="block text-sm font-medium text-gray-600">
