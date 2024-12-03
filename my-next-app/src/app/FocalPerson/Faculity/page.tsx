@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
+import FocalPersonLayout from "../FocalPersonLayout";
 // Custom notification component
 const Notification = ({ 
   type, 
@@ -281,6 +281,8 @@ export default function DepartmentDetail() {
   }
 
   return (
+    <FocalPersonLayout>
+
     <div className="max-w-6xl mx-auto p-6">
       {notification && (
         <Notification
@@ -419,5 +421,6 @@ export default function DepartmentDetail() {
         )}
       </div>
     </div>
+    </FocalPersonLayout>
   );
 }

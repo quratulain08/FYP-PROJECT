@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import FocalPersonLayout from "../FocalPersonLayout";
 interface Department {
     _id: string;
     name: string;
@@ -206,9 +206,11 @@ const VocalPerson: React.FC = () => {
   );
 
   return (
+    <FocalPersonLayout>
     <div className="max-w-3xl mx-auto p-6">
       {loading ? <p>Loading...</p> : error ? <p className="text-red-500">{error}</p> : editMode ? renderForm() : renderDisplay()}
     </div>
+    </FocalPersonLayout>
   );
 };
 

@@ -11,8 +11,7 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
-import Layout from "@/app/components/Layout";
-
+import FocalPersonLayout from "../FocalPersonLayout";
 ChartJS.register(
   ArcElement,
   Tooltip,
@@ -104,6 +103,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
+    <FocalPersonLayout>
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-3xl font-semibold text-green-600 mb-6">Internship Dashboard</h1>
 
@@ -136,6 +136,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      </FocalPersonLayout>
   );
 };
 

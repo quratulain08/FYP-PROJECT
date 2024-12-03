@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Layout from "@/app/components/Layout";
+import CoordinatorLayout from './../../CoordinatorLayout';
 
 // Custom notification component
 const Notification = ({ 
@@ -336,7 +337,7 @@ export default function DepartmentDetail() {
   }
 
   return (
-    <Layout>
+    <CoordinatorLayout>
     <div className="max-w-6xl mx-auto p-6">
       {notification && (
         <Notification
@@ -502,6 +503,6 @@ export default function DepartmentDetail() {
         )}
       </div>
     </div>
-    </Layout>
+    </CoordinatorLayout>
   );
 }

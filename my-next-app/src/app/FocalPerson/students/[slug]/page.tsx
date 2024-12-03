@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import BatchSummary from '@/app/admin/Batch/[slug]/page';
-
+import FocalPersonLayout from "../../FocalPersonLayout";
 interface Student {
   _id: string;
   name: string;
@@ -232,7 +232,7 @@ const StudentsPage: React.FC = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    
+<FocalPersonLayout>    
 
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-semibold text-green-600 mb-8">
@@ -337,7 +337,7 @@ const StudentsPage: React.FC = () => {
         </div>
       )}
     </div>
-
+    </FocalPersonLayout>
   );
 
 };

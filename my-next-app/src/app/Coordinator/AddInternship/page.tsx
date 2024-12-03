@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
+import CoordinatorLayout from "../CoordinatorLayout";
 export default function AddInternship() {
   const router = useRouter();
   const params = useParams();
@@ -58,6 +58,7 @@ export default function AddInternship() {
   };
 
   return (
+    <CoordinatorLayout>
     <div className="max-w-6xl mx-auto p-6">
       <p>{departmentID}</p>
       <h1 className="text-2xl font-semibold text-blue-600 mb-6">Add New Internship</h1>
@@ -176,5 +177,6 @@ export default function AddInternship() {
         {error && <div className="text-red-500 mt-4">{error}</div>}
       </div>
     </div>
+    </CoordinatorLayout>
   );
 }

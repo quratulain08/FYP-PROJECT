@@ -3,7 +3,7 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import InterpriseCellLayout from "../InterpriseCellLayout";
 interface Internship {
   _id: string;
   title: string;
@@ -108,6 +108,7 @@ const Internships: React.FC = () => {
     );
 
   return (
+    <InterpriseCellLayout>
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Internships</h1>
@@ -187,6 +188,7 @@ const Internships: React.FC = () => {
         </div>
       )}
     </div>
+    </InterpriseCellLayout>
   );
 };
 

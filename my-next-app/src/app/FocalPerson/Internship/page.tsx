@@ -5,7 +5,7 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import FocalPersonLayout from "./../FocalPersonLayout";
 interface Internship {
   _id: string;
   title: string;
@@ -70,6 +70,7 @@ const Internships: React.FC = () => {
 
 
   if (loading) return (
+   
     <div className="flex justify-center items-center min-h-screen">
       <p className="text-xl">Loading...</p>
     </div>
@@ -82,6 +83,7 @@ const Internships: React.FC = () => {
   );
 
   return (
+    <FocalPersonLayout>
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Internships</h1>
@@ -133,6 +135,7 @@ const Internships: React.FC = () => {
         </div>
       )}
     </div>
+    </FocalPersonLayout>
 
   );
 };

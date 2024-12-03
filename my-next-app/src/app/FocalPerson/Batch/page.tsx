@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
-
+import FocalPersonLayout from "../FocalPersonLayout";
 interface Student {
   _id: string;
   name: string;
@@ -140,6 +140,7 @@ const BatchSummary: React.FC = () => {
   if (error) return <p>{error}</p>;
 
   return (
+    <FocalPersonLayout>
    
         <div className="max-w-6xl mx-auto p-6">
           <h1 className="text-3xl font-semibold text-green-600 mb-8">
@@ -217,6 +218,7 @@ const BatchSummary: React.FC = () => {
             </div>
           )}
         </div>
+        </FocalPersonLayout>
     );
     
 };

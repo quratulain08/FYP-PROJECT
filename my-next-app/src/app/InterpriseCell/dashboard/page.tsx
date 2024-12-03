@@ -11,7 +11,7 @@ import {
   LinearScale,
   BarElement,
 } from "chart.js";
-import Layout from "@/app/components/Layout";
+import InterpriseCellLayout from "./../InterpriseCellLayout"
 
 ChartJS.register(
   ArcElement,
@@ -104,6 +104,7 @@ const ApprovalDashboard: React.FC = () => {
   };
 
   return (
+    <InterpriseCellLayout>
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-semibold text-green-600 mb-6">
         Internship Approval Dashboard
@@ -140,6 +141,7 @@ const ApprovalDashboard: React.FC = () => {
         </div>
       </div>
     </div>
+    </InterpriseCellLayout>
   );
 };
 
