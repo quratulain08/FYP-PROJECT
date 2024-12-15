@@ -1,24 +1,80 @@
 // pages/StudentsPage.js
-
-import Layout from '@/app/components/Layout';
-import InstituteProfile from '@/app/components/InstituteProfileForm';
-import DepartmentListiInStudents from '@/app/components/departmentInStudents'
-import Navbar from '@/app/Coordinator/navbar/page';
+"use client";
 import CoordinatorLayout from './../CoordinatorLayout';
+import { useRouter } from 'next/navigation';
+import { useEffect,useState } from 'react';
+    
+interface Department {
+    _id: string;
+    name: string;
+    startDate: string;
+    category: string;
+    hodName: string;
+    honorific: string;
+    cnic: string;
+    email: string;
+    phone: string;
+    landLine?: string;
+    focalPersonName: '',
+    focalPersonHonorific: 'Mr.',
+    focalPersonCnic: '',
+    focalPersonEmail: '',
+    focalPersonPhone: '',
+    CoordinatorName: string,
+    CoordinatorHonorific: 'Mr.',
+    CoordinatorCnic: '',
+    CoordinatorEmail: '',
+    CoordinatorPhone: '',
 
+  }
 const StudentsPagee = () => {
-    return (
-        <CoordinatorLayout>
-         <div className="min-h-screen"> {/* Ensures the page takes full height */}
-         {/* Navbar */}
+    const router = useRouter();
+    const [profile, setProfile] = useState<Department | null>(null);
+    const [loading, setLoading] = useState(true); // Track loading state
+    const [error, setError] = useState<string | null>(null); // Track errors
+    useEffect(() => {
+        const fetchAndNavigate = async () => {
+            const CoordinatorEmail = "wajahat1@gmail.com"; // Replace with the actual email
+            try {
+                const response = await fetch(`/api/ProfileForCoordinator?CoordinatorEmail=${CoordinatorEmail}`);
+                if (response.ok) {
+                  const data: Department = await response.json();
+                  setProfile(data);
+                  
+                    if (data && data._id) { 
+                        // Navigate directly to the department detail page
+                        router.push(`/Coordinator/Batch/${data._id}`);
+                    } else {
+                        console.error("Department not found.");
+                    }
+                } else {
+                    console.error("Failed to fetch department:", await response.json());
+                }
+            } catch (error) {
+                console.error("Error fetching department:", error);
+            }
+        };
 
-         {/* The content of the page */}
-         <div className="container mx-auto px-4 py-8 mt-20"> {/* Adjust mt-20 as needed */}
-             <DepartmentListiInStudents />
-         </div>
-     </div>
-     </CoordinatorLayout>
-    );
+        fetchAndNavigate();
+    }, [router]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <p className="text-red-500">{error}</p>
+            </div>
+        );
+    }
+
+    return null; 
 };
 
 export default StudentsPagee;

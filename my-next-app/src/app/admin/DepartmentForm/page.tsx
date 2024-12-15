@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import DepartmentInfo from './DepartmentInfo';
+import DepartmentInfo from '@/models/Department';
 import Layout from "@/app/components/Layout";
 
 const DepartmentDashboard: React.FC = () => {
@@ -20,6 +20,11 @@ const DepartmentDashboard: React.FC = () => {
     focalPersonCnic: '',
     focalPersonEmail: '',
     focalPersonPhone: '',
+    CoordinatorName: '',
+    CoordinatorHonorific: 'Mr.',
+    CoordinatorCnic: '',
+    CoordinatorEmail: '',
+    CoordinatorPhone: '',
   });
 
   const [statusMessage, setStatusMessage] = useState('');
@@ -78,6 +83,11 @@ const DepartmentDashboard: React.FC = () => {
         focalPersonCnic: '',
         focalPersonEmail: '',
         focalPersonPhone: '',
+        CoordinatorName: '',
+        CoordinatorHonorific: 'Mr.',
+        CoordinatorCnic: '',
+        CoordinatorEmail: '',
+        CoordinatorPhone: '',
       }); // Reset the form after successful submission
     } catch (error) {
       console.error(error);
@@ -232,7 +242,6 @@ const DepartmentDashboard: React.FC = () => {
             </div>
 
             {/* Focal Person Information */}
-            {/* Focal Person Information */}
 <div className="border border-green-500 p-4">
   <h2 className="text-green-600 font-semibold mb-2">Focal Person Information</h2>
   <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
@@ -303,6 +312,79 @@ const DepartmentDashboard: React.FC = () => {
     </div>
   </div>
 </div>
+
+         {/* Coordinator Information */}
+         <div className="border border-green-500 p-4">
+  <h2 className="text-green-600 font-semibold mb-2">Coordinator Information</h2>
+  <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+    <div>
+      <label className="block text-xs font-semibold mb-1">Honorific</label>
+      <select
+        name="CoordinatorHonorific"
+        value={department.CoordinatorHonorific}
+        onChange={handleChange}
+        className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+      >
+        <option value="Mr.">Mr.</option>
+        <option value="Ms.">Ms.</option>
+        <option value="Dr.">Dr.</option>
+      </select>
+    </div>
+
+    <div>
+      <label className="block text-xs font-semibold mb-1">Coordinator Name</label>
+      <input
+        type="text"
+        name="CoordinatorName"
+        value={department.CoordinatorName}
+        onChange={handleChange}
+        placeholder="Coordinator Name"
+        required
+        className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+      />
+    </div>
+
+    <div>
+      <label className="block text-xs font-semibold mb-1">CNIC</label>
+      <input
+        type="text"
+        name="CoordinatorCnic"
+        value={department.CoordinatorCnic}
+        onChange={handleChange}
+        placeholder="CNIC"
+        required
+        className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+      />
+    </div>
+
+    <div>
+      <label className="block text-xs font-semibold mb-1">Email</label>
+      <input
+        type="email"
+        name="CoordinatorEmail"
+        value={department.CoordinatorEmail}
+        onChange={handleChange}
+        placeholder="Email"
+        required
+        className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+      />
+    </div>
+
+    <div>
+      <label className="block text-xs font-semibold mb-1">Phone No.</label>
+      <input
+        type="text"
+        name="CoordinatorPhone"
+        value={department.CoordinatorPhone}
+        onChange={handleChange}
+        placeholder="Phone No."
+        required
+        className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+      />
+    </div>
+  </div>
+</div>
+
 
           </div>
         </div>

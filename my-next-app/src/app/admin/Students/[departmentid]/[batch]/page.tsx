@@ -76,7 +76,7 @@
     const [department, setDepartment] = useState<Department | null>(null);
     const params = useParams();
     const DepartmentID = params.departmentid as string;
-    const batch = params.batch as string;
+    const CurrentBatch = params.batch as string;
 
 
 
@@ -225,37 +225,19 @@
     };
 
     const handleUpload = async () => {
-      if (!file) return alert("Please select an Excel file.");
+      if (!file) {
+        alert("Please select a file first.");
+        return;
+      }
     
       setUploading(true);
-    
       try {
-        // Parse the Excel file to JSON
-        const data = await file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: "array" });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        // Static batch name (can be changed dynamically as needed)
+        const batch = CurrentBatch;
+        const departmentName = department?.name || "Unknown Department";
+        // Call the general function with dynamic batch and file
+        await handleFileUpload(file, batch, departmentName);
     
-        // Prepare form data to send with file
-        const formData = new FormData();
-        formData.append("file", file);
-    
-        // Attach the student data (jsonData) as JSON in the form data
-        formData.append("students", JSON.stringify(jsonData));
-    
-        // Upload the formData
-        const response = await fetch("/api/upload-students", {
-          method: "POST",
-          body: formData,
-        });
-    
-        if (!response.ok) {
-          const error = await response.json();
-          console.error(`Failed to upload students: ${error.message}`);
-        } else {
-          alert("Data uploaded successfully.");
-          setShowModal(false);  // Close the modal after successful upload
-        }
       } catch (error) {
         console.error("Upload error:", error);
         alert("Failed to upload data.");
@@ -263,6 +245,57 @@
         setUploading(false);
       }
     };
+    
+    // General file upload handler
+    const handleFileUpload = async (file: File, batch: string, department:string) => {
+      try {
+        // Parse the Excel file to JSON
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array" });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData: Student[] = XLSX.utils.sheet_to_json(worksheet);
+    
+        // Add the batch attribute to each student
+        const studentsWithBatch = jsonData.map((student) => ({
+          ...student,
+          batch,
+          department,
+        }));
+    
+        // Validate file and data
+        if (!file || studentsWithBatch.length === 0) {
+          alert("Please provide a valid file and batch information.");
+          return;
+        }
+    
+        // Prepare form data to send with the file
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("students", JSON.stringify(studentsWithBatch));
+    
+        // Upload the formData
+        const response = await fetch("/api/upload-students", {
+          method: "POST",
+          body: formData,
+        });
+    
+        console.log("Response status:", response.status);
+    
+        if (!response.ok) {
+          const error = await response.json();
+          console.error(`Failed to upload students: ${error.error}`);
+          alert(`Failed to upload students: ${error.error}`);
+          return;
+        }
+    
+        alert("Data uploaded successfully.");
+        setShowModal(false); // Close the modal after successful upload
+      } catch (error) {
+        console.error("Upload error:", error);
+        alert("Failed to upload data.");
+      }
+    };
+    
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
@@ -306,7 +339,7 @@
           </thead>
           <tbody>
             
-            {filteredStudents .filter((student) => student.batch === batch)
+            {filteredStudents .filter((student) => student.batch === CurrentBatch)
             .map((student) => (
               <tr key={student._id} className="border-b border-gray-300">
                 <td className="py-2 px-4">{student.registrationNumber}</td>

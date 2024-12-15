@@ -17,6 +17,11 @@ export interface IDepartment extends Document {
   focalPersonCnic: string;
   focalPersonEmail: string;
   focalPersonPhone: string;
+  CoordinatorName: string;
+  CoordinatorHonorific: string;
+  CoordinatorCnic: string;
+  CoordinatorEmail: string;
+  CoordinatorPhone: string;
 }
 
 const DepartmentSchema: Schema = new Schema({
@@ -34,6 +39,11 @@ const DepartmentSchema: Schema = new Schema({
   focalPersonCnic: { type: String, required: true ,unique: true },
   focalPersonEmail: { type: String, required: true , unique: true },
   focalPersonPhone: { type: String, required: true },
+  CoordinatorName: { type: String, required: true },
+  CoordinatorHonorific: { type: String, required: true ,default: 'Mr.'},
+  CoordinatorCnic: { type: String, required: true ,unique: true },
+  CoordinatorEmail: { type: String, required: true , unique: true },
+  CoordinatorPhone: { type: String, required: true },
 }, {
   timestamps: true,
 });

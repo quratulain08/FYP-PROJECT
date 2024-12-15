@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import Layout from "@/app/components/Layout";
-import CoordinatorLayout from './../../CoordinatorLayout';
+import CoordinatorLayout from "../../CoordinatorLayout";
 
 // Custom notification component
 const Notification = ({ 
@@ -213,7 +213,7 @@ export default function DepartmentDetail() {
 
   const handleAddFaculty = () => {
     if (department) {
-      router.push(`/admin/FacultyForm/${id}`);
+      router.push(`/Coordinator/FacultyForm/${id}`);
     } else {
       setError({ message: "Department information is not available" });
     }
@@ -230,12 +230,12 @@ export default function DepartmentDetail() {
       return;
     }
     
-    const editUrl = `/admin/FacultyForm/${encodeURIComponent(id)}?edit=true&facultyId=${encodeURIComponent(faculty._id)}&readOnlyName=${encodeURIComponent(faculty.name)}&readOnlyCnic=${encodeURIComponent(faculty.cnic)}`;
+    const editUrl = `/Coordinator/FacultyForm/${encodeURIComponent(id)}?edit=true&facultyId=${encodeURIComponent(faculty._id)}&readOnlyName=${encodeURIComponent(faculty.name)}&readOnlyCnic=${encodeURIComponent(faculty.cnic)}`;
     router.push(editUrl);
   };
 
   const handleViewFaculty = (faculty: Faculty) => {
-    router.push(`/admin/FacultyView/${faculty._id}`);
+    router.push(`/Coordinator/FacultyView/${faculty._id}`);
   };
 
   const confirmDelete = (facultyId: string) => {
@@ -405,7 +405,7 @@ export default function DepartmentDetail() {
                 <span className="font-semibold">Land Line:</span> {department.landLine}
               </p>
             )}
-           <p className="mb-3">
+             <p className="mb-3">
                 <span className="font-bold">Focal Person Name:</span> {department.focalPersonHonorific} {department.focalPersonName}
               </p>
               <p className="mb-3">

@@ -47,11 +47,12 @@ const Navbar: React.FC = () => {
               <span className="text-sm">Internships</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
-            <Link href="/Coordinator/Department" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-red-500 mb-2"><FaFolder /></span>
-              <span className="text-sm">Departments & Programs</span>
+            <Link href="/Coordinator/Profile" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+              <span className="text-2xl text-Black-500 mb-2"><FaUser /></span>
+              <span className="text-sm">Profile</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
+          
             <Link href="/Coordinator/Faculty" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
               <span className="text-2xl text-purple-500 mb-2"><FaChalkboardTeacher /></span>
               <span className="text-sm">Faculty Directory</span>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Layout from "@/app/components/Layout";
+import CoordinatorLayout from "../../CoordinatorLayout";
 
 interface Student {
   _id: string;
@@ -35,7 +36,7 @@ const BatchSummary: React.FC = () => {
   const departmentId = params.slug as string;
 
   const handleViewDetails = (batch: string) => {
-    router.push(`/admin/Students/${departmentId}/${batch}`);
+    router.push(`/Coordinator/Students/${departmentId}/${batch}`);
   };
 
   const fetchBatchData = async () => {
@@ -141,7 +142,7 @@ const BatchSummary: React.FC = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <Layout>
+    <CoordinatorLayout>
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-3xl font-semibold text-green-600 mb-8">
           Batch Summary for Department
@@ -223,7 +224,7 @@ const BatchSummary: React.FC = () => {
           </tbody>
         </table>
       </div>
-    </Layout>
+      </CoordinatorLayout>
   );
 };
 

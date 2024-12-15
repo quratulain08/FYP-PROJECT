@@ -35,46 +35,41 @@ export async function DELETE(req: Request) {
 }
 
 // PUT Function
+
 export async function PUT(req: Request, { params }: { params: { slug: string } }) {
   try {
-    const { slug } = params; // `slug` contains the studentId
+    const { slug } = params; // slug contains the Student
     const body = await req.json(); // Parse request body
     const { internshipId } = body; // Extract internshipId from the request body
 
     // Validate request data
     if (!slug || !internshipId) {
-      return NextResponse.json(
-        { error: 'Student ID and Internship ID are required.' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Student ID and Internship ID are required." }, { status: 400 });
     }
 
     await connectToDatabase(); // Ensure database is connected
 
-    // Validate Student existence
-    const student = await StudentModel.findById(slug); // Fetch student by studentId from slug
-    if (!student) {
-      return NextResponse.json({ error: 'Student not found.' }, { status: 404 });
+    // Validate Faculty existence
+    const Student = await StudentModel.findById(slug); // Fetch faculty by facultyId from slug
+    if (!Student) {
+      return NextResponse.json({ error: "Student not found." }, { status: 404 });
     }
 
     // Validate Internship existence
     const internship = await InternshipModel.findById(internshipId); // Fetch internship by internshipId
     if (!internship) {
-      return NextResponse.json({ error: 'Internship not found.' }, { status: 404 });
+      return NextResponse.json({ error: "Internship not found." }, { status: 404 });
     }
 
-    // Add the student to the Internship's assignedStudents array if not already present
+    // Add the Faculty to the Internship's assignedFaculty array if not already present
     if (!internship.assignedStudents.includes(slug)) {
-      internship.assignedStudents.push(slug); // Use studentId (slug) to assign student
+      internship.assignedStudents.push(slug); // Use facultyId (slug) to assign faculty
       await internship.save(); // Save the updated internship
     }
 
-    return NextResponse.json({ message: 'Student assigned to internship successfully.' }, { status: 200 });
+    return NextResponse.json({ message: "Student assigned to internship successfully." }, { status: 200 });
   } catch (error) {
-    console.error('Error assigning student to internship:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    console.error("Error assigning Student to internship:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
