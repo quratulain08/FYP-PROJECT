@@ -32,6 +32,26 @@ export async function DELETE(req: Request) {
     );
   }
 }
+// GET Method: Fetch Internship by ID
+export async function GET(req: Request, { params }: { params: { slug: string } }) {
+  try {
+    const { slug } = params; // Dynamic parameter 'slug'
+    await connectToDatabase();
+
+    const internship = await InternshipModel.findById(slug);
+    if (!internship) {
+      return NextResponse.json({ error: "Internship not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(internship, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching internship:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch internship details" },
+      { status: 500 }
+    );
+  }
+}
 
 
 export async function PUT(req: Request, { params }: { params: { slug: string } }) {
