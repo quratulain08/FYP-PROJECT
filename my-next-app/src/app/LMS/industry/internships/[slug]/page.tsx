@@ -55,16 +55,20 @@ const InternshipDetails: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const deadlineWithTime = `${task.deadline}T${task.time || "00:00"}`; // Combine date and time
-
+  
+    const deadlineWithTime = `${task.deadline}T${task.time || "00:00"}`;
+    console.log("Submitting task:", { 
+        ...task, 
+        deadline: deadlineWithTime, 
+        internshipId: slug 
+      });
     try {
       const response = await fetch(`/api/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug }),
       });
-
+  
       if (response.ok) {
         const newTask = await response.json();
         setTasks((prevTasks) => [...prevTasks, newTask.task]);
@@ -79,6 +83,7 @@ const InternshipDetails: React.FC = () => {
       alert("An error occurred while assigning the task.");
     }
   };
+  
 
   const handleTaskClick = (taskId: string) => {
     router.push(`/LMS/industry/tasks/${taskId}`);
@@ -198,27 +203,29 @@ const InternshipDetails: React.FC = () => {
       )}
 
       {/* Classwork: Display Tasks */}
-      {activeTab === "classwork" && (
-        <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Assigned Tasks</h2>
-          {tasks.length === 0 ? (
-            <p>No tasks assigned yet.</p>
-          ) : (
-            <ul className="space-y-2">
-            {tasks.map((task) => (
-  <li
-    key={task._id}
-    onClick={() => handleTaskClick(task._id!)} // Ensure _id is passed
-    className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
-  >
-    <p className="font-medium text-blue-600 hover:underline">Task {task._id}</p>
-  </li>
-))}
+ {/* Classwork: Display Tasks */}
+{activeTab === "classwork" && (
+  <div className="border p-6 rounded-lg shadow-md">
+    <h2 className="text-2xl font-semibold mb-4">Assigned Tasks</h2>
+    {tasks.length === 0 ? (
+      <p>No tasks assigned yet.</p>
+    ) : (
+      <ul className="space-y-2">
+        {tasks.map((task, index) => (
+          <li
+            key={task._id}
+            onClick={() => handleTaskClick(task._id!)}
+            className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
+          >
+            <p className="font-medium text-blue-600 hover:underline">Task {index + 1}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+)}
 
-            </ul>
-          )}
-        </div>
-      )}
+
 
       {/* Students: Display Enrolled Students */}
       {activeTab === "students" && (

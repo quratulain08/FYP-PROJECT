@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
-import connectToDatabase from "@/lib/mongodb"; // Your DB connection function
-import TaskModel from "@/models/task"; // Your Task Mongoose model
+import connectToDatabase from "@/lib/mongodb";
+import TaskModel from "@/models/task";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { internshipId,title, description, deadline, marks, weightage } = body;
+    const { internshipId, title, description, deadline, marks, weightage } = body;
 
+    // Validate required fields
     if (!internshipId || !title || !description || !deadline || marks == null || weightage == null) {
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });
     }
 
     await connectToDatabase();
 
-    const task = new TaskModel({ internshipId, description, deadline, marks, weightage });
+    // Include the title field when saving
+    const task = new TaskModel({ internshipId, title, description, deadline, marks, weightage });
     await task.save();
 
     return NextResponse.json({ message: "Task created successfully!", task }, { status: 201 });
