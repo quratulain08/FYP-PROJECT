@@ -3,33 +3,62 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
+interface SubmittedTask {
+  _id: string;
+  studentName: string;
+  fileUrl: string;
+  grade: number | null;
+}
+
 const TaskDetails: React.FC = () => {
   const params = useParams();
-  const taskId = params?.id as string | undefined;
+  const slug = params?.slug as string | undefined;
 
   const [task, setTask] = useState<any>(null);
+  const [submissions, setSubmissions] = useState<SubmittedTask[]>([]); // Mock student submissions
   const [error, setError] = useState<string | null>(null);
 
   const fetchTaskDetails = async () => {
-    if (!taskId) {
+    if (!slug) {
       setError("Task ID not provided.");
       return;
     }
     try {
-      const response = await fetch(`/api/tasks/${taskId}`);
+      const response = await fetch(`/api/tasks/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch task details");
       const data = await response.json();
-      console.log("Fetched task data:", data); // Debugging
       setTask(data);
+
+      // Mock student submissions
+      const mockSubmissions: SubmittedTask[] = [
+        { _id: "1", studentName: "Alice Johnson", fileUrl: "https://example.com/file1.pdf", grade: null },
+        { _id: "2", studentName: "Bob Smith", fileUrl: "https://example.com/file2.docx", grade: null },
+        { _id: "3", studentName: "Charlie Brown", fileUrl: "https://example.com/file3.zip", grade: null },
+      ];
+      setSubmissions(mockSubmissions);
     } catch (error) {
       console.error("Error fetching task details:", error);
       setError("Failed to load task details.");
     }
   };
 
+  const handleGradeChange = (id: string, grade: number) => {
+    setSubmissions((prevSubmissions) =>
+      prevSubmissions.map((submission) =>
+        submission._id === id ? { ...submission, grade } : submission
+      )
+    );
+  };
+
+  const handleSaveGrades = () => {
+    // Save grades to the backend
+    console.log("Grades saved:", submissions);
+    alert("Grades saved successfully!");
+  };
+
   useEffect(() => {
     fetchTaskDetails();
-  }, [taskId]);
+  }, [slug]);
 
   if (error) return <p className="text-center p-6 text-red-500">{error}</p>;
   if (!task) return <p className="text-center p-6">Loading task details...</p>;
@@ -37,9 +66,7 @@ const TaskDetails: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">{task.title || "Untitled Task"}</h1>
-      <p className="text-gray-600 mb-4">
-        {task.description || "No description available."}
-      </p>
+      <p className="text-gray-600 mb-4">{task.description || "No description available."}</p>
       <p className="mb-2">
         <strong>Deadline:</strong>{" "}
         {task.deadline ? new Date(task.deadline).toLocaleString() : "No deadline provided."}
@@ -50,6 +77,58 @@ const TaskDetails: React.FC = () => {
       <p className="mb-2">
         <strong>Weightage:</strong> {task.weightage ?? "N/A"}%
       </p>
+
+      {/* Submissions Section */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Student Submissions</h2>
+        {submissions.length === 0 ? (
+          <p>No submissions yet.</p>
+        ) : (
+          <ul className="space-y-4">
+            {submissions.map((submission) => (
+              <li
+                key={submission._id}
+                className="p-4 border rounded bg-gray-50 shadow-sm"
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{submission.studentName}</p>
+                    <a
+                      href={submission.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Submission
+                    </a>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max={task.marks}
+                      placeholder="Assign Grade"
+                      value={submission.grade || ""}
+                      onChange={(e) => handleGradeChange(submission._id, parseInt(e.target.value))}
+                      className="w-24 p-2 border rounded"
+                    />
+                    <span>/ {task.marks}</span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {submissions.length > 0 && (
+          <button
+            onClick={handleSaveGrades}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Save Grades
+          </button>
+        )}
+      </div>
     </div>
   );
 };
