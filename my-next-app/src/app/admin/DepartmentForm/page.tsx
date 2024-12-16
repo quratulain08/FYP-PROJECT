@@ -51,8 +51,18 @@ const DepartmentDashboard: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true); // Start submission process
     setStatusMessage(''); // Reset status message
-
+  
+    // Helper function to generate random 8-digit password
+    const generateRandomPassword = () => {
+      return Math.random().toString(36).slice(-8);
+    };
+  
+    // Generate passwords for Coordinator and Focal Person
+    const coordinatorPassword = generateRandomPassword();
+    const focalPersonPassword = generateRandomPassword();
+  
     try {
+      // Create department first
       const response = await fetch('/api/department', {
         method: 'POST',
         headers: {
@@ -60,7 +70,7 @@ const DepartmentDashboard: React.FC = () => {
         },
         body: JSON.stringify(department),
       });
-      
+  
       if (!response.ok) {
         throw new Error('Error creating department');
       }
@@ -68,6 +78,80 @@ const DepartmentDashboard: React.FC = () => {
       const result = await response.json();
       console.log('Department created:', result);
       setStatusMessage('Department created successfully!');
+  
+      // Register Coordinator with a random password
+      const coordinatorResponse = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: department.CoordinatorEmail,
+          password: coordinatorPassword,
+          role: 'Coordinator',
+        }),
+      });
+  
+      if (!coordinatorResponse.ok) {
+        throw new Error('Error registering Coordinator');
+      }
+      console.log('Coordinator registered');
+  
+      // Register Focal Person with a random password
+      const focalPersonResponse = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: department.focalPersonEmail,
+          password: focalPersonPassword,
+          role: 'FocalPerson',
+        }),
+      });
+  
+      if (!focalPersonResponse.ok) {
+        throw new Error('Error registering Focal Person');
+      }
+      console.log('Focal Person registered');
+     
+    // Send email notifications for both users
+    const emailResponsee = await fetch('/api/sendEmail-Coordinator', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        coordinatorEmail: department.CoordinatorEmail,
+        coordinatorPassword: coordinatorPassword,
+      }),
+    });
+
+    if (!emailResponsee.ok) {
+      throw new Error('Error sending email');
+    }
+    console.log('Emails sent successfully');
+
+
+    // Send email notifications for both users
+    const emailResponse = await fetch('/api/sendEmail-Focalperson', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        focalPersonEmail: department.focalPersonEmail,
+        focalPersonPassword: focalPersonPassword,
+      }),
+    });
+
+    if (!emailResponse.ok) {
+      throw new Error('Error sending email');
+    }
+    console.log('Emails sent successfully');
+
+        
+      // Reset the form after successful submission
       setDepartment({
         name: '',
         startDate: '',
@@ -88,14 +172,15 @@ const DepartmentDashboard: React.FC = () => {
         CoordinatorCnic: '',
         CoordinatorEmail: '',
         CoordinatorPhone: '',
-      }); // Reset the form after successful submission
+      });
     } catch (error) {
       console.error(error);
-      setStatusMessage('Failed to create department. Please try again.');
+      setStatusMessage('Failed to create department or register users. Please try again.');
     } finally {
       setIsSubmitting(false); // End submission process
     }
   };
+  
 
   return (
     <Layout>
