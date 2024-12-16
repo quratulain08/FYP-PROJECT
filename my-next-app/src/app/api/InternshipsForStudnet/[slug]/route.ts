@@ -35,41 +35,59 @@ export async function DELETE(req: Request) {
 }
 
 // PUT Function
-
 export async function PUT(req: Request, { params }: { params: { slug: string } }) {
-  try {
-    const { slug } = params; // slug contains the Student
-    const body = await req.json(); // Parse request body
-    const { internshipId } = body; // Extract internshipId from the request body
+  const studentId = params.slug;
 
-    // Validate request data
-    if (!slug || !internshipId) {
+  try {
+    await connectToDatabase();
+
+    const body = await req.json();
+    const { internshipId } = body;
+
+    if (!studentId || !internshipId) {
       return NextResponse.json({ error: "Student ID and Internship ID are required." }, { status: 400 });
     }
 
-    await connectToDatabase(); // Ensure database is connected
+    if (!mongoose.Types.ObjectId.isValid(studentId) || !mongoose.Types.ObjectId.isValid(internshipId)) {
+      return NextResponse.json({ error: "Invalid Student ID or Internship ID format." }, { status: 400 });
+    }
 
-    // Validate Faculty existence
-    const Student = await StudentModel.findById(slug); // Fetch faculty by facultyId from slug
-    if (!Student) {
+    const student = await StudentModel.findById(studentId);
+    if (!student) {
+      console.error(`Student not found with ID: ${studentId}`);
       return NextResponse.json({ error: "Student not found." }, { status: 404 });
     }
 
-    // Validate Internship existence
-    const internship = await InternshipModel.findById(internshipId); // Fetch internship by internshipId
+    const internship = await InternshipModel.findById(internshipId);
     if (!internship) {
+      console.error(`Internship not found with ID: ${internshipId}`);
       return NextResponse.json({ error: "Internship not found." }, { status: 404 });
     }
 
-    // Add the Faculty to the Internship's assignedFaculty array if not already present
-    if (!internship.assignedStudents.includes(slug)) {
-      internship.assignedStudents.push(slug); // Use facultyId (slug) to assign faculty
-      await internship.save(); // Save the updated internship
+    if (!Array.isArray(internship.assignedStudents)) {
+      console.error("Internship's assignedStudents is not an array:", internship.assignedStudents);
+      return NextResponse.json({ error: "Invalid internship data." }, { status: 500 });
+    }
+
+    if (!internship.assignedStudents.includes(studentId)) {
+      internship.assignedStudents.push(studentId);
+
+      try {
+        await internship.save();
+      } catch (saveError) {
+        console.error("Error saving internship:", saveError);
+        return NextResponse.json({ error: "Error saving internship data." }, { status: 500 });
+      }
     }
 
     return NextResponse.json({ message: "Student assigned to internship successfully." }, { status: 200 });
   } catch (error) {
-    console.error("Error assigning Student to internship:", error);
+    if (error instanceof mongoose.Error.ValidationError) {
+      console.error("Validation error assigning student to internship:", error.errors);
+    } else {
+      console.error("Error assigning student to internship:", error.message);
+      console.error(error.stack);
+    }
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

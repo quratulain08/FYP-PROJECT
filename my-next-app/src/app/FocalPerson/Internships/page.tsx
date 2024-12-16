@@ -169,20 +169,23 @@ const Internships: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {internships.map((internship) => (
+                {internships.filter(
+  (internship) =>
+    internship.assignedStudents.length === 0 || 
+    internship.assignedFaculty.length === 0).map((internship) => (
                   <tr key={internship._id} className="hover:bg-gray-50">
                     <td className="p-4 border">{internship.title}</td>
                     <td className="p-4 border">{internship.hostInstitution}</td>
                     <td className="p-4 border">
                       <select
                         className="border rounded px-2 py-1"
-                        defaultValue={internship.assignedFaculty || ""}
+                        defaultValue={""}
                         onChange={(e) => handleAssignFaculty(internship._id, e.target.value)}
                       >
                         <option value="" disabled>
                           Select Faculty
                         </option>
-                        {faculties.map((faculty) => (
+                        {faculties.filter((faculty) => !internship.assignedFaculty.includes(faculty._id)).map((faculty) => (
                           <option key={faculty._id} value={faculty._id}>
                             {faculty.name}
                           </option>
@@ -192,13 +195,14 @@ const Internships: React.FC = () => {
                     <td className="p-4 border">
                       <select
                         className="border rounded px-2 py-1"
-                        defaultValue={internship.assignedStudents || ""}
+                        defaultValue={ ""}
                         onChange={(e) => handleAssignStudent(internship._id, e.target.value)}
                       >
                         <option value="" disabled>
                           Select Student
                         </option>
-                        {students.map((student) => (
+                        {students.filter((student) => !internship.assignedStudents.includes(student._id)) // Filter out already assigned students
+.map((student) => (
                           <option key={student._id} value={student._id}>
                             {student.registrationNumber}
                           </option>

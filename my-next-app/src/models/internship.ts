@@ -36,23 +36,29 @@ const internshipSchema = new Schema<Internship>({
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   description: { type: String, required: true },
-  assignedFaculty: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "faculty", // Reference to the Student model
-    },
-  ],
+  assignedFaculty: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Faculty",
+      },
+    ],
+    default: [], // Initialize as empty array
+  },
   universityId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "University", // Reference to the University model
     required: true,
   },
-  assignedStudents: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student", // Reference to the Student model
-    },
-  ],
+  assignedStudents: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Student",
+      },
+    ],
+    default: [], // Initialize as empty array
+  },
   isApproved: { type: Boolean, default: false }, 
 });
 
