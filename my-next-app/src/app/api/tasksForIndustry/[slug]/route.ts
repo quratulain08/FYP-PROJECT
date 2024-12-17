@@ -8,7 +8,8 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
   try {
     await connectToDatabase();
 
-    const task = await TaskModel.findById(slug);
+    const task = await TaskModel.find({ internshipId: slug,createdBy: 'industry' });
+    
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }
@@ -19,3 +20,5 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+

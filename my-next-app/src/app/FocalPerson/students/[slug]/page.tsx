@@ -13,6 +13,7 @@ interface Student {
   didInternship: boolean;
   registrationNumber: string;
   section: string;
+  email: string;
 }
 interface Department {
   _id: string;
@@ -86,6 +87,7 @@ const StudentsPage: React.FC = () => {
     didInternship: false,
     registrationNumber: "",
     section: "",
+    email:"",
   });
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);

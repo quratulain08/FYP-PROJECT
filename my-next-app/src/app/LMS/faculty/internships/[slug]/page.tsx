@@ -11,19 +11,36 @@ interface Task {
   time?: string;
   marks: number;
   weightage: number;
-  createdby: string;
 }
 
+interface Internship {
+  _id: string;
+  title: string;
+  hostInstitution: string;
+  location: string;
+  category: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+  assignedFaculty: string;
+  assignedStudents: string;
+}
 interface Student {
   _id: string;
   name: string;
+  department: string;
+  batch: string;
+  didInternship: boolean;
+  registrationNumber: string;
+  section: string;
   email: string;
 }
-
 const InternshipDetails: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string | undefined;
+  const [internship, setInternships] = useState<Internship[]>([]);
+  const [student, setStudents] = useState<Student[]>([]);
 
   const [tasks, setTasks] = useState<Task[]>([]); // List of assigned tasks
   const [activeTab, setActiveTab] = useState<"dashboard" | "classwork" | "students">("dashboard");
@@ -35,21 +52,14 @@ const InternshipDetails: React.FC = () => {
     time: "",
     marks: 0,
     weightage: 0,
-    createdby: "faculty", // Mark tasks as being created by faculty
   });
 
-  const students: Student[] = [
-    { _id: "1", name: "Alice Johnson", email: "alice@example.com" },
-    { _id: "2", name: "Bob Smith", email: "bob@example.com" },
-    { _id: "3", name: "Charlie Brown", email: "charlie@example.com" },
-  ];
 
   // Fetch tasks from API for faculty
   const fetchTasks = async () => {
     try {
-      if (!slug) return;
-
-      const response = await fetch(`/api/tasks?internshipId=${slug}&createdBy=faculty`);
+      const response = await fetch(`/api/taskForFaculty/${slug}`);
+     
       if (!response.ok) throw new Error("Failed to fetch tasks");
 
       const data = await response.json();
@@ -59,6 +69,50 @@ const InternshipDetails: React.FC = () => {
     }
   };
 
+  const FetchAssignedStudent = async () => {
+    try {
+      const response = await fetch(`/api/internships/${slug}`);
+      if (!response.ok) throw new Error("Failed to fetch internship");
+  
+      const data = await response.json();
+      setInternships(data);
+  
+      // Ensure that assignedStudents is an array of strings (student IDs)
+      const assignedStudents: string[] = data.assignedStudents; // or number[] depending on your data structure
+  
+      if (assignedStudents && assignedStudents.length > 0) {
+        // Fetch the students assigned to this internship
+        await FetchStudentfinal(assignedStudents);
+      } else {
+        console.log("No students assigned to this internship");
+      }
+  
+    } catch (error) {
+      console.error("Error fetching internship:", error);
+    }
+  };
+  
+  // Update FetchStudentfinal to use the correct type for assignedStudents
+  const FetchStudentfinal = async (assignedStudents: string[]) => {
+    try {
+      // Fetch student data for each student in the assignedStudents array
+      const studentPromises = assignedStudents.map(async (studentId) => {
+        const response = await fetch(`/api/students/${studentId}`);
+        if (!response.ok) throw new Error(`Failed to fetch student with ID ${studentId}`);
+  
+        const data: Student = await response.json();
+        return data;
+      });
+  
+      // Wait for all student data to be fetched
+      const studentsData = await Promise.all(studentPromises);
+      setStudents(studentsData);
+  
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
+  
   // Handle task form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +133,7 @@ const InternshipDetails: React.FC = () => {
     });
 
     try {
-      const response = await fetch(`/api/tasks`, {
+      const response = await fetch(`/api/taskForFaculty`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug }),
@@ -88,7 +142,7 @@ const InternshipDetails: React.FC = () => {
       if (response.ok) {
         const newTask = await response.json();
         setTasks((prevTasks) => [...prevTasks, newTask.task]);
-        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0, createdby: "faculty" });
+        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 });
         alert("Task assigned successfully!");
       } else {
         const { error } = await response.json();
@@ -108,6 +162,8 @@ const InternshipDetails: React.FC = () => {
   useEffect(() => {
     if (activeTab === "classwork" && slug) {
       fetchTasks();
+      FetchAssignedStudent();
+
     }
   }, [activeTab, slug]);
 
@@ -244,16 +300,21 @@ const InternshipDetails: React.FC = () => {
       {activeTab === "students" && (
         <div className="border p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-semibold mb-4">Enrolled Students</h2>
-          {students.length === 0 ? (
+          {student.length === 0 ? (
             <p>No students are enrolled in this internship.</p>
           ) : (
             <ul className="space-y-2">
-              {students.map((student) => (
-                <li key={student._id} className="p-2 border rounded bg-gray-50 shadow-sm">
-                  <p className="font-medium">{student.name}</p>
-                  <p className="text-sm text-gray-500">{student.email}</p>
-                </li>
-              ))}
+              {student.map((student) => (
+  <li key={student._id} className="p-2 border rounded bg-gray-50 shadow-sm">
+    <p className="font-medium"><strong>{student.name}</strong></p>
+    <p className="text-sm text-gray-500"><strong>Department:</strong> {student.department}</p>
+    <p className="text-sm text-gray-500"><strong>Batch:</strong> {student.batch}</p>
+    <p className="text-sm text-gray-500"><strong>Section:</strong> {student.section}</p>
+    <p className="text-sm text-gray-500"><strong>Did Internship:</strong> {student.didInternship ? 'Yes' : 'No'}</p>
+    <p className="text-sm text-gray-500"><strong>Registration Number:</strong> {student.registrationNumber}</p>
+    <p className="text-sm text-gray-500"><strong>Email:</strong> {student.email}</p>
+  </li>
+))}
             </ul>
           )}
         </div>

@@ -4,15 +4,15 @@ import connectToDatabase from '@/lib/mongodb'; // Adjust the path as necessary
 
 // Define the interface for the incoming request data
 interface SendEmailRequest {
-  coordinatorEmail: string;
-  coordinatorPassword: string;
+    FacultyEmail: string;
+  FacultyPassword: string;
 }
 
-// POST: Send emails for Coordinator and Focal Person registration
+// POST: Send emails for Faculty  registration
 export async function POST(req: Request) {
   try {
     // Parse the incoming JSON request body
-    const { coordinatorEmail, coordinatorPassword}: SendEmailRequest = await req.json();
+    const { FacultyEmail, FacultyPassword}: SendEmailRequest = await req.json();
 
     // Connect to the database (if needed)
     await connectToDatabase();
@@ -31,15 +31,15 @@ export async function POST(req: Request) {
     // Define email options
     const emailOptions = {
       from: process.env.EMAIL_USER, // Sender address
-      to: `${coordinatorEmail}`, // List of receivers
+      to: `${FacultyEmail}`, // List of receivers
       subject: 'Registration Successful', // Subject line
       text: `Hello,
 
       Your account has been successfully registered as follows:
 
-      Coordinator:
-      Email: ${coordinatorEmail}
-      Password: ${coordinatorPassword}
+      Faculty:
+      Email: ${FacultyEmail}
+      Password: ${FacultyPassword}
 
       Please login to the platform to get started.
 

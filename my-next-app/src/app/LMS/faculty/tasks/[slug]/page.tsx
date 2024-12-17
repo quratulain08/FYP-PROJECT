@@ -35,7 +35,7 @@ const InternshipDetails: React.FC = () => {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/tasks?internshipId=${slug}`);
+      const response = await fetch(`/api/taskForFaculty/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch tasks");
 
       const data = await response.json();
@@ -55,7 +55,7 @@ const InternshipDetails: React.FC = () => {
     const deadlineWithTime = `${task.deadline}T${task.time || "00:00"}`;
 
     try {
-      const response = await fetch(`/api/tasks`, {
+      const response = await fetch(`/api/taskForFaculty`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug }),

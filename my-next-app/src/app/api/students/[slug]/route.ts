@@ -7,16 +7,16 @@ export async function GET(
     request: Request,
     { params }: { params: { slug: string } }
   ) {
-    const email = params.slug;
+    const _id = params.slug;
   
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    if (!_id) {
+      return NextResponse.json({ error: '_id is required' }, { status: 400 });
     }
   
     try {
       await connectToDatabase();
   
-      const student = await Student.findOne({ email });
+      const student = await Student.findOne({ _id });
   
       if (!student) {
         return NextResponse.json({ error: 'Student not found' }, { status: 404 });

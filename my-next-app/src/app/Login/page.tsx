@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -14,30 +14,58 @@ const Login: React.FC = () => {
     setError(null); // Reset error state
 
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.error || 'Login failed. Please try again.');
+        setError(errorData.error || "Login failed. Please try again.");
         return;
       }
 
       const data = await response.json();
-      console.log('Login successful:', data);
+      console.log("Login successful:", data);
 
       // Store the token and email in localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('email', email); // Store email
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("email", email); // Store email
+      localStorage.setItem("role", data.user.role); // Store user role
 
-      // Navigate to Navbar component
-      router.push('/navbar'); 
+      const userRole = localStorage.getItem("role");
+
+      // Ensure the role value is a string
+      if (userRole) {
+        console.log("User Role from localStorage:", userRole); // Debugging step
+
+        // Navigate based on user role
+        switch (userRole.toLowerCase()) {
+          case "admin":
+            router.push("/admin/dashboard");
+            break;
+          case "coordinator":
+            router.push("/Coordinator/Internships");
+            break;
+          case "focalperson":
+            router.push("/FocalPerson/dashboard");
+            break;
+          case "faculty":
+            router.push("/FacultySupervisor/navbar");
+            break;
+          case "student":
+            router.push("/Student/navbar");
+            break;
+          default:
+            router.push("/dashboard"); // Default page if no specific role matches
+        }
+      } else {
+        setError("Role not found. Please log in again.");
+      }
     } catch (error) {
-      console.error('Error during login:', error);
-      setError('An error occurred. Please try again later.');
+      console.error("Error during login:", error);
+      setError("An error occurred. Please try again later.");
     }
   };
 

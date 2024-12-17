@@ -18,6 +18,7 @@ interface FacultyData {
     joiningDate: string;
     leavingDate?: string;
     isCoreComputingTeacher: boolean;
+    email:string;
     lastAcademicQualification: {
         degreeName: string;
         degreeType: string;
@@ -40,6 +41,7 @@ interface ValidationErrors {
     academicRank?: string;
     joiningDate?: string;
     leavingDate?: string;
+    email?:string;
 
     
     degreeName?: string;
@@ -80,6 +82,7 @@ export default function FacultyForm() {
     const [name, setName] = useState<string>('');
     const [cnic, setCnic] = useState<string>('');
     const [gender, setGender] = useState<string>('Male');
+    const [email, setEmail] = useState<string>('');
     const [address, setAddress] = useState<string>('');
     const [contractType, setContractType] = useState<string>('Permanent');
     const [academicRank, setAcademicRank] = useState<string>('Professor');
@@ -129,6 +132,7 @@ export default function FacultyForm() {
             setName(facultyData.name);
             setCnic(facultyData.cnic);
             setGender(facultyData.gender);
+            setEmail(facultyData.email);
             setAddress(facultyData.address);
             setSelectedProvince(facultyData.province);
             setSelectedCity(facultyData.city);
@@ -192,6 +196,7 @@ export default function FacultyForm() {
         // Required field validations
         if (!honorific) newErrors.honorific = 'Honorific is required';
         if (!name) newErrors.name = 'Name is required';
+        if (!email) newErrors.email = 'email is required';
         if (!gender) newErrors.gender = 'Gender is required';
         if (!address) newErrors.address = 'Address is required';
         if (!selectedProvince) newErrors.province = 'Province is required';
@@ -267,6 +272,7 @@ const handleCNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             honorific,
             name,
             cnic,
+            email,
             gender,
             address,
             province: selectedProvince,
@@ -359,6 +365,7 @@ const handleCNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                     </select>
                                     <ErrorMessage error={errors.honorific} />
                                 </div>
+                                
 
                                 <div>
                                     <label className="block text-xs font-semibold mb-1">Name</label>
@@ -383,6 +390,18 @@ const handleCNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                                         <option>Female</option>
                                     </select>
                                     <ErrorMessage error={errors.gender} />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold mb-1">email</label>
+                                    <input 
+                                        type="text" 
+                                        className="w-full p-4 border rounded-md text-sm min-h-[50px]" 
+                                        value={email}
+                                        disabled={isEdit}
+                                        onChange={(e) => setEmail(e.target.value)} 
+                                    />
+                                    <ErrorMessage error={errors.email} />
                                 </div>
 
                                 <div>
