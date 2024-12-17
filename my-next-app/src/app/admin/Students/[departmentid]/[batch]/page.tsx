@@ -14,6 +14,7 @@
     didInternship: boolean;
     registrationNumber: string;
     section: string;
+    email: string;
   }
   interface Department {
     _id: string;
@@ -88,6 +89,7 @@
       didInternship: false,
       registrationNumber: "",
       section: "",
+      email: "",
     });
     const [editingStudent, setEditingStudent] = useState<Student | null>(null);
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -245,6 +247,70 @@
         setUploading(false);
       }
     };
+
+    const sendMailToAll = async () => {
+    
+       // Filter students by batch (replace 'selectedBatch' with your actual batch condition)
+  const studentsInSelectedBatch = filteredStudents.filter(
+    (student) => student.batch === CurrentBatch // Assuming 'batch' is a field in your student object
+  );
+
+  // Loop through each student in the selected batch and send an email individually
+  for (let student of studentsInSelectedBatch) {
+    const email = student.email;
+
+    if (email) {
+      
+
+      try {
+        // Send the email list to your API or email service
+        const generateRandomPassword = () => {
+          return Math.random().toString(36).slice(-8);
+        };
+      
+        // Generate passwords for Coordinator and Focal Person
+        const StudentPassword = generateRandomPassword();
+      
+        // Register Focal Person with a random password
+        const facultyResponse = await fetch('/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            password: StudentPassword,
+            role: 'Student',
+          }),
+        });
+    
+        if (!facultyResponse.ok) {
+          throw new Error('Error registering Student Person');
+        }
+        console.log('Student Person registered');
+    
+        // Send email notifications for both users
+        const emailResponse = await fetch('/api/sendEmail-Student', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            StudentEmail: email,
+            StudentPassword: StudentPassword,
+          }),
+        });
+      
+        if (!emailResponse.ok) {
+          throw new Error('Error sending email');
+        }
+        console.log('Emails sent successfully');
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+    };
+  };
     
     // General file upload handler
     const handleFileUpload = async (file: File, batch: string, department:string) => {
@@ -302,28 +368,36 @@
 
     return (
       <Layout>
+<div className="max-w-6xl mx-auto p-6">
+    <h1 className="text-3xl font-semibold text-green-600 mb-8">
+      Students in Department: {department?.name}
+    </h1>
+    <div className="flex justify-between mb-6">
+      <div className="flex space-x-4">
+        <Filter
+          label="Internship Status"
+          value={selectedInternshipStatus}
+          options={["Yes", "No"]}
+          onChange={(e) => setSelectedInternshipStatus(e.target.value)}
+        />
+      </div>
+      <div className="space-x-4">
+        <button
+          onClick={openUploadModal}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+        >
+          Add New Student
+        </button>
+        <button
+          onClick={sendMailToAll}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
+          Send Mail to All
+        </button>
+      </div>
+    </div>
 
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-semibold text-green-600 mb-8">
-          Students in Department: {department?.name}
-        </h1>
-        <div className="flex justify-between mb-6">
-          <div className="flex space-x-4">
-            <Filter
-              label="Internship Status"
-              value={selectedInternshipStatus}
-              options={[ "Yes", "No"]}
-              onChange={(e) => setSelectedInternshipStatus(e.target.value)}
-            />
-              
-          </div>
-          <button
-            onClick={openUploadModal}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-          >
-            Add New Student
-          </button>
-        </div>
+        
 
         <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead>

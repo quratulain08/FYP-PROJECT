@@ -25,6 +25,7 @@ interface Faculty extends Document {
   leavingDate?: Date;
   isCoreComputingTeacher: boolean;
   lastAcademicQualification: LastAcademicQualification;
+  email: string; // Add email attribute
 }
 
 const lastAcademicQualificationSchema = new Schema<LastAcademicQualification>({
@@ -56,6 +57,7 @@ const facultySchema = new Schema<Faculty>({
   leavingDate: { type: Date },
   isCoreComputingTeacher: { type: Boolean, required: true },
   lastAcademicQualification: { type: lastAcademicQualificationSchema, required: true },
+  email: { type: String, required: true, unique: true }, // Email attribute added
 });
 
 const FacultyModel: Model<Faculty> =

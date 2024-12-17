@@ -51,6 +51,12 @@ const Login: React.FC = () => {
           case "focalperson":
             router.push("/FocalPerson/dashboard");
             break;
+          case "faculty":
+            router.push("/FacultySupervisor/navbar");
+            break;
+          case "student":
+            router.push("/Student/navbar");
+            break;
           default:
             router.push("/dashboard"); // Default page if no specific role matches
         }

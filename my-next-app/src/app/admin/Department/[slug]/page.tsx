@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2,Mail } from "lucide-react";
 import Layout from "@/app/components/Layout";
 
 // Custom notification component
@@ -71,6 +71,7 @@ interface Faculty {
   contractType: string;
   academicRank: string;
   joiningDate: string;
+  email:string;
   leavingDate?: string;
   isCoreComputingTeacher: boolean;
   lastAcademicQualification: {
@@ -212,7 +213,7 @@ export default function DepartmentDetail() {
 
   const handleAddFaculty = () => {
     if (department) {
-      router.push(`/admin/FacultyForm/${id}`);
+      router.push(`/Coordinator/FacultyForm/${id}`);
     } else {
       setError({ message: "Department information is not available" });
     }
@@ -229,17 +230,69 @@ export default function DepartmentDetail() {
       return;
     }
     
-    const editUrl = `/admin/FacultyForm/${encodeURIComponent(id)}?edit=true&facultyId=${encodeURIComponent(faculty._id)}&readOnlyName=${encodeURIComponent(faculty.name)}&readOnlyCnic=${encodeURIComponent(faculty.cnic)}`;
+    const editUrl = `/Coordinator/FacultyForm/${encodeURIComponent(id)}?edit=true&facultyId=${encodeURIComponent(faculty._id)}&readOnlyName=${encodeURIComponent(faculty.name)}&readOnlyCnic=${encodeURIComponent(faculty.cnic)}`;
     router.push(editUrl);
   };
 
   const handleViewFaculty = (faculty: Faculty) => {
-    router.push(`/admin/FacultyView/${faculty._id}`);
+    router.push(`/Coordinator/FacultyView/${faculty._id}`);
   };
 
   const confirmDelete = (facultyId: string) => {
     setModalData({ isOpen: true, facultyId });
   };
+
+ // Register Focal Person with a random password
+// sendEmail function to handle registration and email sending
+const sendEmail = async (email: string ) => {
+  try {
+    const generateRandomPassword = () => {
+      return Math.random().toString(36).slice(-8);
+    };
+  
+    // Generate passwords for Coordinator and Focal Person
+    const FacultyPassword = generateRandomPassword();
+  
+    // Register Focal Person with a random password
+    const facultyResponse = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        password: FacultyPassword,
+        role: 'Faculty',
+      }),
+    });
+
+    if (!facultyResponse.ok) {
+      throw new Error('Error registering faculty Person');
+    }
+    console.log('faclty Person registered');
+
+    // Send email notifications for both users
+    const emailResponse = await fetch('/api/sendEmail-Faculty', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        FacultyEmail: email,
+        FacultyPassword: FacultyPassword,
+      }),
+    });
+
+    if (!emailResponse.ok) {
+      throw new Error('Error sending email');
+    }
+    console.log('Emails sent successfully');
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+
 
   const handleDeleteFaculty = async (facultyId: string) => {
     if (!facultyId) {
@@ -483,6 +536,14 @@ export default function DepartmentDetail() {
                           disabled={loading}
                         >
                           <Pencil size={20} />
+                        </button>
+                        <button
+                          onClick={() => sendEmail(faculty.email)}
+                          className="text-red-600 hover:text-red-900"
+                          title="sendMail"
+                          disabled={loading}
+                        >
+                          <Mail size={20} />
                         </button>
                         <button
                           onClick={() => confirmDelete(faculty._id)}
