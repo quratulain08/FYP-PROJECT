@@ -10,6 +10,7 @@ interface Task {
   deadline: string;
   time?: string;
   marks: number;
+  createdby:string;
   weightage: number;
 }
 
@@ -55,6 +56,7 @@ const InternshipDetails: React.FC = () => {
     time: "",
     marks: 0,
     weightage: 0,
+    createdby: "",
   });
 
 
@@ -62,7 +64,7 @@ const InternshipDetails: React.FC = () => {
   // Fetch tasks from API
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`/api/tasks/${slug}`);
+      const response = await fetch(`/api/tasksForIndustry/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch tasks");
   
       const data = await response.json();
@@ -137,16 +139,16 @@ const InternshipDetails: React.FC = () => {
     });
 
     try {
-      const response = await fetch(`/api/tasks`, {
+      const response = await fetch(`/api/tasksForIndustry`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug }),
+        body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug  }),
       });
 
       if (response.ok) {
         const newTask = await response.json();
         setTasks((prevTasks) => [...prevTasks, newTask.task]);
-        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 });
+        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 ,createdby:''});
         alert("Task assigned successfully!");
       } else {
         const { error } = await response.json();

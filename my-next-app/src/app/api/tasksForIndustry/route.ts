@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { internshipId, title, description, deadline, marks, weightage } = body;
 
     // Assume "createdBy" is determined automatically
-    const createdBy = "faculty"; // This value can come dynamically from a session, token, etc.
+    const createdBy = "industry"; // This value can come dynamically from a session, token, etc.
 
     // Validate required fields
     if (!internshipId || !title || !description || !deadline || marks == null || weightage == null) {

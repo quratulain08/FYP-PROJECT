@@ -51,7 +51,7 @@ const TaskDetails: React.FC = () => {
       return;
     }
     try {
-      const response = await fetch(`/api/tasks/${slug}`);
+      const response = await fetch(`/api/tasksForIndustry/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch task details");
       const data = await response.json();
       setTask(data);

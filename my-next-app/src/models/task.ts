@@ -9,7 +9,7 @@ interface ITask extends Document {
   marks: number;
   time?: string; // Optional
   weightage: number;
-  createdBy: { type: String, required: true }, 
+  createdBy: string;
 }
 
 // Schema definition
@@ -21,6 +21,8 @@ const TaskSchema = new Schema<ITask>({
   marks: { type: Number, required: true },
   time: { type: String, required: false }, // Make time optional
   weightage: { type: Number, required: true },
+  createdBy: { type: String, required: true }, 
+
 });
 
 // Model export
