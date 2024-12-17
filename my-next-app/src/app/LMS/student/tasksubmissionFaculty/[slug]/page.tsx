@@ -26,7 +26,7 @@ const TaskSubmission: React.FC = () => {
     }
   
     try {
-      const response = await fetch(`/api/tasks/${slug}`);
+      const response = await fetch(`/api/taskForFaculty/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch task details");
   
       const data = await response.json();
