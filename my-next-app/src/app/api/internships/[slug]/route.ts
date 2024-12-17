@@ -54,40 +54,46 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
 }
 
 
-export async function PUT(req: Request, { params }: { params: { slug: string } }) {
-  try {
-    const { slug } = params; // slug contains the facultyId
-    const body = await req.json(); // Parse request body
-    const { internshipId } = body; // Extract internshipId from the request body
 
-    // Validate request data
-    if (!slug || !internshipId) {
+export async function PUT(req: Request, { params }: { params: { slug: string } }) {
+  const Facultyid = params.slug;
+
+  try {
+    await connectToDatabase();
+
+    const body = await req.json();
+    const { internshipId } = body;
+
+    // Validate required IDs
+    if (!Facultyid || !internshipId) {
       return NextResponse.json({ error: "Faculty ID and Internship ID are required." }, { status: 400 });
     }
 
-    await connectToDatabase(); // Ensure database is connected
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(Facultyid) || !mongoose.Types.ObjectId.isValid(internshipId)) {
+      return NextResponse.json({ error: "Invalid Faculty ID or Internship ID format." }, { status: 400 });
+    }
 
-    // Validate Faculty existence
-    const faculty = await FacultyModel.findById(slug); // Fetch faculty by facultyId from slug
-    if (!faculty) {
+    // Check if Student exists
+    const studentExists = await FacultyModel.exists({ _id: Facultyid });
+    if (!studentExists) {
       return NextResponse.json({ error: "Faculty not found." }, { status: 404 });
     }
 
-    // Validate Internship existence
-    const internship = await InternshipModel.findById(internshipId); // Fetch internship by internshipId
+    // Add studentId to internship's assignedFaculty array
+    const internship = await InternshipModel.findByIdAndUpdate(
+      internshipId,
+      { $addToSet: { assignedFaculty: Facultyid } }, // Add to array only if not present
+      { new: true } // Return updated document
+    );
+
     if (!internship) {
       return NextResponse.json({ error: "Internship not found." }, { status: 404 });
     }
 
-    // Add the Faculty to the Internship's assignedFaculty array if not already present
-    if (!internship.assignedFaculty.includes(slug)) {
-      internship.assignedFaculty.push(slug); // Use facultyId (slug) to assign faculty
-      await internship.save(); // Save the updated internship
-    }
-
     return NextResponse.json({ message: "Faculty assigned to internship successfully." }, { status: 200 });
   } catch (error) {
-    console.error("Error assigning faculty to internship:", error);
+    console.error("Error assigning Faculty to internship:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

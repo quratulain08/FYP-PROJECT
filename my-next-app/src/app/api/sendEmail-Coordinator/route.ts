@@ -21,8 +21,8 @@ export async function POST(req: Request) {
     const transporter = nodemailer.createTransport({
       service: 'gmail', // You can use other email services like SendGrid or AWS SES
       auth: {
-        user: '210955@students.au.edu.pk',// Use your email address
-        pass: 'ammary9290', // Use your email password or app password
+        user: process.env.EMAIL_USER, // Use your email address
+        pass: process.env.EMAIL_PASS, // Use your email password or app password
       },
       logger: true, // Enable logging
   debug: true,  // Output debug information

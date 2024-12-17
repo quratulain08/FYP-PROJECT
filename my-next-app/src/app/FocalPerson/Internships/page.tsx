@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import FocalPersonLayout from "./../FocalPersonLayout";
+import { FaPlus } from "react-icons/fa";
 
 interface Internship {
   _id: string;
@@ -134,6 +135,35 @@ const Internships: React.FC = () => {
       }
   };
 
+  const handleDelete = async (id:string) => {
+    if (window.confirm("Are you sure you want to delete this internship?")) {
+      try {
+        const response = await fetch(`/api/internships/${id}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert(result.message);
+          router.push("/admin/internships"); // Redirect to internships list
+        } else {
+          alert(`Error: ${result.error}`);
+        }
+      } catch (error) {
+        console.error("Error deleting internship:", error);
+        alert("Failed to delete internship.");
+      }
+    }
+  };
+
+
+  // Collect all assigned student IDs across all internships
+const allAssignedStudents: string[] = internships.reduce<string[]>((acc, internship) => {
+  return [...acc, ...internship.assignedStudents];
+}, []);
+
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -179,13 +209,14 @@ const Internships: React.FC = () => {
                     <td className="p-4 border">
                       <select
                         className="border rounded px-2 py-1"
-                        defaultValue={""}
+                        defaultValue={internship.assignedFaculty|| ""}
                         onChange={(e) => handleAssignFaculty(internship._id, e.target.value)}
                       >
                         <option value="" disabled>
                           Select Faculty
                         </option>
-                        {faculties.filter((faculty) => !internship.assignedFaculty.includes(faculty._id)).map((faculty) => (
+                        {faculties
+                        .map((faculty) => (
                           <option key={faculty._id} value={faculty._id}>
                             {faculty.name}
                           </option>
@@ -195,14 +226,14 @@ const Internships: React.FC = () => {
                     <td className="p-4 border">
                       <select
                         className="border rounded px-2 py-1"
-                        defaultValue={ ""}
+                        defaultValue={ internship.assignedStudents ||""}
                         onChange={(e) => handleAssignStudent(internship._id, e.target.value)}
                       >
                         <option value="" disabled>
                           Select Student
                         </option>
-                        {students.filter((student) => !internship.assignedStudents.includes(student._id)) // Filter out already assigned students
-.map((student) => (
+                        {students .filter((student) => !allAssignedStudents.includes(student._id)) // Filter unassigned students
+                         .map((student) => (
                           <option key={student._id} value={student._id}>
                             {student.registrationNumber}
                           </option>
@@ -212,15 +243,17 @@ const Internships: React.FC = () => {
                     <td className="p-4 border">
                       <button
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-                        onClick={() => router.push(`/internships/${internship._id}`)}
+                        onClick={() => router.push(`viewInternship/${internship._id}`)}
                       >
                         View Details
                       </button>
                       <button
-                        className="ml-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
-                      >
-                        Delete
-                      </button>
+  onClick={() => handleDelete(internship._id)} // Use an arrow function here
+  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200" 
+  title="Delete"
+>
+Delete</button>
+
                     </td>
                   </tr>
                 ))}

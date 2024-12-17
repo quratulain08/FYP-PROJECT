@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import * as XLSX from "xlsx";
 import Layout from "@/app/components/Layout";
 import BatchSummary from '@/app/admin/Batch/[slug]/page';
-import CoordinatorLayout from "../CoordinatorLayout";
+import CoordinatorLayout from "../../../CoordinatorLayout";
 
 interface Student {
   _id: string;
