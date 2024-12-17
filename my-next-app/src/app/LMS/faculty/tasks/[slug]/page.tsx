@@ -18,11 +18,11 @@ const InternshipDetails: React.FC = () => {
   const router = useRouter();
   const slug = params?.slug as string;
 
-  const [tasks, setTasks] = useState<Task[]>([]); // List of assigned tasks
+  const [task, setTask] = useState<Task | null>(null); // Single task object
   const [loading, setLoading] = useState<boolean>(true); // Loading state
   const [error, setError] = useState<string | null>(null); // Error state
 
-  const [task, setTask] = useState<Task>({
+  const [newTask, setNewTask] = useState<Task>({
     title: "",
     description: "",
     deadline: "",
@@ -31,18 +31,18 @@ const InternshipDetails: React.FC = () => {
     weightage: 0,
   });
 
-  // Fetch tasks from API
-  const fetchTasks = async () => {
+  // Fetch task from API
+  const fetchTask = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/taskForFaculty/${slug}`);
-      if (!response.ok) throw new Error("Failed to fetch tasks");
+      const response = await fetch(`/api/task/${slug}`);
+      if (!response.ok) throw new Error("Failed to fetch task");
 
       const data = await response.json();
-      setTasks(data); // Set fetched tasks
+      setTask(data); // Set fetched task
     } catch (error) {
-      console.error("Error fetching tasks:", error);
-      setError("Failed to load tasks. Please try again.");
+      console.error("Error fetching task:", error);
+      setError("Failed to load task. Please try again.");
     } finally {
       setLoading(false); // Stop loading
     }
@@ -52,20 +52,20 @@ const InternshipDetails: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const deadlineWithTime = `${task.deadline}T${task.time || "00:00"}`;
+    const deadlineWithTime = `${newTask.deadline}T${newTask.time || "00:00"}`;
 
     try {
       const response = await fetch(`/api/taskForFaculty`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug }),
+        body: JSON.stringify({ ...newTask, deadline: deadlineWithTime, internshipId: slug }),
       });
 
       if (!response.ok) throw new Error("Failed to assign task");
 
-      const newTask = await response.json();
-      setTasks((prevTasks) => [...prevTasks, newTask.task]); // Add new task to the list
-      setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 }); // Clear form
+      const createdTask = await response.json();
+      setTask(createdTask.task); // Set the newly created task
+      setNewTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 }); // Clear form
       alert("Task assigned successfully!");
     } catch (error) {
       console.error("Error saving task:", error);
@@ -73,9 +73,9 @@ const InternshipDetails: React.FC = () => {
     }
   };
 
-  // Trigger fetchTasks on component load and tab switch
+  // Trigger fetchTask on component load and tab switch
   useEffect(() => {
-    fetchTasks();
+    fetchTask();
   }, [slug]);
 
   return (
@@ -83,7 +83,7 @@ const InternshipDetails: React.FC = () => {
       <h1 className="text-2xl font-semibold mb-4">Internship Tasks</h1>
 
       {/* Loading and Error States */}
-      {loading && <p>Loading tasks...</p>}
+      {loading && <p>Loading task...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       {/* Form to Assign Task */}
@@ -92,38 +92,38 @@ const InternshipDetails: React.FC = () => {
           type="text"
           placeholder="Task Title"
           className="w-full p-2 border rounded"
-          value={task.title}
-          onChange={(e) => setTask({ ...task, title: e.target.value })}
+          value={newTask.title}
+          onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
           required
         />
         <textarea
           placeholder="Task Description"
           className="w-full p-2 border rounded"
-          value={task.description}
-          onChange={(e) => setTask({ ...task, description: e.target.value })}
+          value={newTask.description}
+          onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
           required
         />
         <input
           type="date"
           className="w-full p-2 border rounded"
-          value={task.deadline}
-          onChange={(e) => setTask({ ...task, deadline: e.target.value })}
+          value={newTask.deadline}
+          onChange={(e) => setNewTask({ ...newTask, deadline: e.target.value })}
           required
         />
         <input
           type="number"
           placeholder="Marks"
           className="w-full p-2 border rounded"
-          value={task.marks}
-          onChange={(e) => setTask({ ...task, marks: parseInt(e.target.value) })}
+          value={newTask.marks}
+          onChange={(e) => setNewTask({ ...newTask, marks: parseInt(e.target.value) })}
           required
         />
         <input
           type="number"
           placeholder="Weightage (%)"
           className="w-full p-2 border rounded"
-          value={task.weightage}
-          onChange={(e) => setTask({ ...task, weightage: parseInt(e.target.value) })}
+          value={newTask.weightage}
+          onChange={(e) => setNewTask({ ...newTask, weightage: parseInt(e.target.value) })}
           required
         />
         <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
@@ -131,22 +131,19 @@ const InternshipDetails: React.FC = () => {
         </button>
       </form>
 
-      {/* Display Tasks */}
-      <h2 className="text-xl font-semibold mt-6">Assigned Tasks</h2>
-      {tasks.length === 0 ? (
-        <p>No tasks assigned yet.</p>
+      {/* Display Task */}
+      <h2 className="text-xl font-semibold mt-6">Assigned Task</h2>
+      {task ? (
+        <div className="p-2 border rounded bg-gray-100 mt-4">
+          <p className="font-medium">{task.title}</p>
+          <p className="text-sm text-gray-600">
+            Deadline: {new Date(task.deadline).toLocaleString()}
+          </p>
+          <p className="text-sm">Marks: {task.marks}, Weightage: {task.weightage}%</p>
+          <p className="mt-2">{task.description}</p>
+        </div>
       ) : (
-        <ul className="space-y-2 mt-4">
-          {tasks.map((t, index) => (
-            <li key={t._id} className="p-2 border rounded bg-gray-100">
-              <p className="font-medium">
-                {index + 1}. {t.title}
-              </p>
-              <p className="text-sm text-gray-600">Deadline: {new Date(t.deadline).toLocaleString()}</p>
-              <p className="text-sm">Marks: {t.marks}, Weightage: {t.weightage}%</p>
-            </li>
-          ))}
-        </ul>
+        <p>No task assigned yet.</p>
       )}
     </div>
   );

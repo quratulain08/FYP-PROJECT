@@ -62,12 +62,8 @@ const InternshipDetails: React.FC = () => {
   };
   
   // Handle task click for details
-  const handleTaskClickIndustry = (taskId: string) => {
-    router.push(`/LMS/student/tasksubmissionIndustry/${taskId}`);
-  };
-
-  const handleTaskClickFaculty = (taskId: string) => {
-    router.push(`/LMS/student/tasksubmissionFaculty/${taskId}`);
+  const handleTaskClick = (taskId: string) => {
+    router.push(`/LMS/student/tasksubmission/${taskId}`);
   };
 
   useEffect(() => {
@@ -111,7 +107,7 @@ const InternshipDetails: React.FC = () => {
               {tasks.map((task, index) => (
                 <li
                   key={task._id}
-                  onClick={() => handleTaskClickIndustry(task._id!)}
+                  onClick={() => handleTaskClick(task._id!)}
                   className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
                 >
                   <p className="font-medium text-blue-600 hover:underline">Task {index + 1}</p>
@@ -136,7 +132,7 @@ const InternshipDetails: React.FC = () => {
         {tasks2.map((task, index) => (
           <li
             key={task._id}
-            onClick={() => handleTaskClickFaculty(task._id!)}
+            onClick={() => handleTaskClick(task._id!)}
             className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
           >
             <p className="font-medium text-blue-600 hover:underline">Task {index + 1}</p>
