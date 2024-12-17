@@ -62,7 +62,7 @@ const InternshipDetails: React.FC = () => {
   // Fetch tasks from API
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`/api/tasks?internshipId=${slug}&createdBy=industry`);
+      const response = await fetch(`/api/tasks/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch tasks");
   
       const data = await response.json();

@@ -8,7 +8,8 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
   try {
     await connectToDatabase();
 
-    const task = await TaskModel.findById(slug);
+    const task = await TaskModel.find({ internshipId: slug });
+    
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
     }

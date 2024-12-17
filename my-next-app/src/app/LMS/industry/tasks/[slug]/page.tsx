@@ -10,9 +10,36 @@ interface SubmittedTask {
   grade: number | null;
 }
 
+
+interface Internship {
+  _id: string;
+  title: string;
+  hostInstitution: string;
+  location: string;
+  category: string;
+  startDate: string;
+  endDate: string;
+  description: string;
+  assignedFaculty: string;
+  assignedStudents: string;
+}
+interface Student {
+  _id: string;
+  name: string;
+  department: string;
+  batch: string;
+  didInternship: boolean;
+  registrationNumber: string;
+  section: string;
+  email: string;
+}
+
+
 const TaskDetails: React.FC = () => {
   const params = useParams();
   const slug = params?.slug as string | undefined;
+  const [internship, setInternships] = useState<Internship[]>([]);
+  const [student, setStudents] = useState<Student[]>([]);
 
   const [task, setTask] = useState<any>(null);
   const [submissions, setSubmissions] = useState<SubmittedTask[]>([]); // Mock student submissions
@@ -42,6 +69,52 @@ const TaskDetails: React.FC = () => {
     }
   };
 
+
+
+  const FetchAssignedStudent = async () => {
+    try {
+      const response = await fetch(`/api/internships/${slug}`);
+      if (!response.ok) throw new Error("Failed to fetch internship");
+  
+      const data = await response.json();
+      setInternships(data);
+  
+      // Ensure that assignedStudents is an array of strings (student IDs)
+      const assignedStudents: string[] = data.assignedStudents; // or number[] depending on your data structure
+  
+      if (assignedStudents && assignedStudents.length > 0) {
+        // Fetch the students assigned to this internship
+        await FetchStudentfinal(assignedStudents);
+      } else {
+        console.log("No students assigned to this internship");
+      }
+  
+    } catch (error) {
+      console.error("Error fetching internship:", error);
+    }
+  };
+  
+  // Update FetchStudentfinal to use the correct type for assignedStudents
+  const FetchStudentfinal = async (assignedStudents: string[]) => {
+    try {
+      // Fetch student data for each student in the assignedStudents array
+      const studentPromises = assignedStudents.map(async (studentId) => {
+        const response = await fetch(`/api/students/${studentId}`);
+        if (!response.ok) throw new Error(`Failed to fetch student with ID ${studentId}`);
+  
+        const data: Student = await response.json();
+        return data;
+      });
+  
+      // Wait for all student data to be fetched
+      const studentsData = await Promise.all(studentPromises);
+      setStudents(studentsData);
+  
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
+  };
+  
   const handleGradeChange = (id: string, grade: number) => {
     setSubmissions((prevSubmissions) =>
       prevSubmissions.map((submission) =>
@@ -58,6 +131,8 @@ const TaskDetails: React.FC = () => {
 
   useEffect(() => {
     fetchTaskDetails();
+    FetchAssignedStudent();
+
   }, [slug]);
 
   if (error) return <p className="text-center p-6 text-red-500">{error}</p>;
