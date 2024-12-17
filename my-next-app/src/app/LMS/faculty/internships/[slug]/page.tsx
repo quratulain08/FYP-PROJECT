@@ -11,7 +11,7 @@ interface Task {
   time?: string;
   marks: number;
   weightage: number;
-  createdby:string;
+  createdby: string;
 }
 
 interface Student {
@@ -35,7 +35,7 @@ const InternshipDetails: React.FC = () => {
     time: "",
     marks: 0,
     weightage: 0,
-    createdby:"",
+    createdby: "faculty", // Mark tasks as being created by faculty
   });
 
   const students: Student[] = [
@@ -44,9 +44,11 @@ const InternshipDetails: React.FC = () => {
     { _id: "3", name: "Charlie Brown", email: "charlie@example.com" },
   ];
 
-  // Fetch tasks from API
+  // Fetch tasks from API for faculty
   const fetchTasks = async () => {
     try {
+      if (!slug) return;
+
       const response = await fetch(`/api/tasks?internshipId=${slug}&createdBy=faculty`);
       if (!response.ok) throw new Error("Failed to fetch tasks");
 
@@ -86,7 +88,7 @@ const InternshipDetails: React.FC = () => {
       if (response.ok) {
         const newTask = await response.json();
         setTasks((prevTasks) => [...prevTasks, newTask.task]);
-        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 , createdby:""});
+        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0, createdby: "faculty" });
         alert("Task assigned successfully!");
       } else {
         const { error } = await response.json();
@@ -216,7 +218,7 @@ const InternshipDetails: React.FC = () => {
         </div>
       )}
 
-      {/* Classwork: Display Tasks */}
+      {/* Classwork: Display Tasks Assigned by Faculty */}
       {activeTab === "classwork" && (
         <div className="border p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-semibold mb-4">Assigned Tasks</h2>
