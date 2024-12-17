@@ -25,6 +25,7 @@ interface Internship {
   assignedFaculty: string;
   assignedStudents: string;
 }
+
 interface Student {
   _id: string;
   name: string;
@@ -35,6 +36,7 @@ interface Student {
   section: string;
   email: string;
 }
+
 const InternshipDetails: React.FC = () => {
   const params = useParams();
   const router = useRouter();
@@ -54,12 +56,10 @@ const InternshipDetails: React.FC = () => {
     weightage: 0,
   });
 
-
   // Fetch tasks from API for faculty
   const fetchTasks = async () => {
     try {
       const response = await fetch(`/api/taskForFaculty/${slug}`);
-     
       if (!response.ok) throw new Error("Failed to fetch tasks");
 
       const data = await response.json();
@@ -73,64 +73,51 @@ const InternshipDetails: React.FC = () => {
     try {
       const response = await fetch(`/api/internships/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch internship");
-  
+
       const data = await response.json();
       setInternships(data);
-  
+
       // Ensure that assignedStudents is an array of strings (student IDs)
-      const assignedStudents: string[] = data.assignedStudents; // or number[] depending on your data structure
-  
+      const assignedStudents: string[] = data.assignedStudents;
+
       if (assignedStudents && assignedStudents.length > 0) {
-        // Fetch the students assigned to this internship
         await FetchStudentfinal(assignedStudents);
       } else {
         console.log("No students assigned to this internship");
       }
-  
+
     } catch (error) {
       console.error("Error fetching internship:", error);
     }
   };
-  
-  // Update FetchStudentfinal to use the correct type for assignedStudents
+
   const FetchStudentfinal = async (assignedStudents: string[]) => {
     try {
-      // Fetch student data for each student in the assignedStudents array
       const studentPromises = assignedStudents.map(async (studentId) => {
         const response = await fetch(`/api/students/${studentId}`);
         if (!response.ok) throw new Error(`Failed to fetch student with ID ${studentId}`);
-  
+
         const data: Student = await response.json();
         return data;
       });
-  
-      // Wait for all student data to be fetched
+
       const studentsData = await Promise.all(studentPromises);
       setStudents(studentsData);
-  
+
     } catch (error) {
       console.error("Error fetching students:", error);
     }
   };
-  
-  // Handle task form submission
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate form data
     if (!task.title || !task.description || !task.deadline) {
       alert("Title, description, and deadline are required.");
       return;
     }
 
     const deadlineWithTime = `${task.deadline}T${task.time || "00:00"}`;
-
-    console.log("Submitting task:", {
-      ...task,
-      deadline: deadlineWithTime,
-      internshipId: slug,
-      createdBy: "faculty",
-    });
 
     try {
       const response = await fetch(`/api/taskForFaculty`, {
@@ -154,7 +141,6 @@ const InternshipDetails: React.FC = () => {
     }
   };
 
-  // Handle task click for details
   const handleTaskClick = (taskId: string) => {
     router.push(`/LMS/faculty/tasks/${taskId}`);
   };
@@ -163,7 +149,6 @@ const InternshipDetails: React.FC = () => {
     if (activeTab === "classwork" && slug) {
       fetchTasks();
       FetchAssignedStudent();
-
     }
   }, [activeTab, slug]);
 
@@ -173,19 +158,19 @@ const InternshipDetails: React.FC = () => {
       <div className="flex justify-between border-b mb-6">
         <button
           onClick={() => setActiveTab("dashboard")}
-          className={`py-2 px-4 ${activeTab === "dashboard" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          className={`py-2 px-4 ${activeTab === "dashboard" ? "border-b-2 border-green-500 text-green-600 font-bold" : ""}`}
         >
           Dashboard
         </button>
         <button
           onClick={() => setActiveTab("classwork")}
-          className={`py-2 px-4 ${activeTab === "classwork" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          className={`py-2 px-4 ${activeTab === "classwork" ? "border-b-2 border-green-500  text-green-600 font-bold" : ""}`}
         >
           Classwork
         </button>
         <button
           onClick={() => setActiveTab("students")}
-          className={`py-2 px-4 ${activeTab === "students" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          className={`py-2 px-4 ${activeTab === "students" ? "border-b-2 border-green-500   text-green-600 font-bold" : ""}`}
         >
           Students
         </button>
@@ -194,7 +179,7 @@ const InternshipDetails: React.FC = () => {
       {/* Dashboard: Assign Tasks */}
       {activeTab === "dashboard" && (
         <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Assign Task</h2>
+          <h2 className="text-2xl text-green-600 font-semibold mb-4">Assign Task</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block font-medium">Task Title</label>
@@ -266,7 +251,7 @@ const InternshipDetails: React.FC = () => {
 
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             >
               Assign Task
             </button>
@@ -277,7 +262,7 @@ const InternshipDetails: React.FC = () => {
       {/* Classwork: Display Tasks Assigned by Faculty */}
       {activeTab === "classwork" && (
         <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Assigned Tasks</h2>
+          <h2 className="text-2xl text-green-600 font-semibold mb-4">Assigned Tasks</h2>
           {tasks.length === 0 ? (
             <p>No tasks assigned yet.</p>
           ) : (
@@ -288,7 +273,7 @@ const InternshipDetails: React.FC = () => {
                   onClick={() => handleTaskClick(task._id!)}
                   className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
                 >
-                  <p className="font-medium text-blue-600 hover:underline">Task {index + 1}</p>
+                  <p className="font-medium text-green-600 hover:underline">Task {index + 1}</p>
                 </li>
               ))}
             </ul>
@@ -299,22 +284,22 @@ const InternshipDetails: React.FC = () => {
       {/* Students: Display Enrolled Students */}
       {activeTab === "students" && (
         <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Enrolled Students</h2>
+          <h2 className="text-2xl text-green-600 font-semibold mb-4">Enrolled Students</h2>
           {student.length === 0 ? (
             <p>No students are enrolled in this internship.</p>
           ) : (
             <ul className="space-y-2">
               {student.map((student) => (
-  <li key={student._id} className="p-2 border rounded bg-gray-50 shadow-sm">
-    <p className="font-medium"><strong>{student.name}</strong></p>
-    <p className="text-sm text-gray-500"><strong>Department:</strong> {student.department}</p>
-    <p className="text-sm text-gray-500"><strong>Batch:</strong> {student.batch}</p>
-    <p className="text-sm text-gray-500"><strong>Section:</strong> {student.section}</p>
-    <p className="text-sm text-gray-500"><strong>Did Internship:</strong> {student.didInternship ? 'Yes' : 'No'}</p>
-    <p className="text-sm text-gray-500"><strong>Registration Number:</strong> {student.registrationNumber}</p>
-    <p className="text-sm text-gray-500"><strong>Email:</strong> {student.email}</p>
-  </li>
-))}
+                <li key={student._id} className="p-2 border rounded bg-gray-50 shadow-sm">
+                  <p className="font-medium"><strong>{student.name}</strong></p>
+                  <p className="text-sm text-gray-500"><strong>Department:</strong> {student.department}</p>
+                  <p className="text-sm text-gray-500"><strong>Batch:</strong> {student.batch}</p>
+                  <p className="text-sm text-gray-500"><strong>Section:</strong> {student.section}</p>
+                  <p className="text-sm text-gray-500"><strong>Did Internship:</strong> {student.didInternship ? 'Yes' : 'No'}</p>
+                  <p className="text-sm text-gray-500"><strong>Registration Number:</strong> {student.registrationNumber}</p>
+                  <p className="text-sm text-gray-500"><strong>Email:</strong> {student.email}</p>
+                </li>
+              ))}
             </ul>
           )}
         </div>

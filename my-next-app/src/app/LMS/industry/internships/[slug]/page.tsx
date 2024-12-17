@@ -270,7 +270,7 @@ const InternshipDetails: React.FC = () => {
 
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+              className="bg-green-600  text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
             >
               Assign Task
             </button>
@@ -303,7 +303,7 @@ const InternshipDetails: React.FC = () => {
       {/* Students: Display Enrolled Students */}
       {activeTab === "students" && (
         <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Enrolled Students</h2>
+          <h2 className="text-2xl text-green-600 font-semibold mb-4">Enrolled Students</h2>
           {student.length === 0 ? (
             <p>No students are enrolled in this internship.</p>
           ) : (
