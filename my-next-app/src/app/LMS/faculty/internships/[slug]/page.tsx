@@ -55,7 +55,7 @@ const InternshipDetails: React.FC = () => {
   });
 
 
-  // Fetch tasks from API
+  // Fetch tasks from API for faculty
   const fetchTasks = async () => {
     try {
       const response = await fetch(`/api/taskForFaculty/${slug}`);
@@ -274,7 +274,7 @@ const InternshipDetails: React.FC = () => {
         </div>
       )}
 
-      {/* Classwork: Display Tasks */}
+      {/* Classwork: Display Tasks Assigned by Faculty */}
       {activeTab === "classwork" && (
         <div className="border p-6 rounded-lg shadow-md">
           <h2 className="text-2xl font-semibold mb-4">Assigned Tasks</h2>
