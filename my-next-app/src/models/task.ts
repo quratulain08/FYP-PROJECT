@@ -9,6 +9,7 @@ interface ITask extends Document {
   marks: number;
   time?: string; // Optional
   weightage: number;
+  createdBy: { type: String, required: true }, 
 }
 
 // Schema definition

@@ -45,15 +45,16 @@ const InternshipDetails: React.FC = () => {
   // Fetch tasks from API
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`/api/tasks?internshipId=${slug}`);
+      const response = await fetch(`/api/tasks?internshipId=${slug}&createdBy=industry`);
       if (!response.ok) throw new Error("Failed to fetch tasks");
-
+  
       const data = await response.json();
       setTasks(data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
   };
+  
 
   // Handle task form submission
   const handleSubmit = async (e: React.FormEvent) => {
