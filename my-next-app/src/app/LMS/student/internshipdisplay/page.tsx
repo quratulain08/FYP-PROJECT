@@ -3,6 +3,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import StudentLayout from "@/app/Student/StudentLayout";
+import Student from "@/models/student";
 
 interface Internship {
   _id: string;
@@ -13,31 +14,63 @@ interface Internship {
   startDate: string;
   endDate: string;
   description: string;
+  assignedStudents:String;
+}
+
+interface Student {
+  _id: string;
+  name: string;
+  department: string;
+  batch: string;
+  didInternship: boolean;
+  registrationNumber: string;
+  section: string;
+  email: string;
 }
 
 const InternshipDisplay: React.FC = () => {
-  const [internships, setInternships] = useState<Internship[]>([]);
+  const [internship, setInternship] = useState<Internship | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
+    const [student, setStudents] = useState<Student[]>([]);
+
 
   useEffect(() => {
     fetchInternships();
   }, []);
 
   const fetchInternships = async () => {
+    const email = "wajahat.isb02@gmail.com"; // Replace with actual logic to get the email
+  
     try {
-      const response = await fetch("/api/internships");
-      if (!response.ok) throw new Error("Failed to fetch internships");
+      // Fetch student data by email
+      const responsee = await fetch(`/api/StudentByemail/${email}`);
+      if (!responsee.ok) throw new Error("Failed to fetch student details");
+  
+      const dataa = await responsee.json();
+      setStudents(dataa);
+  
+      if (dataa.length === 0) {
+        throw new Error("No students found with the provided email");
+      }
+  
+      const studentId = dataa._id; // Assuming you want the first student in the array
+      console.log("Student ID:", studentId); // Debug log
 
+      // Fetch internships by assigned student ID
+      const response = await fetch(`/api/InternshipsByAssignedStudents/${studentId}`);
+      if (!response.ok) throw new Error("Failed to fetch internships");
+  
       const data = await response.json();
-      setInternships(data);
+      setInternship(data);
     } catch (err) {
+      console.error(err);
       setError("Error fetching internships.");
     } finally {
       setLoading(false);
     }
-  };
+  };                                                                    
 
   const handleCardClick = (id: string) => {
     router.push(`/LMS/student/taskdisplay/${id}`);
@@ -85,41 +118,42 @@ const InternshipDisplay: React.FC = () => {
         <h1 className="text-2xl font-semibold">Internships</h1>
       </div>
 
-      {internships.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600">No internships available.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {internships.map((internship) => (
-            <div
-              key={internship._id}
-              onClick={() => handleCardClick(internship._id)}
-              className="border border-gray-300 rounded-lg p-6 shadow-lg hover:shadow-xl transition duration-300"
-            >
-              <div className="flex justify-between items-start">
-                <h2 className="text-xl text-green-600 font-semibold mb-4">
-                  {internship.title} - {internship.hostInstitution}
-                </h2>
-               
+      {internship ? (
+          <div
+            onClick={() => handleCardClick(internship._id)}
+            className="border border-gray-300 rounded-lg p-6 shadow-lg hover:shadow-xl transition duration-300"
+          >
+            <h2 className="text-xl text-green-600 font-semibold mb-4">
+              {internship.title} - {internship.hostInstitution}
+            </h2>
+            <div className="grid grid-cols-1 gap-4 mt-4">
+              <div>
+                <p>
+                  <span className="font-semibold">Category:</span> {internship.category}
+                </p>
+                <p>
+                  <span className="font-semibold">Start Date:</span> {internship.startDate}
+                </p>
+                <p>
+                  <span className="font-semibold">End Date:</span> {internship.endDate}
+                </p>
               </div>
-
-              <div className="grid grid-cols-1 gap-4 mt-4">
-                <div>
-                  <p><span className="font-semibold">Category:</span> {internship.category}</p>
-                  <p><span className="font-semibold">Start Date:</span> {internship.startDate}</p>
-                  <p><span className="font-semibold">End Date:</span> {internship.endDate}</p>
-                </div>
-                <div>
-                  <p><span className="font-semibold">Location:</span> {internship.location}</p>
-                  <p><span className="font-semibold">Description:</span> {internship.description}</p>
-                </div>
+              <div>
+                <p>
+                  <span className="font-semibold">Location:</span> {internship.location}
+                </p>
+                <p>
+                  <span className="font-semibold">Description:</span> {internship.description}
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-gray-600">No internship available.</p>
+          </div>
+        )}
+      </div>
     </StudentLayout>
   );
 };

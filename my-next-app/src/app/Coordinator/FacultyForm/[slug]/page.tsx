@@ -15,6 +15,7 @@ interface FacultyData {
     city: string;
     contractType: string;
     academicRank: string;
+    email: string;
     joiningDate: string;
     leavingDate?: string;
     isCoreComputingTeacher: boolean;
@@ -41,7 +42,7 @@ interface ValidationErrors {
     joiningDate?: string;
     leavingDate?: string;
 
-    
+    email?: string;
     degreeName?: string;
     degreeType?: string;
     fieldOfStudy?: string;
@@ -79,6 +80,8 @@ export default function FacultyForm() {
     const [honorific, setHonorific] = useState<string>('Mr');
     const [name, setName] = useState<string>('');
     const [cnic, setCnic] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+
     const [gender, setGender] = useState<string>('Male');
     const [address, setAddress] = useState<string>('');
     const [contractType, setContractType] = useState<string>('Permanent');
@@ -128,6 +131,8 @@ export default function FacultyForm() {
             setHonorific(facultyData.honorific);
             setName(facultyData.name);
             setCnic(facultyData.cnic);
+            setCnic(facultyData.email);
+
             setGender(facultyData.gender);
             setAddress(facultyData.address);
             setSelectedProvince(facultyData.province);
@@ -199,6 +204,7 @@ export default function FacultyForm() {
         if (!contractType) newErrors.contractType = 'Contract type is required';
         if (!academicRank) newErrors.academicRank = 'Academic rank is required';
         if (!joiningDate) newErrors.joiningDate = 'Joining date is required';
+        if (!email) newErrors.email = 'email  is required';
 
         // CNIC validation
         const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
@@ -395,6 +401,17 @@ const handleCNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 disabled={isEdit}
             />
             <ErrorMessage error={errors.cnic} />
+        </div>
+        <div>
+            <label className="block text-xs font-semibold mb-1">email</label>
+            <input
+                type="text"
+                className="w-full p-4 border rounded-md text-sm min-h-[50px]"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} 
+                disabled={isEdit}
+            />
+            <ErrorMessage error={errors.email} />
         </div>
                             </div>
                         </div>

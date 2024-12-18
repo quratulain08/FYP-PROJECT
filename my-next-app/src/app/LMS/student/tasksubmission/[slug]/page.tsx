@@ -114,8 +114,12 @@ const TaskSubmission: React.FC = () => {
       // Make the API call
       const response = await fetch(`/api/submission/${slug}`, {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ file: fileId, studentName: "John Doe" }),
       });
+
 
       if (response.ok) {
         const data = await response.json();
@@ -144,9 +148,9 @@ const TaskSubmission: React.FC = () => {
 
   return (
     <StudentLayout>
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4">{task.title || "Untitled Task"}</h1>
-      <p className="text-gray-600 mb-4">{task.description || "No description available."}</p>
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-3xl font-bold mb-4 text-green-600">{task.title || "Untitled Task"}</h1>
+      <p className="text-gray-700 mb-4">{task.description || "No description available."}</p>
       <p className="mb-2">
         <strong>Deadline:</strong> {task.deadline ? new Date(task.deadline).toLocaleString() : "No deadline provided."}
       </p>
@@ -157,9 +161,8 @@ const TaskSubmission: React.FC = () => {
         <strong>Weightage:</strong> {task.weightage ?? "N/A"}%
       </p>
 
-      {/* File Upload Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Submit Your Task</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Submit Your Task</h2>
         <div className="space-y-4">
           <input
             type="file"
@@ -169,17 +172,21 @@ const TaskSubmission: React.FC = () => {
           />
           <button
             onClick={handleUpload}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className={`${
+              uploading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
+            } text-white px-4 py-2 rounded`}
+            disabled={uploading}
           >
-            Upload
+            {uploading ? "Uploading..." : "Upload"}
           </button>
         </div>
         {submissionStatus && (
           <p className="mt-4 text-center text-green-600 font-medium">{submissionStatus}</p>
         )}
       </div>
+
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Your Submissions</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Your Submissions</h2>
         {submissions.length === 0 ? (
           <p>No submissions yet.</p>
         ) : (
@@ -206,8 +213,11 @@ const TaskSubmission: React.FC = () => {
         )}
       </div>
     </div>
-    </StudentLayout>
-  );
+  </StudentLayout>
+);
 };
+
+  
+
 
 export default TaskSubmission;

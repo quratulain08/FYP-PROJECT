@@ -50,6 +50,8 @@ const UniversityPage = () => {
     setLoading(true);
     setError(null);
 
+   
+    
     const newUniversity = { name, address, contactEmail, location };
     try {
       const res = await fetch('/api/universities', {

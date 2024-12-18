@@ -197,7 +197,6 @@ export default function DepartmentDetail() {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto p-6">
-        <h1>{id}</h1>
         <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-semibold text-green-600">

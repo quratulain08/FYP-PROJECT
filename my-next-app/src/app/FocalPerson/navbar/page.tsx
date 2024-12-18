@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { FaHome, FaUniversity, FaFolder, FaUsers, FaChalkboardTeacher, FaUser } from 'react-icons/fa';
+import { FaHome, FaUniversity, FaFolder, FaUsers, FaChalkboardTeacher, FaUser, FaClipboardList } from 'react-icons/fa';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 
 
@@ -66,8 +66,13 @@ const Navbar: React.FC = () => {
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
             <Link href="/FocalPerson/Internships" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-black mb-2"><FaUsers /></span>
-              <span className="text-sm"> Directory</span>
+              <span className="text-2xl text-red-500 mb-2"><FaFolder /></span>
+              <span className="text-sm"> Assign Them</span>
+              <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
+            </Link>
+            <Link href="/FocalPerson/allInternships" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
+              <span className="text-2xl text-blue-500 mb-2"><FaClipboardList /></span>
+              <span className="text-sm"> All Internships</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
           </div>

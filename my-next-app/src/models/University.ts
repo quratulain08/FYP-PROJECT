@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 export interface IUniversity extends mongoose.Document {
   name: string;
   location: string;
+  address: string;
+  contactEmail: string;
 }
 
 const UniversitySchema = new mongoose.Schema({
@@ -12,6 +14,16 @@ const UniversitySchema = new mongoose.Schema({
     trim: true
   },
   location: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  address: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  contactEmail: {
     type: String,
     required: true,
     trim: true

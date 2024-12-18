@@ -63,6 +63,10 @@ const Internship = () => {
     }));
   };
 
+
+
+
+  
   const fetchInternships = async () => {
     setLoading(true);
     setError(null);
