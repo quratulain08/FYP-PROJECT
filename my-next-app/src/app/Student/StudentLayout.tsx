@@ -1,3 +1,4 @@
+"use client";
 import Navbar from './navbar/page'; // Adjust the import path to your navbar file
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation

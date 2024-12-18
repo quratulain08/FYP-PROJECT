@@ -213,7 +213,7 @@ const InternshipDetails: React.FC = () => {
       {/* Students Tab */}
       {activeTab === "students" && (
         <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Enrolled Students</h2>
+          <h2 className="text-2xl font-semibold mb-4">Other Students</h2>
           {student.length === 0 ? (
             <p>No students are enrolled in this internship.</p>
           ) : (

@@ -1,4 +1,5 @@
 // src/components/Layout.tsx
+"use client";
 import Navbar from '../admin/navbar/page'; 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation
@@ -17,9 +18,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
 }, [router]);
 
-if (!isAuthenticated) {
-  return <div>Loading...</div>; // Optionally show a loading spinner or message
-}
+ if (!isAuthenticated) {
+        return <div>Loading...</div>; // Optionally show a loading spinner or message
+    }
 
 
   return (
