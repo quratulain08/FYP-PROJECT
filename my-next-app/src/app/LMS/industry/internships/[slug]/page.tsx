@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import  IndustryLayout from "@/app/Industry/IndustryLayout";
 
 interface Task {
   _id?: string;
@@ -172,6 +173,7 @@ const InternshipDetails: React.FC = () => {
   }, [activeTab, slug]);
 
   return (
+    <IndustryLayout>
     <div className="max-w-7xl mx-auto p-6">
       {/* Tabs Navigation */}
       <div className="flex justify-between border-b mb-6">
@@ -325,6 +327,7 @@ const InternshipDetails: React.FC = () => {
         </div>
       )}
     </div>
+    </IndustryLayout>
   );
 };
 

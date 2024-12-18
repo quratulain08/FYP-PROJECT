@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+
+interface IScheme extends Document {
+  taskId: mongoose.Schema.Types.ObjectId;
+  studentName: string;
+  fileUrl: string;
+  submittedAt: Date;
+}
+
 const SubmissionSchema = new mongoose.Schema({
   taskId: { type: mongoose.Schema.Types.ObjectId, ref: "Task", required: true },
   studentName: { type: String, required: true },
@@ -7,4 +15,5 @@ const SubmissionSchema = new mongoose.Schema({
   submittedAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.models.Submission || mongoose.model("Submission", SubmissionSchema);
+export default mongoose.models.Submission || mongoose.model<IScheme>('Submission', SubmissionSchema);
+

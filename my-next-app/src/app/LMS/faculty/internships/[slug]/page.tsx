@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import  FacultyLayout from "@/app/FacultySupervisor/FacultyLayout";
 
 interface Task {
   _id?: string;
@@ -153,6 +154,7 @@ const InternshipDetails: React.FC = () => {
   }, [activeTab, slug]);
 
   return (
+  <FacultyLayout>
     <div className="max-w-4xl mx-auto p-6">
       {/* Tabs Navigation */}
       <div className="flex justify-between border-b mb-6">
@@ -305,7 +307,8 @@ const InternshipDetails: React.FC = () => {
         </div>
       )}
     </div>
-  );
+    </FacultyLayout>
+    );
 };
 
 export default InternshipDetails;

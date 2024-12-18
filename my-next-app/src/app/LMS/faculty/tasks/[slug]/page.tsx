@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import  FacultyLayout from "@/app/FacultySupervisor/FacultyLayout";
 
 interface Task {
   _id?: string;
@@ -79,6 +80,7 @@ const InternshipDetails: React.FC = () => {
   }, [slug]);
 
   return (
+    <FacultyLayout>
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4">Internship Tasks</h1>
 
@@ -146,6 +148,7 @@ const InternshipDetails: React.FC = () => {
         <p>No task assigned yet.</p>
       )}
     </div>
+    </FacultyLayout>
   );
 };
 

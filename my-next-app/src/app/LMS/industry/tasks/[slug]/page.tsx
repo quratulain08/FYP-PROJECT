@@ -1,5 +1,5 @@
 "use client";
-
+import  IndustryLayout from "@/app/Industry/IndustryLayout";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
@@ -139,6 +139,7 @@ const TaskDetails: React.FC = () => {
   if (!task) return <p className="text-center p-6">Loading task details...</p>;
 
   return (
+    <IndustryLayout>
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">{task.title || "Untitled Task"}</h1>
       <p className="text-gray-600 mb-4">{task.description || "No description available."}</p>
@@ -205,6 +206,7 @@ const TaskDetails: React.FC = () => {
         )}
       </div>
     </div>
+    </IndustryLayout>
   );
 };
 
