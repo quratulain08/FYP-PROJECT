@@ -141,28 +141,28 @@ const InternshipDetails: React.FC = () => {
       <div className="flex justify-between border-b mb-6">
         <button
           onClick={() => setActiveTab("internship")}
-          className={`py-2 px-4 ${activeTab === "internship" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          className={`py-2 px-4 ${activeTab === "internship" ? "border-b-2 border-green-500 text-green-600 font-bold" : ""}`}
         >
           Tasks from Industry supervisor
         </button>
         <button
           onClick={() => setActiveTab("classwork")}
-          className={`py-2 px-4 ${activeTab === "classwork" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          className={`py-2 px-4 ${activeTab === "classwork" ? "border-b-2 border-green-500 text-green-600 font-bold" : ""}`}
         >
           Tasks from Faculty supervisor
         </button>
         <button
           onClick={() => setActiveTab("students")}
-          className={`py-2 px-4 ${activeTab === "students" ? "border-b-2 border-blue-500 font-bold" : ""}`}
+          className={`py-2 px-4 ${activeTab === "students" ? "border-b-2 border-green-500 text-green-600 font-bold" : ""}`}
         >
-          Submitted Tasks
+          Other Students Enrolled
         </button>
       </div>
 
       {/* Internship Tab */}
       {activeTab === "internship" && (
         <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Tasks Assigned by Industry</h2>
+          <h2 className="text-2xl  text-green-600  font-semibold mb-4">Tasks Assigned by Industry</h2>
           {tasks.length === 0 ? (
             <p>No tasks assigned yet.</p>
           ) : (
@@ -173,7 +173,7 @@ const InternshipDetails: React.FC = () => {
                   onClick={() => handleTaskClick(task._id!)}
                   className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
                 >
-                  <p className="font-medium text-blue-600 hover:underline">Task {index + 1}</p>
+                  <p className="font-medium text-green-600 hover:underline">Task {index + 1}</p>
                   <p className="text-sm text-gray-500">
                     Deadline: {new Date(task.deadline).toLocaleString()}
                   </p>
@@ -186,8 +186,8 @@ const InternshipDetails: React.FC = () => {
 
       {/* Faculty Tab */}
 {activeTab === "classwork" && (
-  <div className="border p-6 rounded-lg shadow-md">
-    <h2 className="text-2xl font-semibold mb-4">Tasks Assigned by Faculty</h2>
+  <div className="border p-6  rounded-lg shadow-md">
+    <h2 className="text-2xl border-green-500 text-green-600 font-semibold mb-4">Tasks Assigned by Faculty</h2>
     {tasks2.length === 0 ? (
       <p>No tasks assigned yet.</p>
     ) : (
@@ -213,7 +213,7 @@ const InternshipDetails: React.FC = () => {
       {/* Students Tab */}
       {activeTab === "students" && (
         <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Other Students</h2>
+          <h2 className="text-2xl font-semibold  text-green-600 mb-4">Other Students</h2>
           {student.length === 0 ? (
             <p>No students are enrolled in this internship.</p>
           ) : (

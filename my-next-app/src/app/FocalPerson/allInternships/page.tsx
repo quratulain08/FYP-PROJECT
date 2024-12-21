@@ -16,6 +16,8 @@ interface Internship {
   description: string;
   assignedFaculty: string;
   assignedStudents: string;
+  isApproved: boolean;
+  numberOfStudents:number;
 }
 
 interface Faculty {
@@ -147,7 +149,7 @@ const Internships: React.FC = () => {
 
         if (response.ok) {
           alert(result.message);
-          router.push("/admin/internships"); // Redirect to internships list
+          router.push("/FocalPerson/allInternships"); // Redirect to internships list
         } else {
           alert(`Error: ${result.error}`);
         }
@@ -199,46 +201,58 @@ const allAssignedStudents: string[] = internships.reduce<string[]>((acc, interns
                 </tr>
               </thead>
               <tbody>
-                {internships.filter(
-  (internship) =>
-    internship.assignedStudents.length !== 0 || 
-    internship.assignedFaculty.length !== 0).map((internship) => (
+              {internships
+        .filter(
+          (internship) =>
+            (internship.assignedStudents?.length !== 0 || 
+             internship.assignedFaculty?.length !== 0) && 
+            internship.isApproved === true
+        )
+        .map((internship) => (
                   <tr key={internship._id} className="hover:bg-gray-50">
                     <td className="p-4 border">{internship.title}</td>
                     <td className="p-4 border">{internship.hostInstitution}</td>
                     <td className="p-4 border">
-                      <select
-                        className="border rounded px-2 py-1"
-                        defaultValue={ internship.assignedFaculty || ""}
-                        onChange={(e) => handleAssignFaculty(internship._id, e.target.value)}
-                      >
-                        <option value="" disabled>
-                          Select Faculty
-                        </option>
-                        {faculties
-                        .map((faculty) => (
-                          <option key={faculty._id} value={faculty._id}>
-                            {faculty.name}
-                          </option>
-                        ))}
-                      </select>
+                    <select
+    className="border rounded px-2 py-1"
+    value={internship.assignedFaculty || ""} // Use `value` instead of `defaultValue` for controlled component
+    onChange={(e) => handleAssignFaculty(internship._id, e.target.value)}
+  >
+    <option value="" disabled>
+      Select Faculty
+    </option>
+    {faculties.map((faculty) => (
+      <option key={faculty._id} value={faculty._id}>
+        {faculty.name}
+      </option>
+    ))}
+  </select>
                     </td>
                     <td className="p-4 border">
-                      <select
-                        className="border rounded px-2 py-1"
-                        defaultValue={ internship.assignedStudents || ""}
-                        onChange={(e) => handleAssignStudent(internship._id, e.target.value)}
-                      >
-                        <option value="" disabled>
-                          Select Student
-                        </option>
-                        {students .filter((student) => !allAssignedStudents.includes(student._id)) // Filter unassigned students
-                         .map((student) => (
-                          <option key={student._id} value={student._id}>
-                            {student.registrationNumber}
-                          </option>
-                        ))}
-                      </select>
+                    {Array.from({ length: internship.numberOfStudents }).map((_, index) => (
+    <div key={index} className="mb-2">
+      <select
+        className="border rounded px-2 py-1"
+        value={internship.assignedStudents?.[index] || ""} // Display the student assigned to this slot
+        onChange={(e) => handleAssignStudent(internship._id, e.target.value)}
+      >
+        <option value="" disabled>
+          Select Student
+        </option>
+        {students
+          .filter(
+            (student) =>
+              !allAssignedStudents.includes(student._id) || 
+              internship.assignedStudents?.includes(student._id) // Include already assigned students
+          )
+          .map((student) => (
+            <option key={student._id} value={student._id}>
+              {student.registrationNumber}
+            </option>
+          ))}
+      </select>
+    </div>
+  ))}
                     </td>
                     <td className="p-4 border">
                       <button

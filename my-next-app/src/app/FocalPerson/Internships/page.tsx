@@ -15,7 +15,9 @@ interface Internship {
   endDate: string;
   description: string;
   assignedFaculty: string;
+  isApproved : boolean;
   assignedStudents: string;
+  numberOfStudents: number;
 }
 
 interface Faculty {
@@ -147,7 +149,7 @@ const Internships: React.FC = () => {
 
         if (response.ok) {
           alert(result.message);
-          router.push("/admin/internships"); // Redirect to internships list
+          router.push("/FocalPerson/internships"); // Redirect to internships list
         } else {
           alert(`Error: ${result.error}`);
         }
@@ -199,17 +201,21 @@ const allAssignedStudents: string[] = internships.reduce<string[]>((acc, interns
                 </tr>
               </thead>
               <tbody>
-                {internships.filter(
-  (internship) =>
-    internship.assignedStudents.length === 0 || 
-    internship.assignedFaculty.length === 0).map((internship) => (
+              {internships
+       .filter((internship) => 
+  internship.isApproved === true &&
+  internship.assignedFaculty.length === 0 &&
+  internship.numberOfStudents !== internship.assignedStudents.length
+)
+
+        .map((internship) => (
                   <tr key={internship._id} className="hover:bg-gray-50">
                     <td className="p-4 border">{internship.title}</td>
                     <td className="p-4 border">{internship.hostInstitution}</td>
                     <td className="p-4 border">
                       <select
                         className="border rounded px-2 py-1"
-                        defaultValue={internship.assignedFaculty|| ""}
+                        defaultValue={ ""}
                         onChange={(e) => handleAssignFaculty(internship._id, e.target.value)}
                       >
                         <option value="" disabled>
@@ -224,22 +230,31 @@ const allAssignedStudents: string[] = internships.reduce<string[]>((acc, interns
                       </select>
                     </td>
                     <td className="p-4 border">
-                      <select
-                        className="border rounded px-2 py-1"
-                        defaultValue={ internship.assignedStudents ||""}
-                        onChange={(e) => handleAssignStudent(internship._id, e.target.value)}
-                      >
-                        <option value="" disabled>
-                          Select Student
-                        </option>
-                        {students .filter((student) => !allAssignedStudents.includes(student._id)) // Filter unassigned students
-                         .map((student) => (
-                          <option key={student._id} value={student._id}>
-                            {student.registrationNumber}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
+  {Array.from({ length: internship.numberOfStudents }).map((_, index) => (
+    <div key={index} className="mb-2">
+      <select
+        className="border rounded px-2 py-1"
+        value={internship.assignedStudents?.[index] || ""} // Display the student assigned to this slot
+        onChange={(e) => handleAssignStudent(internship._id, e.target.value)}
+      >
+        <option value="" disabled>
+          Select Student
+        </option>
+        {students
+          .filter(
+            (student) =>
+              !allAssignedStudents.includes(student._id) || 
+              internship.assignedStudents?.includes(student._id) // Include already assigned students
+          )
+          .map((student) => (
+            <option key={student._id} value={student._id}>
+              {student.registrationNumber}
+            </option>
+          ))}
+      </select>
+    </div>
+  ))}
+</td>
                     <td className="p-4 border">
                       <button
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
