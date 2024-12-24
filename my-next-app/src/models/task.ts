@@ -10,6 +10,7 @@ interface ITask extends Document {
   time?: string; // Optional
   weightage: number;
   createdBy: string;
+  assignedStudents: mongoose.Types.ObjectId[], // Array of ObjectId references to Faculty
 }
 
 // Schema definition
@@ -22,6 +23,15 @@ const TaskSchema = new Schema<ITask>({
   time: { type: String, required: false }, // Make time optional
   weightage: { type: Number, required: true },
   createdBy: { type: String, required: true }, 
+  assignedStudents: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Student",
+      },
+    ],
+    default: [], // Initialize as empty array
+  },
 
 });
 

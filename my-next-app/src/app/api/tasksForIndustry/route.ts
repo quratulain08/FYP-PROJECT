@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { internshipId, title, description, deadline, marks, weightage } = body;
+    const { internshipId, title, description, deadline, marks, weightage ,assignedStudents=[]} = body;
 
     // Assume "createdBy" is determined automatically
     const createdBy = "industry"; // This value can come dynamically from a session, token, etc.
@@ -25,6 +25,7 @@ export async function POST(req: Request) {
       deadline,
       marks,
       weightage,
+      assignedStudents,
       createdBy, // Automatically set
     });
 

@@ -34,15 +34,22 @@ interface Student {
   email: string;
 }
 
+interface Submission {
+  _id: string;
+  studentName: string;
+  fileUrl: string;
+  submittedAt: string;
+}
+
 
 const TaskDetails: React.FC = () => {
   const params = useParams();
   const slug = params?.slug as string | undefined;
   const [internship, setInternships] = useState<Internship[]>([]);
   const [student, setStudents] = useState<Student[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
 
   const [task, setTask] = useState<any>(null);
-  const [submissions, setSubmissions] = useState<SubmittedTask[]>([]); // Mock student submissions
   const [error, setError] = useState<string | null>(null);
 
   const fetchTaskDetails = async () => {
@@ -56,13 +63,15 @@ const TaskDetails: React.FC = () => {
       const data = await response.json();
       setTask(data);
 
-      // Mock student submissions
-      const mockSubmissions: SubmittedTask[] = [
-        { _id: "1", studentName: "Alice Johnson", fileUrl: "https://example.com/file1.pdf", grade: null },
-        { _id: "2", studentName: "Bob Smith", fileUrl: "https://example.com/file2.docx", grade: null },
-        { _id: "3", studentName: "Charlie Brown", fileUrl: "https://example.com/file3.zip", grade: null },
-      ];
-      setSubmissions(mockSubmissions);
+        // Fetch submissions
+      const submissionsResponse = await fetch(`/api/submission/${slug}`);
+      if (submissionsResponse.ok) {
+        const submissionsData = await submissionsResponse.json();
+        console.log("Fetched submissions:", submissionsData); // Debugging log
+        setSubmissions(submissionsData);
+      } else {
+        console.error("Failed to fetch submissions");
+      }
     } catch (error) {
       console.error("Error fetching task details:", error);
       setError("Failed to load task details.");
@@ -204,6 +213,35 @@ const TaskDetails: React.FC = () => {
             Save Grades
           </button>
         )}
+
+
+<div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Your Submissions</h2>
+        {submissions.length === 0 ? (
+          <p>No submissions yet.</p>
+        ) : (
+          <ul className="space-y-4">
+            {submissions.map((submission, index) => (
+              <li key={submission._id} className="p-4 border rounded bg-gray-50 shadow-sm">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">Submission {index + 1}</p>
+                    <p>Submitted At: {new Date(submission.submittedAt).toLocaleString()}</p>
+                    <a
+                      href={submission.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Submission
+                    </a>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       </div>
     </div>
     </IndustryLayout>

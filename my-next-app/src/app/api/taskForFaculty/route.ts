@@ -4,7 +4,7 @@ import TaskModel from "@/models/task"; // Task Mongoose model
 export async function POST(req: Request) {
     try {
       const body = await req.json();
-      const { internshipId, title, description, deadline, marks, weightage } = body;
+      const { internshipId, title, description, deadline, marks, weightage, assignedStudents=[]} = body;
   
       // Assume "createdBy" is determined automatically
       const createdBy = "faculty"; // This value can come dynamically from a session, token, etc.
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
         deadline,
         marks,
         weightage,
+        assignedStudents,
         createdBy, // Automatically set
       });
   

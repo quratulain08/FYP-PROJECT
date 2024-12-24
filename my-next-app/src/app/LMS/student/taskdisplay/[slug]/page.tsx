@@ -11,6 +11,7 @@ interface IndustryTask {
   deadline: string;
   marks: number;
   weightage: number;
+  assignedStudents:string[];
 }
 
 interface FacultyTask {
@@ -20,6 +21,7 @@ interface FacultyTask {
   deadline: string;
   marks: number;
   weightage: number;
+  assignedStudents:string[];
 }
 
 
@@ -52,9 +54,11 @@ const InternshipDetails: React.FC = () => {
   const slug = params?.slug as string | undefined;
   const [internship, setInternships] = useState<Internship[]>([]);
   const [student, setStudents] = useState<Student[]>([]);
-
+  const [error, setError] = useState<string | null>(null);
+  const [adminId, setAdminId] = useState<string | null>(null);
   const [tasks, setTasks] = useState<IndustryTask[]>([]); // List of assigned tasks
   const [tasks2, setTasks2] = useState<FacultyTask[]>([]); // List of assigned tasks
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [activeTab, setActiveTab] = useState<"internship" | "classwork" | "students">("internship");
 
@@ -120,19 +124,48 @@ const InternshipDetails: React.FC = () => {
       console.error("Error fetching students:", error);
     }
   };
-  
-  
+
+
   // Handle task click for details
   const handleTaskClick = (taskId: string) => {
     router.push(`/LMS/student/tasksubmission/${taskId}`);
   };
 
   useEffect(() => {
-    if (activeTab === "internship" && slug) {
-      fetchTasks();
-      FetchAssignedStudent();
-    }
-  }, [activeTab, slug]);
+    const fetchData = async () => {
+      const email = "ammary9290111@gmail.com"; // Replace with actual logic to get the email
+
+      setLoading(true); // Set loading to true before fetching data
+      try {
+       // Fetch student data by email
+      const responsee = await fetch(`/api/StudentByemail/${email}`);
+      if (!responsee.ok) throw new Error("Failed to fetch student details");
+  
+      const dataa = await responsee.json();
+      setStudents(dataa);
+  
+      if (dataa.length === 0) {
+        throw new Error("No students found with the provided email");
+      }
+  
+      const adminid = dataa._id; // // Assuming you want the first student in the array
+        setAdminId(adminid); // Set the adminId state
+
+        // Fetch tasks and assigned students if activeTab and slug are valid
+        if (activeTab === "internship" && slug) {
+          await fetchTasks();
+          await FetchAssignedStudent();
+        }
+      } catch (err: unknown) {
+        console.log(err);
+        setError("Error fetching internships.");
+      } finally {
+        setLoading(false); // Ensure loading is stopped in all cases
+      }
+    };
+
+    fetchData(); // Call the async function
+  }, [activeTab, slug]); // Dependencies
 
   return (
     <StudentLayout>
@@ -167,7 +200,9 @@ const InternshipDetails: React.FC = () => {
             <p>No tasks assigned yet.</p>
           ) : (
             <ul className="space-y-2">
-              {tasks.map((task, index) => (
+              {tasks
+              .filter(task => task.assignedStudents.includes(adminId!)) // Filter tasks based on studentId
+              .map((task, index) => (
                 <li
                   key={task._id}
                   onClick={() => handleTaskClick(task._id!)}
@@ -192,7 +227,9 @@ const InternshipDetails: React.FC = () => {
       <p>No tasks assigned yet.</p>
     ) : (
       <ul className="space-y-2">
-        {tasks2.map((task, index) => (
+        {tasks2
+      .filter(tasks2 => tasks2.assignedStudents.includes(adminId!)) // Filter tasks based on studentId
+       .map((task, index) => (
           <li
             key={task._id}
             onClick={() => handleTaskClick(task._id!)}

@@ -12,6 +12,8 @@ interface Task {
   time?: string;
   marks: number;
   weightage: number;
+  assignedStudents: string[];
+
 }
 
 interface Internship {
@@ -55,6 +57,7 @@ const InternshipDetails: React.FC = () => {
     time: "",
     marks: 0,
     weightage: 0,
+    assignedStudents: [],
   });
 
   // Fetch tasks from API for faculty
@@ -110,6 +113,45 @@ const InternshipDetails: React.FC = () => {
     }
   };
 
+  const handleCheckboxChange = (studentId: string, isChecked: boolean) => {
+    if (isChecked) {
+      // Add the student to the assignedStudents array
+      setTask((prevTask) => ({
+        ...prevTask,
+        assignedStudents: [...prevTask.assignedStudents, studentId],
+      }));
+    } else {
+      // Remove the student from the assignedStudents array
+      setTask((prevTask) => ({
+        ...prevTask,
+        assignedStudents: prevTask.assignedStudents.filter(
+          (id) => id !== studentId
+        ),
+      }));
+    }
+  };
+  
+
+  const handleSelectAll = (isChecked: boolean) => {
+    if (isChecked) {
+      // Add all students to the assignedStudents array
+      const allStudentIds = student.map((s) => s._id);
+      setTask((prevTask) => ({
+        ...prevTask,
+        assignedStudents: allStudentIds,
+      }));
+    } else {
+      // Clear the assignedStudents array
+      setTask((prevTask) => ({
+        ...prevTask,
+        assignedStudents: [],
+      }));
+    }
+  };
+  
+
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -130,7 +172,7 @@ const InternshipDetails: React.FC = () => {
       if (response.ok) {
         const newTask = await response.json();
         setTasks((prevTasks) => [...prevTasks, newTask.task]);
-        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 });
+        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 ,assignedStudents: []});
         alert("Task assigned successfully!");
       } else {
         const { error } = await response.json();
@@ -180,87 +222,135 @@ const InternshipDetails: React.FC = () => {
 
       {/* Dashboard: Assign Tasks */}
       {activeTab === "dashboard" && (
-        <div className="border p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl text-green-600 font-semibold mb-4">Assign Task</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block font-medium">Task Title</label>
-              <textarea
-                className="w-full border p-2 rounded"
-                rows={2}
-                value={task.title}
-                onChange={(e) => setTask({ ...task, title: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-medium">Task Description</label>
-              <textarea
-                className="w-full border p-2 rounded"
-                rows={4}
-                value={task.description}
-                onChange={(e) => setTask({ ...task, description: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block font-medium">Deadline (Date)</label>
-                <input
-                  type="date"
-                  className="w-full border p-2 rounded"
-                  value={task.deadline}
-                  onChange={(e) => setTask({ ...task, deadline: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block font-medium">Deadline (Time)</label>
-                <input
-                  type="time"
-                  className="w-full border p-2 rounded"
-                  value={task.time || ""}
-                  onChange={(e) => setTask({ ...task, time: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block font-medium">Marks</label>
-                <input
-                  type="number"
-                  className="w-full border p-2 rounded"
-                  value={task.marks}
-                  onChange={(e) => setTask({ ...task, marks: parseInt(e.target.value) })}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block font-medium">Weightage (%)</label>
-                <input
-                  type="number"
-                  className="w-full border p-2 rounded"
-                  value={task.weightage}
-                  onChange={(e) => setTask({ ...task, weightage: parseInt(e.target.value) })}
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Assign Task
-            </button>
-          </form>
-        </div>
-      )}
-
+         <div className="border border-gray-300 p-6 rounded-lg shadow-lg bg-white mb-6">
+         <h2 className="text-2xl font-semibold mb-4 text-green-600">Assign Task</h2>
+         <form onSubmit={handleSubmit} className="space-y-4">
+           {/* Task Title */}
+           <div>
+             <label className="block font-medium">Task Title</label>
+             <textarea
+               className="w-full border border-gray-300 p-2 rounded-lg"
+               rows={2}
+               value={task.title}
+               onChange={(e) => setTask({ ...task, title: e.target.value })}
+               required
+             />
+           </div>
+       
+           {/* Task Description */}
+           <div>
+             <label className="block font-medium">Task Description</label>
+             <textarea
+               className="w-full border border-gray-300 p-2 rounded-lg"
+               rows={4}
+               value={task.description}
+               onChange={(e) => setTask({ ...task, description: e.target.value })}
+               required
+             />
+           </div>
+       
+           {/* Deadline */}
+           <div className="grid grid-cols-2 gap-4">
+             <div>
+               <label className="block font-medium">Deadline (Date)</label>
+               <input
+                 type="date"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.deadline}
+                 onChange={(e) => setTask({ ...task, deadline: e.target.value })}
+                 required
+               />
+             </div>
+             <div>
+               <label className="block font-medium">Deadline (Time)</label>
+               <input
+                 type="time"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.time || ""}
+                 onChange={(e) => setTask({ ...task, time: e.target.value })}
+                 required
+               />
+             </div>
+           </div>
+       
+           {/* Marks and Weightage */}
+           <div className="grid grid-cols-2 gap-4">
+             <div>
+               <label className="block font-medium">Marks</label>
+               <input
+                 type="number"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.marks}
+                 onChange={(e) => setTask({ ...task, marks: parseInt(e.target.value) })}
+                 required
+               />
+             </div>
+             <div>
+               <label className="block font-medium">Weightage (%)</label>
+               <input
+                 type="number"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.weightage}
+                 onChange={(e) =>
+                   setTask({ ...task, weightage: parseInt(e.target.value) })
+                 }
+                 required
+               />
+             </div>
+           </div>
+       
+           {/* Assign Students */}
+           <div>
+             <label className="block font-medium mb-2">Assign to:</label>
+             <div className="space-y-2">
+               {student.length === 0 ? (
+                 <p>No students available</p>
+               ) : (
+                 <>
+                   {student.map((student) => (
+                     <div key={student._id} className="flex items-center space-x-2">
+                       <input
+                         type="checkbox"
+                         id={`student-${student._id}`}
+                         value={student._id}
+                         checked={task.assignedStudents.includes(student._id)}
+                         onChange={(e) =>
+                           handleCheckboxChange(student._id, e.target.checked)
+                         }
+                         className="form-checkbox"
+                       />
+                       <label htmlFor={`student-${student._id}`} className="text-sm">
+                         {student.registrationNumber}
+                       </label>
+                     </div>
+                   ))}
+                   <div className="flex items-center space-x-2">
+                     <input
+                       type="checkbox"
+                       id="select-all"
+                       onChange={(e) => handleSelectAll(e.target.checked)}
+                       className="form-checkbox"
+                     />
+                     <label htmlFor="select-all" className="text-sm">
+                       All
+                     </label>
+                   </div>
+                 </>
+               )}
+             </div>
+           </div>
+       
+           {/* Submit Button */}
+           <button
+             type="submit"
+             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+           >
+             Assign Task
+           </button>
+         </form>
+       </div>
+       
+       )}
       {/* Classwork: Display Tasks Assigned by Faculty */}
       {activeTab === "classwork" && (
         <div className="border p-6 rounded-lg shadow-md">
