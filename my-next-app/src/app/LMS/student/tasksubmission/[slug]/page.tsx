@@ -3,6 +3,19 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import StudentLayout from "@/app/Student/StudentLayout";
+import Student from "@/models/student";
+
+
+interface Student {
+  _id: string;
+  name: string;
+  department: string;
+  batch: string;
+  didInternship: boolean;
+  registrationNumber: string;
+  section: string;
+  email: string;
+}
 
 interface Submission {
   _id: string;
@@ -18,10 +31,13 @@ const TaskSubmission: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [task, setTask] = useState<any>(null);
+  const [student, setStudent] = useState<Student | null>(null); // Update to hold a single student
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   const fetchTaskDetails = async () => {
     if (!slug) {
@@ -49,6 +65,26 @@ const TaskSubmission: React.FC = () => {
     } catch (error) {
       console.error("Error fetching task details:", error);
       setError("Failed to load task details.");
+    }
+  };
+
+  const FetchStudentDetails = async () => {
+    const email = "ammary9290111@gmail.com"; // Replace with actual logic to get the email
+  
+    try {
+      // Fetch student data by email
+      const responsee = await fetch(`/api/StudentByemail/${email}`);
+      if (!responsee.ok) throw new Error("Failed to fetch student details");
+  
+      const dataa: Student = await responsee.json(); // Assume the API returns a single student object
+      setStudent(dataa);
+  
+      if (!dataa) {
+        throw new Error("No student found with the provided email");
+      }
+    } catch (err: unknown) {
+      console.error("Error fetching student:", err);
+      setError("Error fetching student.");
     }
   };
 
@@ -101,11 +137,15 @@ const TaskSubmission: React.FC = () => {
         alert("Task ID is missing.");
         return;
       }
+      if (!student) {
+        alert("No student details available.");
+        return;
+      }
 
       // Prepare FormData
       const formData = new FormData();
       formData.append("file", fileId); // Pass fileId instead of fileUrl here
-      formData.append("studentName", "John Doe"); // Replace with dynamic student name
+      formData.append("studentName", student.name); // Replace with dynamic student name
 
       // Debugging logs
       console.log("Submitting file:", fileId);
@@ -117,30 +157,32 @@ const TaskSubmission: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ file: fileId, studentName: "John Doe" }),
+        body: JSON.stringify({ file: fileId, studentName: student.name }),
       });
 
 
       if (response.ok) {
         const data = await response.json();
-        console.log("File uploaded successfully:", data);
+        console.log("submission done successfully:", data);
 
-        alert("File uploaded successfully!");
+        alert("submission done successfully!");
         setUploadedFile(null); // Clear file input
         fetchTaskDetails(); // Refresh submissions
       } else {
         const errorData = await response.json();
-        console.error("Error uploading file:", errorData);
-        alert(`Failed to upload file: ${errorData.error}`);
+        console.error("Error while submission:", errorData);
+        alert(`Failed to record submit : ${errorData.error}`);
       }
     } catch (error) {
-      console.log("Unexpected error during file upload:", error);
-      alert("An unexpected error occurred during the file upload.");
+      console.log("Unexpected error during submission:", error);
+      alert("An unexpected error occurred during the submissionn.");
     }
   };
 
   useEffect(() => {
+    FetchStudentDetails();
     fetchTaskDetails();
+ 
   }, [slug]);
 
   if (error) return <p className="text-center p-6 text-red-500">{error}</p>;
@@ -195,8 +237,9 @@ const TaskSubmission: React.FC = () => {
               <li key={submission._id} className="p-4 border rounded bg-gray-50 shadow-sm">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium">Submission {index + 1}</p>
-                    <p>Submitted At: {new Date(submission.submittedAt).toLocaleString()}</p>
+                    <p className="font-medium"><strong>Submission {index + 1}</strong></p>
+                    <p><strong>By:</strong>  { submission.studentName}</p>
+                    <p><strong> Submitted At:</strong> {new Date(submission.submittedAt).toLocaleString()}</p>
                     <a
                       href={submission.fileUrl}
                       target="_blank"

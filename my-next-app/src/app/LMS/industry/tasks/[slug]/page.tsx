@@ -2,13 +2,8 @@
 import  IndustryLayout from "@/app/Industry/IndustryLayout";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import React, { ChangeEvent } from 'react';
 
-interface SubmittedTask {
-  _id: string;
-  studentName: string;
-  fileUrl: string;
-  grade: number | null;
-}
 
 
 interface Internship {
@@ -38,6 +33,7 @@ interface Submission {
   _id: string;
   studentName: string;
   fileUrl: string;
+  grade?: number;
   submittedAt: string;
 }
 
@@ -124,19 +120,44 @@ const TaskDetails: React.FC = () => {
     }
   };
   
-  const handleGradeChange = (id: string, grade: number) => {
+  const handleGradeChange = (submissionId: string, grade: number) => {
     setSubmissions((prevSubmissions) =>
       prevSubmissions.map((submission) =>
-        submission._id === id ? { ...submission, grade } : submission
+        submission._id === submissionId
+          ? { ...submission, grade }
+          : submission
       )
     );
   };
 
-  const handleSaveGrades = () => {
-    // Save grades to the backend
-    console.log("Grades saved:", submissions);
-    alert("Grades saved successfully!");
+  const handleSaveGrades = async () => {
+    try {
+      const updatePromises = submissions.map((submission) =>
+        fetch(`/api/submission/${submission._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ grade: submission.grade }),
+        })
+      );
+  
+      // Wait for all updates to complete
+      const responses = await Promise.all(updatePromises);
+      const failedResponses = responses.filter((response) => !response.ok);
+  
+      if (failedResponses.length > 0) {
+        alert("Some grades failed to save. Please try again.");
+        return;
+      }
+  
+      alert("Grades saved successfully!");
+    } catch (error) {
+      console.error("Error saving grades:", error);
+      alert("An error occurred while saving grades.");
+    }
   };
+  
 
   useEffect(() => {
     fetchTaskDetails();
@@ -165,83 +186,57 @@ const TaskDetails: React.FC = () => {
 
       {/* Submissions Section */}
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Student Submissions</h2>
-        {submissions.length === 0 ? (
-          <p>No submissions yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {submissions.map((submission) => (
-              <li
-                key={submission._id}
-                className="p-4 border rounded bg-gray-50 shadow-sm"
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">{submission.studentName}</p>
-                    <a
-                      href={submission.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      View Submission
-                    </a>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="number"
-                      min="0"
-                      max={task.marks}
-                      placeholder="Assign Grade"
-                      value={submission.grade || ""}
-                      onChange={(e) => handleGradeChange(submission._id, parseInt(e.target.value))}
-                      className="w-24 p-2 border rounded"
-                    />
-                    <span>/ {task.marks}</span>
-                  </div>
+      <h2 className="text-2xl font-semibold mb-4">Student Submissions</h2>
+      {submissions.length === 0 ? (
+        <p>No submissions yet.</p>
+      ) : (
+        <ul className="space-y-4">
+          {submissions.map((submission, index) => (
+            <li key={submission._id} className="p-4 border rounded bg-gray-50 shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-medium"><strong> Student Name : </strong> {submission.studentName}</p>
+                  <p><strong> Submitted At:</strong> {new Date(submission.submittedAt).toLocaleString()}</p>
+                  <a
+                    href={submission.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    View Submission
+                  </a>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {submissions.length > 0 && (
-          <button
-            onClick={handleSaveGrades}
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Save Grades
-          </button>
-        )}
-
-
-<div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Your Submissions</h2>
-        {submissions.length === 0 ? (
-          <p>No submissions yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {submissions.map((submission, index) => (
-              <li key={submission._id} className="p-4 border rounded bg-gray-50 shadow-sm">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Submission {index + 1}</p>
-                    <p>Submitted At: {new Date(submission.submittedAt).toLocaleString()}</p>
-                    <a
-                      href={submission.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
-                    >
-                      View Submission
-                    </a>
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    min="0"
+                    max={task.marks}
+                    placeholder="Assign Grade"
+                    value={submission.grade || ""}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      handleGradeChange(submission._id, parseInt(e.target.value))
+                    }
+                    className="w-24 p-2 border rounded"
+                  />
+                  <span>/ {task.marks}</span>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {submissions.length > 0 && (
+        <button
+          onClick={handleSaveGrades}
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Save Grades
+        </button>
+      )}
+     
+  
+
       </div>
     </div>
     </IndustryLayout>
