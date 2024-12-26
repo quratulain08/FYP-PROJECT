@@ -11,6 +11,11 @@ interface ITask extends Document {
   weightage: number;
   createdBy: string;
   assignedStudents: mongoose.Types.ObjectId[], // Array of ObjectId references to Faculty
+  comments: {
+    commenterName: string; // Name of the user who commented (can be a Student or Faculty)
+    content: string; // The comment content
+    commentCreatedAt: Date; // Date the comment was created
+  }[]; // Array of comments
 }
 
 // Schema definition
@@ -22,7 +27,7 @@ const TaskSchema = new Schema<ITask>({
   marks: { type: Number, required: true },
   time: { type: String, required: false }, // Make time optional
   weightage: { type: Number, required: true },
-  createdBy: { type: String, required: true }, 
+  createdBy: { type: String, required: true },
   assignedStudents: {
     type: [
       {
@@ -32,7 +37,13 @@ const TaskSchema = new Schema<ITask>({
     ],
     default: [], // Initialize as empty array
   },
-
+  comments: [
+    {
+      commenterName: { type: String, required: false },
+      content: { type: String, required: false },
+      commentCreatedAt: { type: Date, required: false },
+    },
+  ], // Array of comments
 });
 
 // Model export

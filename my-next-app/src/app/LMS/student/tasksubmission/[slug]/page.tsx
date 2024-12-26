@@ -88,6 +88,42 @@ const TaskSubmission: React.FC = () => {
     }
   };
 
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  };
+  
+  const handleCommentSubmit = async () => {
+    // if (!comment) {
+    //   alert("Please enter a comment before submitting.");
+    //   return;
+    // }
+
+    // try {
+    //   const response = await fetch(`/api/task/${slug}/comments`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       commenterName: student?.name, // Get student name dynamically
+    //       content: comment,
+    //       commentCreatedAt: new Date(),
+    //     }),
+    //   });
+
+    //   if (response.ok) {
+    //     const data = await response.json();
+    //     alert("Comment submitted successfully.");
+    //     setComment(""); // Clear the comment field
+    //     fetchTaskDetails(); // Refresh task details with new comments
+    //   } else {
+    //     alert("Failed to submit comment.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error submitting comment:", error);
+    //   alert("Error submitting comment.");
+    // }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -255,6 +291,44 @@ const TaskSubmission: React.FC = () => {
           </ul>
         )}
       </div>
+
+      <div className="flex mt-8">
+        {/* Commenting box */}
+        <div className="w-1/3 ml-8 p-6 bg-gray-100 rounded-lg shadow-sm">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Add a Comment</h2>
+          <textarea
+          //  value={comment}
+            onChange={handleCommentChange}
+            rows={4}
+            className="w-full p-2 border rounded-lg mb-4"
+            placeholder="Write your comment..."
+          />
+          <button
+            onClick={handleCommentSubmit}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Submit Comment
+          </button>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
+        </div>
+
+        {/* View all comments */}
+        {/* <div className="w-2/3 ml-8 p-6 bg-gray-100 rounded-lg shadow-sm">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">All Comments</h2>
+          {comments.length === 0 ? (
+            <p>No comments yet.</p>
+          ) : (
+            <ul>
+              {comments.map((comment, index) => (
+                <li key={index} className="mb-4 p-4 border-b">
+                  <p className="text-gray-700">{comment}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div> */}
+      </div>
+    
     </div>
   </StudentLayout>
 );
