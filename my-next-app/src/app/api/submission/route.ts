@@ -15,9 +15,10 @@ export async function POST(
     const file = formData.get("file") as File | null;
     const studentName = formData.get("studentName") as string | null;
     const taskId = formData.get("taskId") as string | null;
+   // const studentId = formData.get("studentId") as string | null;
 
-
-    if (!file || !taskId || !studentName) {
+    
+    if (!file || !taskId || !studentName ) {
       return NextResponse.json({ error: "File, Task ID, and Student Name are required." }, { status: 400 });
     }
 
@@ -33,6 +34,7 @@ export async function POST(
     await connectToDatabase();
     const submission = new SubmissionModel({
       taskId,
+      
       studentName,
       fileUrl: `/uploads/${file.name}`,
     });

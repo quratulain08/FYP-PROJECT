@@ -15,6 +15,12 @@ interface Task {
   assignedStudents: string[];
 
 }
+interface InternshipInvolvement {
+  taskTitle: string;
+  totalMarks: number;
+  obtainedMarks: string | number;
+}
+
 
 interface Internship {
   _id: string;
@@ -46,6 +52,10 @@ const InternshipDetails: React.FC = () => {
   const slug = params?.slug as string | undefined;
   const [internship, setInternships] = useState<Internship[]>([]);
   const [student, setStudents] = useState<Student[]>([]);
+  const [involvement, setInvolvement] = useState<InternshipInvolvement[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [tasks, setTasks] = useState<Task[]>([]); // List of assigned tasks
   const [activeTab, setActiveTab] = useState<"dashboard" | "classwork" | "students">("dashboard");
@@ -112,6 +122,33 @@ const InternshipDetails: React.FC = () => {
       console.error("Error fetching students:", error);
     }
   };
+
+
+  const openModal = async (student: Student) => {
+    setLoading(true); // Ensure loading starts before the fetch
+  
+    try {
+      const response = await fetch(`/api/gradeReport/${slug}/${student._id}`); // Use student.id
+      if (!response.ok) {
+        throw new Error("Failed to fetch involvement data");
+      }
+  
+      const data: InternshipInvolvement[] = await response.json();
+      setInvolvement(data);
+      setSelectedStudent(student);  // Ensure selected student is set
+      setIsModalOpen(true); // Open modal after data is loaded
+    } catch (error) {
+      console.error("Error fetching student internship data:", error);
+    } finally {
+      setLoading(false); // Always stop loading, even if there’s an error
+    }
+  };
+  
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+
 
   const handleCheckboxChange = (studentId: string, isChecked: boolean) => {
     if (isChecked) {
@@ -373,30 +410,96 @@ const InternshipDetails: React.FC = () => {
         </div>
       )}
 
-      {/* Students: Display Enrolled Students */}
-      {activeTab === "students" && (
+    {/* Students: Display Enrolled Students */}
+    {activeTab === "students" && (
         <div className="border p-6 rounded-lg shadow-md">
           <h2 className="text-2xl text-green-600 font-semibold mb-4">Enrolled Students</h2>
           {student.length === 0 ? (
             <p>No students are enrolled in this internship.</p>
           ) : (
             <ul className="space-y-2">
-              {student.map((student) => (
-                <li key={student._id} className="p-2 border rounded bg-gray-50 shadow-sm">
-                  <p className="font-medium"><strong>{student.name}</strong></p>
-                  <p className="text-sm text-gray-500"><strong>Department:</strong> {student.department}</p>
-                  <p className="text-sm text-gray-500"><strong>Batch:</strong> {student.batch}</p>
-                  <p className="text-sm text-gray-500"><strong>Section:</strong> {student.section}</p>
-                  <p className="text-sm text-gray-500"><strong>Did Internship:</strong> {student.didInternship ? 'Yes' : 'No'}</p>
-                  <p className="text-sm text-gray-500"><strong>Registration Number:</strong> {student.registrationNumber}</p>
-                  <p className="text-sm text-gray-500"><strong>Email:</strong> {student.email}</p>
-                </li>
-              ))}
-            </ul>
+            {student.map((student) => (
+              <li
+                key={student._id}
+                onClick={() => openModal(student)}
+                className="cursor-pointer hover:text-green-700 mb-4 p-4 bg-gray-100 rounded-lg shadow-sm hover:bg-gray-200"
+              >
+                <p className="font-medium">
+                  <strong>{student.name}</strong>
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong>Department:</strong> {student.department}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong>Batch:</strong> {student.batch}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong>Section:</strong> {student.section}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong>Did Internship:</strong> {student.didInternship ? 'Yes' : 'No'}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong>Registration Number:</strong> {student.registrationNumber}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <strong>Email:</strong> {student.email}
+                </p>
+              </li>
+            ))}
+          </ul>
           )}
         </div>
       )}
+
+  {isModalOpen && selectedStudent && (
+  <div className="modal-overlay fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+    <div className="modal-content bg-white p-6 rounded-lg shadow-lg relative max-w-3xl w-full">
+      {/* Close Button */}
+      <button
+        onClick={closeModal}
+        aria-label="Close modal"
+        className="absolute top-2 right-2 text-2xl font-bold text-gray-700 hover:text-red-600"
+      >
+        &times;
+      </button>
+
+      {/* Modal Title */}
+      <h2 className="text-2xl font-semibold mb-4 text-green-600 border-b-2 border-green-600 pb-2">
+        {selectedStudent.name}'s Grade Report
+      </h2>
+
+      <div className="border p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-4">Student Internship Involvement</h2>
+      <table className="min-w-full table-auto border-collapse border border-gray-300">
+        <thead>
+          <tr>
+          <th className="border border-gray-300 px-4 py-2">Task No</th>
+            <th className="border border-gray-300 px-4 py-2">Task Title</th>
+            <th className="border border-gray-300 px-4 py-2">Total Marks</th>
+            <th className="border border-gray-300 px-4 py-2">Obtained Marks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {involvement.map((row, index) => (
+            <tr key={index} className="hover:bg-gray-100">
+              <td className="border border-gray-300 px-4 py-2">{index+1}</td>
+              <td className="border border-gray-300 px-4 py-2">{row.taskTitle}</td>
+              <td className="border border-gray-300 px-4 py-2">{row.totalMarks}</td>
+              <td className="border border-gray-300 px-4 py-2">{row.obtainedMarks}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
+
+     
+    </div>
+  </div>
+)}
+
+    </div>
+
     </FacultyLayout>
     );
 };

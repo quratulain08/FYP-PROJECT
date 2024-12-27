@@ -193,9 +193,12 @@ const TaskSubmission: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ file: fileId, studentName: student.name }),
+        body: JSON.stringify({
+          fileId: fileId, // Now sending "file" instead of "fileId"
+          studentName: student.name,
+          studentId: student._id,
+        }),
       });
-
 
       if (response.ok) {
         const data = await response.json();
@@ -292,12 +295,12 @@ const TaskSubmission: React.FC = () => {
         )}
       </div>
 
-      <div className="flex mt-8">
+      {/* <div className="flex mt-8">
         {/* Commenting box */}
-        <div className="w-1/3 ml-8 p-6 bg-gray-100 rounded-lg shadow-sm">
+        {/* <div className="w-1/3 ml-8 p-6 bg-gray-100 rounded-lg shadow-sm">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">Add a Comment</h2>
           <textarea
-          //  value={comment}
+            value={comment}
             onChange={handleCommentChange}
             rows={4}
             className="w-full p-2 border rounded-lg mb-4"
@@ -310,7 +313,7 @@ const TaskSubmission: React.FC = () => {
             Submit Comment
           </button>
           {error && <p className="text-red-500 mt-2">{error}</p>}
-        </div>
+        </div> */}
 
         {/* View all comments */}
         {/* <div className="w-2/3 ml-8 p-6 bg-gray-100 rounded-lg shadow-sm">
@@ -327,7 +330,7 @@ const TaskSubmission: React.FC = () => {
             </ul>
           )}
         </div> */}
-      </div>
+      {/* </div> */} 
     
     </div>
   </StudentLayout>
