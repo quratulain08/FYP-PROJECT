@@ -403,6 +403,8 @@ const InternshipDetails: React.FC = () => {
                   className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
                 >
                   <p className="font-medium text-green-600 hover:underline">Task {index + 1}</p>
+                  <p> <strong>Title:</strong> {task.title}</p>
+
                 </li>
               ))}
             </ul>

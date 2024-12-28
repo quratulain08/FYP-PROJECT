@@ -3,10 +3,21 @@ import { Types } from "mongoose";
 import Task from "@/models/task";
 import Submission from "@/models/submission";
 import connectToDatabase from "@/lib/mongodb";
+import { ObjectId } from "mongoose";
 
 // Utility to check if a string is a valid MongoDB ObjectId
 const isValidObjectId = (id: string) => Types.ObjectId.isValid(id);
-
+interface Task {
+    _id: ObjectId | string;
+    title: string;
+    marks: number;
+  }
+  
+  interface Submission {
+    taskId: ObjectId | string;
+    studentId: ObjectId | string;
+    grade: number;
+  }
 // GET - Fetch all tasks and submissions for a student
 export async function GET(
   request: Request,
@@ -23,21 +34,23 @@ export async function GET(
 
   try {
     await connectToDatabase();
-
-    const tasks = await Task.find({ internshipId }).lean();
-    const submissions = await Submission.find({ studentId }).lean();
+     // Fetch tasks and submissions
+    // Fetch tasks and submissions with explicit typing
+    const tasks: Task[] = await Task.find({ internshipId }).lean();
+    const submissions: Submission[] = await Submission.find({ studentId }).lean();
 
     const result = tasks.map((task) => {
-        const submission = submissions.find(
-          (sub) =>(sub.taskId as string) === (task._id as string)
-        );
-      
-        return {
-          taskTitle: task.title,
-          totalMarks: task.marks,
-          obtainedMarks: submission ? submission.grade : "Not Submitted",
-        };
-      });
+      const submission = submissions.find(
+        (sub) => sub.taskId.toString() === task._id.toString() // Convert both IDs to strings
+      );
+
+      return {
+        taskTitle: task.title,
+        totalMarks: task.marks,
+        obtainedMarks: submission ? submission.grade : "Not Submitted",
+      };
+    }); 
+ 
  
 
     return NextResponse.json(result);
