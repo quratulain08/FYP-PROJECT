@@ -73,7 +73,7 @@ const InternshipDisplay: React.FC = () => {
   };                                                                    
 
   const handleCardClick = (id: string) => {
-    router.push(`/LMS/student/taskdisplay/${id}`);
+    router.push(`/Student/taskdisplay/${id}`);
   };
   
   const handleDelete = async (id: string) => {

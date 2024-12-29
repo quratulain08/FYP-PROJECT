@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import  IndustryLayout from "@/app/Industry/IndustryLayout";
+import  FacultyLayout from "@/app/FacultySupervisor/FacultyLayout";
 
 interface Task {
   _id?: string;
@@ -12,10 +11,16 @@ interface Task {
   deadline: string;
   time?: string;
   marks: number;
-  createdby:string;
   weightage: number;
   assignedStudents: string[];
+
 }
+interface InternshipInvolvement {
+  taskTitle: string;
+  totalMarks: number;
+  obtainedMarks: string | number;
+}
+
 
 interface Internship {
   _id: string;
@@ -29,6 +34,7 @@ interface Internship {
   assignedFaculty: string;
   assignedStudents: string;
 }
+
 interface Student {
   _id: string;
   name: string;
@@ -39,26 +45,21 @@ interface Student {
   section: string;
   email: string;
 }
-interface InternshipInvolvement {
-  taskTitle: string;
-  totalMarks: number;
-  obtainedMarks: string | number;
-}
-
 
 const InternshipDetails: React.FC = () => {
   const params = useParams();
-  const [internship, setInternships] = useState<Internship[]>([]);
-  const [student, setStudents] = useState<Student[]>([]);
   const router = useRouter();
   const slug = params?.slug as string | undefined;
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [internship, setInternships] = useState<Internship[]>([]);
+  const [student, setStudents] = useState<Student[]>([]);
   const [involvement, setInvolvement] = useState<InternshipInvolvement[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]); // List of assigned tasks
   const [activeTab, setActiveTab] = useState<"dashboard" | "classwork" | "students">("dashboard");
+
   const [task, setTask] = useState<Task>({
     title: "",
     description: "",
@@ -66,22 +67,17 @@ const InternshipDetails: React.FC = () => {
     time: "",
     marks: 0,
     weightage: 0,
-    createdby: "",
     assignedStudents: [],
   });
 
-  
-
-
-  // Fetch tasks from API
+  // Fetch tasks from API for faculty
   const fetchTasks = async () => {
     try {
-      const response = await fetch(`/api/tasksForIndustry/${slug}`);
+      const response = await fetch(`/api/taskForFaculty/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch tasks");
 
       const data = await response.json();
       setTasks(data);
-      
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -91,88 +87,40 @@ const InternshipDetails: React.FC = () => {
     try {
       const response = await fetch(`/api/internships/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch internship");
-  
+
       const data = await response.json();
       setInternships(data);
-  
+
       // Ensure that assignedStudents is an array of strings (student IDs)
-      const assignedStudents: string[] = data.assignedStudents; // or number[] depending on your data structure
-  
+      const assignedStudents: string[] = data.assignedStudents;
+
       if (assignedStudents && assignedStudents.length > 0) {
-        // Fetch the students assigned to this internship
         await FetchStudentfinal(assignedStudents);
       } else {
         console.log("No students assigned to this internship");
       }
-  
+
     } catch (error) {
       console.error("Error fetching internship:", error);
     }
   };
-  
-  // Update FetchStudentfinal to use the correct type for assignedStudents
+
   const FetchStudentfinal = async (assignedStudents: string[]) => {
     try {
-      // Fetch student data for each student in the assignedStudents array
       const studentPromises = assignedStudents.map(async (studentId) => {
         const response = await fetch(`/api/students/${studentId}`);
         if (!response.ok) throw new Error(`Failed to fetch student with ID ${studentId}`);
-  
+
         const data: Student = await response.json();
         return data;
       });
-  
-      // Wait for all student data to be fetched
+
       const studentsData = await Promise.all(studentPromises);
       setStudents(studentsData);
-  
+
     } catch (error) {
       console.error("Error fetching students:", error);
     }
-  };
-  
-
-  // Handle task form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!task.title || !task.description || !task.deadline) {
-      alert("Title, description, and deadline are required.");
-      return;
-    }
-
-    const deadlineWithTime = `${task.deadline}T${task.time || "00:00"}`;
-
-    console.log("Submitting task:", {
-      ...task,
-      deadline: deadlineWithTime,
-      internshipId: slug,
-    });
-
-    try {
-      const response = await fetch(`/api/tasksForIndustry`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug  }),
-      });
-
-      if (response.ok) {
-        const newTask = await response.json();
-        setTasks((prevTasks) => [...prevTasks, newTask.task]);
-        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 ,createdby:'' , assignedStudents: []});
-        alert("Task assigned successfully!");
-      } else {
-        const { error } = await response.json();
-        alert(`Failed to assign task: ${error}`);
-      }
-    } catch (error) {
-      console.error("Error saving task:", error);
-      alert("An error occurred while assigning the task.");
-    }
-  };
-
-  const handleTaskClick = (taskId: string) => {
-    router.push(`/LMS/industry/tasks/${taskId}`);
   };
 
 
@@ -199,6 +147,7 @@ const InternshipDetails: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
 
 
   const handleCheckboxChange = (studentId: string, isChecked: boolean) => {
@@ -240,61 +189,69 @@ const InternshipDetails: React.FC = () => {
 
 
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleAssignStudent = async (TaskId: string, studentId: string) => {
-    if (window.confirm("Are you sure you want to assign this student to the internship?")) {
-        try {
-          const response = await fetch(`/api/InternshipsForStudnet/${studentId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ TaskId }),
-          });
-  
-          const result = await response.json();
-  
-          if (response.ok) {
-            alert(result.message);
-            } else {
-            alert(`Error: ${result.error}`);
-          }
-        } catch (error) {
-          console.log("Error assigning student:", error);
-          alert("Failed to assign student.");
-        }
+    if (!task.title || !task.description || !task.deadline) {
+      alert("Title, description, and deadline are required.");
+      return;
+    }
+
+    const deadlineWithTime = `${task.deadline}T${task.time || "00:00"}`;
+
+    try {
+      const response = await fetch(`/api/taskForFaculty`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...task, deadline: deadlineWithTime, internshipId: slug }),
+      });
+
+      if (response.ok) {
+        const newTask = await response.json();
+        setTasks((prevTasks) => [...prevTasks, newTask.task]);
+        setTask({ title: "", description: "", deadline: "", time: "", marks: 0, weightage: 0 ,assignedStudents: []});
+        alert("Task assigned successfully!");
+      } else {
+        const { error } = await response.json();
+        alert(`Failed to assign task: ${error}`);
       }
+    } catch (error) {
+      console.error("Error saving task:", error);
+      alert("An error occurred while assigning the task.");
+    }
   };
 
-
-
+  const handleTaskClick = (taskId: string) => {
+    router.push(`/FacultySupervisor/tasks/${taskId}`);
+  };
 
   useEffect(() => {
     if (activeTab === "classwork" && slug) {
       fetchTasks();
       FetchAssignedStudent();
-      
     }
   }, [activeTab, slug]);
 
   return (
-    <IndustryLayout>
-    <div className="max-w-7xl mx-auto p-6">
+  <FacultyLayout>
+    <div className="max-w-4xl mx-auto p-6">
       {/* Tabs Navigation */}
       <div className="flex justify-between border-b mb-6">
         <button
           onClick={() => setActiveTab("dashboard")}
-          className={`py-2 px-4 ${activeTab === "dashboard" ? "border-b-2 text-green-600 font-semibold  text-green-600" : "text-gray-600"}`}
+          className={`py-2 px-4 ${activeTab === "dashboard" ? "border-b-2 border-green-500 text-green-600 font-bold" : ""}`}
         >
           Dashboard
         </button>
         <button
           onClick={() => setActiveTab("classwork")}
-          className={`py-2 px-4 ${activeTab === "classwork" ? "border-b-2 border-green-600 font-semibold text-green-600" : "text-gray-600"}`}
+          className={`py-2 px-4 ${activeTab === "classwork" ? "border-b-2 border-green-500  text-green-600 font-bold" : ""}`}
         >
           Classwork
         </button>
         <button
           onClick={() => setActiveTab("students")}
-          className={`py-2 px-4 ${activeTab === "students" ? "border-b-2 border-green-600 font-semibold text-green-600" : "text-gray-600"}`}
+          className={`py-2 px-4 ${activeTab === "students" ? "border-b-2 border-green-500   text-green-600 font-bold" : ""}`}
         >
           Students
         </button>
@@ -302,151 +259,152 @@ const InternshipDetails: React.FC = () => {
 
       {/* Dashboard: Assign Tasks */}
       {activeTab === "dashboard" && (
-        <div className="border border-gray-300 p-6 rounded-lg shadow-lg bg-white mb-6">
-        <h2 className="text-2xl font-semibold mb-4 text-green-600">Assign Task</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Task Title */}
-          <div>
-            <label className="block font-medium">Task Title</label>
-            <textarea
-              className="w-full border border-gray-300 p-2 rounded-lg"
-              rows={2}
-              value={task.title}
-              onChange={(e) => setTask({ ...task, title: e.target.value })}
-              required
-            />
-          </div>
-      
-          {/* Task Description */}
-          <div>
-            <label className="block font-medium">Task Description</label>
-            <textarea
-              className="w-full border border-gray-300 p-2 rounded-lg"
-              rows={4}
-              value={task.description}
-              onChange={(e) => setTask({ ...task, description: e.target.value })}
-              required
-            />
-          </div>
-      
-          {/* Deadline */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium">Deadline (Date)</label>
-              <input
-                type="date"
-                className="w-full border border-gray-300 p-2 rounded-lg"
-                value={task.deadline}
-                onChange={(e) => setTask({ ...task, deadline: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-medium">Deadline (Time)</label>
-              <input
-                type="time"
-                className="w-full border border-gray-300 p-2 rounded-lg"
-                value={task.time || ""}
-                onChange={(e) => setTask({ ...task, time: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-      
-          {/* Marks and Weightage */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium">Marks</label>
-              <input
-                type="number"
-                className="w-full border border-gray-300 p-2 rounded-lg"
-                value={task.marks}
-                onChange={(e) => setTask({ ...task, marks: parseInt(e.target.value) })}
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-medium">Weightage (%)</label>
-              <input
-                type="number"
-                className="w-full border border-gray-300 p-2 rounded-lg"
-                value={task.weightage}
-                onChange={(e) =>
-                  setTask({ ...task, weightage: parseInt(e.target.value) })
-                }
-                required
-              />
-            </div>
-          </div>
-      
-          {/* Assign Students */}
-          <div>
-            <label className="block font-medium mb-2">Assign to:</label>
-            <div className="space-y-2">
-              {student.length === 0 ? (
-                <p>No students available</p>
-              ) : (
-                <>
-                  {student.map((student) => (
-                    <div key={student._id} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id={`student-${student._id}`}
-                        value={student._id}
-                        checked={task.assignedStudents.includes(student._id)}
-                        onChange={(e) =>
-                          handleCheckboxChange(student._id, e.target.checked)
-                        }
-                        className="form-checkbox"
-                      />
-                      <label htmlFor={`student-${student._id}`} className="text-sm">
-                        {student.registrationNumber}
-                      </label>
-                    </div>
-                  ))}
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="select-all"
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                      className="form-checkbox"
-                    />
-                    <label htmlFor="select-all" className="text-sm">
-                      All
-                    </label>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-      
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-          >
-            Assign Task
-          </button>
-        </form>
-      </div>
-      
-      )}
-      {/* Classwork: Display Tasks */}
+         <div className="border border-gray-300 p-6 rounded-lg shadow-lg bg-white mb-6">
+         <h2 className="text-2xl font-semibold mb-4 text-green-600">Assign Task</h2>
+         <form onSubmit={handleSubmit} className="space-y-4">
+           {/* Task Title */}
+           <div>
+             <label className="block font-medium">Task Title</label>
+             <textarea
+               className="w-full border border-gray-300 p-2 rounded-lg"
+               rows={2}
+               value={task.title}
+               onChange={(e) => setTask({ ...task, title: e.target.value })}
+               required
+             />
+           </div>
+       
+           {/* Task Description */}
+           <div>
+             <label className="block font-medium">Task Description</label>
+             <textarea
+               className="w-full border border-gray-300 p-2 rounded-lg"
+               rows={4}
+               value={task.description}
+               onChange={(e) => setTask({ ...task, description: e.target.value })}
+               required
+             />
+           </div>
+       
+           {/* Deadline */}
+           <div className="grid grid-cols-2 gap-4">
+             <div>
+               <label className="block font-medium">Deadline (Date)</label>
+               <input
+                 type="date"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.deadline}
+                 onChange={(e) => setTask({ ...task, deadline: e.target.value })}
+                 required
+               />
+             </div>
+             <div>
+               <label className="block font-medium">Deadline (Time)</label>
+               <input
+                 type="time"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.time || ""}
+                 onChange={(e) => setTask({ ...task, time: e.target.value })}
+                 required
+               />
+             </div>
+           </div>
+       
+           {/* Marks and Weightage */}
+           <div className="grid grid-cols-2 gap-4">
+             <div>
+               <label className="block font-medium">Marks</label>
+               <input
+                 type="number"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.marks}
+                 onChange={(e) => setTask({ ...task, marks: parseInt(e.target.value) })}
+                 required
+               />
+             </div>
+             <div>
+               <label className="block font-medium">Weightage (%)</label>
+               <input
+                 type="number"
+                 className="w-full border border-gray-300 p-2 rounded-lg"
+                 value={task.weightage}
+                 onChange={(e) =>
+                   setTask({ ...task, weightage: parseInt(e.target.value) })
+                 }
+                 required
+               />
+             </div>
+           </div>
+       
+           {/* Assign Students */}
+           <div>
+             <label className="block font-medium mb-2">Assign to:</label>
+             <div className="space-y-2">
+               {student.length === 0 ? (
+                 <p>No students available</p>
+               ) : (
+                 <>
+                   {student.map((student) => (
+                     <div key={student._id} className="flex items-center space-x-2">
+                       <input
+                         type="checkbox"
+                         id={`student-${student._id}`}
+                         value={student._id}
+                         checked={task.assignedStudents.includes(student._id)}
+                         onChange={(e) =>
+                           handleCheckboxChange(student._id, e.target.checked)
+                         }
+                         className="form-checkbox"
+                       />
+                       <label htmlFor={`student-${student._id}`} className="text-sm">
+                         {student.registrationNumber}
+                       </label>
+                     </div>
+                   ))}
+                   <div className="flex items-center space-x-2">
+                     <input
+                       type="checkbox"
+                       id="select-all"
+                       onChange={(e) => handleSelectAll(e.target.checked)}
+                       className="form-checkbox"
+                     />
+                     <label htmlFor="select-all" className="text-sm">
+                       All
+                     </label>
+                   </div>
+                 </>
+               )}
+             </div>
+           </div>
+       
+           {/* Submit Button */}
+           <button
+             type="submit"
+             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+           >
+             Assign Task
+           </button>
+         </form>
+       </div>
+       
+       )}
+      {/* Classwork: Display Tasks Assigned by Faculty */}
       {activeTab === "classwork" && (
-        <div className="border border-gray-300 p-6 rounded-lg shadow-lg bg-white mb-6">
-          <h2 className="text-2xl font-semibold mb-4 text-green-600">Assigned Tasks</h2>
+        <div className="border p-6 rounded-lg shadow-md">
+          <h2 className="text-2xl text-green-600 font-semibold mb-4">Assigned Tasks</h2>
           {tasks.length === 0 ? (
             <p>No tasks assigned yet.</p>
           ) : (
-            <ul className="space-y-4">
+            <ul className="space-y-2">
               {tasks.map((task, index) => (
                 <li
                   key={task._id}
                   onClick={() => handleTaskClick(task._id!)}
-                  className="p-4 border border-gray-300 rounded-lg shadow-sm bg-gray-50 hover:bg-gray-100 cursor-pointer transition duration-300"
+                  className="p-4 border rounded bg-gray-50 shadow-sm hover:bg-gray-100 cursor-pointer"
                 >
-                  <p className="font-semibold text-blue-600 hover:underline">Task {index + 1}</p>
+                  <p className="font-medium text-green-600 hover:underline">Task {index + 1}</p>
                   <p> <strong>Title:</strong> {task.title}</p>
+
                 </li>
               ))}
             </ul>
@@ -454,8 +412,8 @@ const InternshipDetails: React.FC = () => {
         </div>
       )}
 
-      {/* Students: Display Enrolled Students */}
-      {activeTab === "students" && (
+    {/* Students: Display Enrolled Students */}
+    {activeTab === "students" && (
         <div className="border p-6 rounded-lg shadow-md">
           <h2 className="text-2xl text-green-600 font-semibold mb-4">Enrolled Students</h2>
           {student.length === 0 ? (
@@ -544,11 +502,8 @@ const InternshipDetails: React.FC = () => {
 
     </div>
 
-      
-    
-    
-    </IndustryLayout>
-  );
+    </FacultyLayout>
+    );
 };
 
 export default InternshipDetails;

@@ -36,7 +36,7 @@ export async function GET(
     await connectToDatabase();
      // Fetch tasks and submissions
     // Fetch tasks and submissions with explicit typing
-    const tasks: Task[] = await Task.find({ internshipId }).lean();
+    const tasks: Task[] = await Task.find({ internshipId ,studentId }).lean();
     const submissions: Submission[] = await Submission.find({ studentId }).lean();
 
     const result = tasks.map((task) => {
