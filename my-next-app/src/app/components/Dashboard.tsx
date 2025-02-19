@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Bar, Pie } from "react-chartjs-2";
+import { Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  LineElement,
+  PointElement,  // Import PointElement
   Title,
   Tooltip,
   Legend,
@@ -16,7 +17,8 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  LineElement,
+  PointElement,  // Register PointElement
   Title,
   Tooltip,
   Legend,
@@ -70,16 +72,18 @@ const StudentDashboard: React.FC = () => {
     {}
   );
 
-  // Data for Bar Chart (Department-wise breakdown)
-  const barChartData = {
+  // Data for Line Chart (Department-wise breakdown)
+  const lineChartData = {
     labels: Object.keys(departmentCounts),
     datasets: [
       {
         label: "Students per Department",
         data: Object.values(departmentCounts),
-        backgroundColor: "rgba(75, 192, 192, 0.5)",
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
+        fill: true,
+        backgroundColor: "rgba(46, 125, 50, 0.4)", // Light Green background
+        borderColor: "rgba(46, 125, 50, 1)", // Green line color
+        tension: 0.4,
+        borderWidth: 2,
       },
     ],
   };
@@ -90,7 +94,8 @@ const StudentDashboard: React.FC = () => {
     datasets: [
       {
         data: [studentsWithInternships, totalStudents - studentsWithInternships],
-        backgroundColor: ["#4caf50", "#f44336"],
+        backgroundColor: ["#66bb6a", "#e57373"], // Green and Red
+        hoverBackgroundColor: ["#4caf50", "#f44336"],
       },
     ],
   };
@@ -126,25 +131,24 @@ const StudentDashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-  {/* Bar Chart */}
-  <div className="bg-white p-4 shadow-md rounded-md">
-    <h2 className="text-xl font-bold mb-4">Department-wise Breakdown</h2>
-    <Bar data={barChartData} />
-  </div>
+        {/* Line Chart */}
+        <div className="bg-white p-4 shadow-md rounded-md">
+          <h2 className="text-xl font-bold mb-4">Department-wise Breakdown</h2>
+          <Line data={lineChartData} />
+        </div>
 
-  {/* Pie Chart */}
-  <div className="bg-white p-4 shadow-md rounded-md">
-    <h2 className="text-xl font-bold mb-4">Internship Status</h2>
-    <div className="h-64">
-      <Pie data={pieChartData} />
-    </div>
-    <p className="text-center mt-4 text-lg font-semibold">
-      Total Students: {totalStudents}
-    </p>
-  </div>
-</div>
-
+        {/* Pie Chart */}
+        <div className="bg-white p-4 shadow-md rounded-md">
+          <h2 className="text-xl font-bold mb-4">Internship Status</h2>
+          <div className="h-64">
+            <Pie data={pieChartData} />
+          </div>
+          <p className="text-center mt-4 text-lg font-semibold">
+            Total Students: {totalStudents}
+          </p>
+        </div>
       </div>
+    </div>
   );
 };
 
