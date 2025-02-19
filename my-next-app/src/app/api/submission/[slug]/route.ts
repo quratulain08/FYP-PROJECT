@@ -16,12 +16,22 @@ export async function POST(
   try {
     const formData = await req.json();
     console.log(formData)
-    const file = formData.file as string | null;
+    const fileId = formData.fileId as string | null;
     const studentName = formData.studentName as string | null;
+    const studentId = formData.studentId as string | null;
 
+    
 
-    if (!file || !taskId || !studentName) {
-      return NextResponse.json({ error: "File, Task ID, and Student Name are required." }, { status: 400 });
+    if (!fileId  ) {
+      return NextResponse.json({ error: "File  are required." }, { status: 400 });
+    }
+    if ( !taskId ) {
+      return NextResponse.json({ error: "Task ID are required." }, { status: 400 });
+    } if ( !studentName ) {
+      return NextResponse.json({ error: " Student Name are required." }, { status: 400 });
+    }
+    if ( !studentId ) {
+      return NextResponse.json({ error: " Student id are required." }, { status: 400 });
     }
 
 
@@ -31,7 +41,8 @@ export async function POST(
     const submission = new SubmissionModel({
       taskId,
       studentName,
-      fileUrl: file,
+      studentId,
+      fileUrl: fileId,
     });
     await submission.save();
 

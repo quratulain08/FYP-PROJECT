@@ -128,7 +128,7 @@ const InternshipDetails: React.FC = () => {
 
   // Handle task click for details
   const handleTaskClick = (taskId: string) => {
-    router.push(`/LMS/student/tasksubmission/${taskId}`);
+    router.push(`/Student/tasksubmission/${taskId}`);
   };
 
   useEffect(() => {

@@ -2,7 +2,7 @@
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import  IndustryLayout from "@/app/Industry/IndustryLayout";
+import  FacultyLayout  from "@/app/FacultySupervisor/FacultyLayout";
 interface Internship {
   _id: string;
   title: string;
@@ -13,9 +13,37 @@ interface Internship {
   endDate: string;
   description: string;
 }
+interface FacultyData {
+  departmentId: string;
+  honorific: string;
+  name: string;
+  cnic: string;
+  gender: string;
+  address: string;
+  province: string;
+  city: string;
+  contractType: string;
+  academicRank: string;
+  joiningDate: string;
+  leavingDate?: string;
+  isCoreComputingTeacher: boolean;
+  email:string;
+  lastAcademicQualification: {
+      degreeName: string;
+      degreeType: string;
+      fieldOfStudy: string;
+      degreeAwardingCountry: string;
+      degreeAwardingInstitute: string;
+      degreeStartDate: string;
+      degreeEndDate: string;
+  };
+}
+
 
 const InternshipDisplay: React.FC = () => {
   const [internships, setInternships] = useState<Internship[]>([]);
+  const [Faculties, setFaculty] = useState<FacultyData[]>([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -25,21 +53,40 @@ const InternshipDisplay: React.FC = () => {
   }, []);
 
   const fetchInternships = async () => {
+    const email = "aqurat@gmail.com"; // Replace with actual logic to get the email
+  
     try {
-      const response = await fetch("/api/internships");
-      if (!response.ok) throw new Error("Failed to fetch internships");
+      // Fetch student data by email
+      const responsee = await fetch(`/api/facultyByEmail/${email}`);
+      if (!responsee.ok) throw new Error("Failed to fetch student details");
+  
+      const dataa = await responsee.json();
+      setFaculty(dataa);
+  
+      if (dataa.length === 0) {
+        throw new Error("No students found with the provided email");
+      }
+  
+      const FacultyId = dataa._id; // Assuming you want the first student in the array
+      console.log("FacultyId :", FacultyId); // Debug log
 
+      // Fetch internships by assigned student ID
+      const response = await fetch(`/api/InternshipsForAssignedFaculty/${FacultyId}`);
+      if (!response.ok) throw new Error("Failed to fetch internships");
+  
       const data = await response.json();
       setInternships(data);
     } catch (err) {
+      console.error(err);
       setError("Error fetching internships.");
     } finally {
       setLoading(false);
     }
-  };
+  };                                                                    
+
 
   const handleCardClick = (id: string) => {
-    router.push(`/LMS/industry/internships/${id}`);
+    router.push(`/FacultySupervisor/internships/${id}`);
   };
   
   const handleDelete = async (id: string) => {
@@ -78,7 +125,7 @@ const InternshipDisplay: React.FC = () => {
   );
 
   return (
-    <IndustryLayout>
+    <FacultyLayout>
     <div className="max-w-7xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Internships</h1>
@@ -119,7 +166,7 @@ const InternshipDisplay: React.FC = () => {
         </div>
       )}
     </div>
-    </IndustryLayout>
+    </FacultyLayout>
   );
 };
 

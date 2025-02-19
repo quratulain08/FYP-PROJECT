@@ -17,6 +17,9 @@ interface ProfileData {
 }
 
 const InstituteProfile: React.FC = () => {
+
+  const [statusMessage, setStatusMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileData, setProfileData] = useState<Record<string, ProfileData>>({});
   const [editMode, setEditMode] = useState<Record<string, boolean>>({});
   const [newProfile, setNewProfile] = useState<ProfileData>({
@@ -54,6 +57,74 @@ const InstituteProfile: React.FC = () => {
 
     fetchProfiles();
   }, []);
+
+  const [formData, setFormData] = useState({
+    user: '',
+    password: '',
+  });
+  
+    const handleChangeRegister = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    };
+
+
+const handleSubmitRegister = async (e: React.FormEvent) => {
+  e.preventDefault();
+  console.log('Form Submitted:', formData);
+
+  setIsSubmitting(true); // Start submission process
+  setStatusMessage(''); // Reset status message
+
+  try {
+    // Extract email and password from formState
+    const { user: email, password } = formData;
+
+    // Register Focal Person
+    const focalPersonResponse = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        role: 'EnterpriseCell',
+      }),
+    });
+
+    if (!focalPersonResponse.ok) {
+      throw new Error('Error registering Focal Person');
+    }
+    console.log('Focal Person registered');
+
+    // Send email notification to Focal Person
+    const emailResponse = await fetch('/api/sendEmail-EnterpriseCell', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        EnterpriseCellEmail: email,
+        EnterpriseCellPassword: password,
+      }),
+    });
+
+    if (!emailResponse.ok) {
+      throw new Error('Error sending email');
+    }
+    console.log('Email sent successfully');
+    setStatusMessage('Focal Person registered and email sent successfully.');
+  } catch (error) {
+    console.error(error);
+    setStatusMessage('Failed to register Focal Person or send email. Please try again.');
+  } finally {
+    setIsSubmitting(false); // End submission process
+  }
+};
 
   const handleChange = (role: string, field: keyof ProfileData, value: string) => {
     setProfileData((prevData) => ({
@@ -410,20 +481,40 @@ const InstituteProfile: React.FC = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      {/* Add Profile Button */}
-      <button
-        onClick={() => setShowAddForm((prev) => !prev)}
-        className="mb-6 w-30 bg-green-600 text-white p-3 rounded-md hover:bg-green-900 transition"
-      >
-        {showAddForm ? "Cancel Add Profile" : "Add New Profile"}
-      </button>
-      
-      {/* Add Profile Form */}
-      {showAddForm && renderAddProfileForm()}
 
-      {/* Profile Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    
+    <div className="max-w-5xl mx-auto p-8">
+      <form
+      onSubmit={handleSubmitRegister}
+      className="max-w-sm mx-auto p-6 bg-white shadow-md rounded-lg space-y-4"
+    >
+      <h2 className="text-center text-xl font-bold text-green-600">Register EnterpriseCell</h2>
+      <input
+        type="text"
+        name="user"
+        value={formData.user}
+        onChange={handleChangeRegister}
+        placeholder="Username"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChangeRegister}
+        placeholder="Password"
+        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+        required
+      />
+      <button
+        type="submit"
+        className="w-full bg-green-500 text-white p-3 rounded-md hover:bg-green-600 transition"
+      >
+        Register
+      </button>
+    </form>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {renderDisplay("vc", "Vice Chancellor")}
         {renderDisplay("dean", "Dean")}
         {renderDisplay("chairman", "Chairman Academics")}
