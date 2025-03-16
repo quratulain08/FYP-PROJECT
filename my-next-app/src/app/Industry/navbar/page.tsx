@@ -1,14 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Building2, Briefcase, LogOut, User, ChevronDown } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { Building2, Briefcase, LogOut, User, BarChart3, Users, Home, FileText } from "lucide-react"
 
 const IndustryNavbar = () => {
   const [email, setEmail] = useState<string | null>(null)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email")
@@ -22,12 +21,8 @@ const IndustryNavbar = () => {
     }, 0)
   }
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-  }
-
   const isActive = (path: string) => {
-    return pathname === path
+    return pathname?.startsWith(path)
   }
 
   return (
@@ -48,7 +43,7 @@ const IndustryNavbar = () => {
             <div className="hidden md:flex items-center mr-4 bg-gray-100 px-3 py-1.5 rounded-full">
               <User className="text-gray-600 mr-2 h-4 w-4" />
               <span className="text-gray-700 font-medium" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
-                {email ?? "Guest"}
+                {email ?? "Guest"} <span className="text-green-600">(Industry)</span>
               </span>
             </div>
             <button
@@ -65,92 +60,38 @@ const IndustryNavbar = () => {
 
       {/* Main Navigation */}
       <nav className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 py-1">
-          <div className="flex justify-between items-center overflow-x-auto hide-scrollbar">
-            <div className="flex space-x-4">
-              <Link
-                href="/Industry/university"
-                className={`flex flex-col items-center px-4 py-2 rounded-md transition-all duration-200 ${
-                  isActive("/Industry/university")
-                    ? "bg-green-500 text-white"
-                    : "text-gray-700 hover:bg-green-50 hover:text-green-600"
-                }`}
-              >
-                <Building2
-                  className={`h-5 w-5 mb-1 ${isActive("/Industry/university") ? "text-white" : "text-green-600"}`}
-                />
-                <span
-                  className="text-xs font-medium whitespace-nowrap"
-                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                >
-                  Universities
-                </span>
-              </Link>
+        <div className="container mx-auto">
+          <div className="flex overflow-x-auto hide-scrollbar">
 
-              <div className="relative group">
-                <Link
-                  href="/Industry/internshipdisplay"
-                  className={`flex flex-col items-center px-4 py-2 rounded-md transition-all duration-200 ${
-                    isActive("/Industry/internshipdisplay")
-                      ? "bg-green-500 text-white"
-                      : "text-gray-700 hover:bg-green-50 hover:text-green-600"
-                  }`}
-                  onClick={(e) => {
-                    if (isDropdownOpen) {
-                      e.preventDefault()
-                      toggleDropdown()
-                    }
-                  }}
-                >
-                  <Briefcase
-                    className={`h-5 w-5 mb-1 ${isActive("/Industry/internshipdisplay") ? "text-white" : "text-gray-700"}`}
-                  />
-                  <div className="flex items-center">
-                    <span
-                      className="text-xs font-medium whitespace-nowrap"
-                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                    >
-                      Internships
-                    </span>
-                    <ChevronDown
-                      className={`h-3 w-3 ml-1 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        toggleDropdown()
-                      }}
-                    />
-                  </div>
-                </Link>
+            <button
+              onClick={() => router.push("/Industry/university")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Industry/university")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Building2 className="h-5 w-5 mr-2" />
+              <span>Universities</span>
+            </button>
 
-                {/* Dropdown Menu */}
-                {isDropdownOpen && (
-                  <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
-                    <Link
-                      href="/Industry/internshipdisplay"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
-                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                    >
-                      View Internships
-                    </Link>
-                    <Link
-                      href="/Industry/createinternship"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
-                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                    >
-                      Create Internship
-                    </Link>
-                    <Link
-                      href="/Industry/manageapplications"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600"
-                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                    >
-                      Manage Applications
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
+            <button
+              onClick={() => router.push("/Industry/internshipdisplay")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Industry/internshipdisplay") ||
+                isActive("/Industry/internships") ||
+                isActive("/Industry/createinternship")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Briefcase className="h-5 w-5 mr-2" />
+              <span>Internships</span>
+            </button>
+
+    
           </div>
         </div>
       </nav>

@@ -24,7 +24,7 @@ const Navbar: React.FC = () => {
       <nav className="bg-white border-b border-gray-300 shadow-sm">
         <div className="container mx-auto px-4 py-1 flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/nceac-logo.jpg" alt="NCAA Logo" className="h-12 mr-3" />
+            <img src="/air-university-logo-1.png" alt="NCAA Logo" className="h-12 mr-3" />
             <h1 className="text-lg text-gray-700 font-normal">Air University, Islamabad</h1>
           </div>
           <div className="flex items-center">
@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link> */}
             <Link href="/FacultySupervisor/internshipdisplay" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-red-500 mb-2"><FaFolder /></span>
+              <span className="text-2xl text-gray-700 mb-2"><FaFolder /></span>
               <span className="text-sm">Internships</span>
               <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
             </Link>
