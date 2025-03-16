@@ -1,164 +1,282 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Program from "@/models/Program";
-import Layout from "@/app/components/Layout";
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import Layout from "@/app/components/Layout"
+import { FaEdit, FaTrash } from "react-icons/fa"
+import { Calendar, Tag, Phone, Mail, User, Clock, FileText, Plus, BookOpen } from "lucide-react"
 
 interface Department {
-  id: string;
-  name: string;
-  startDate: string;
-  category: string;
-  hodName: string;
-  honorific: string;
-  cnic: string;
-  email: string;
-  phone: string;
-  landLine?: string;
-  focalPersonName: '',
-  focalPersonHonorific: 'Mr.',
-  focalPersonCnic: '',
-  focalPersonEmail: '',
-  focalPersonPhone: '',
+  id: string
+  name: string
+  startDate: string
+  category: string
+  hodName: string
+  honorific: string
+  cnic: string
+  email: string
+  phone: string
+  landLine?: string
+  focalPersonName: ""
+  focalPersonHonorific: "Mr."
+  focalPersonCnic: ""
+  focalPersonEmail: ""
+  focalPersonPhone: ""
 }
 
 interface Program {
-  _id: string;
-  name: string;
-  departmentId: string;
-  startDate: string;
-  category: string;
-  durationYears: number;
-  description?: string;
-  contactEmail: string;
-  contactPhone?: string;
-  programHead: string;
+  _id: string
+  name: string
+  departmentId: string
+  startDate: string
+  category: string
+  durationYears: number
+  description?: string
+  contactEmail: string
+  contactPhone?: string
+  programHead: string
   programHeadContact?: {
-    email?: string;
-    phone?: string;
-  };
-  programObjectives?: string[];
+    email?: string
+    phone?: string
+  }
+  programObjectives?: string[]
+}
+
+// Program Card Component
+const ProgramCard = ({
+  program,
+  onEdit,
+  onDelete,
+}: {
+  program: Program
+  onEdit: () => void
+  onDelete: () => void
+}) => {
+  const [isHovered, setIsHovered] = useState(false)
+
+  // Get program initials (up to 2 characters)
+  const getInitials = () => {
+    const words = program.name.split(" ")
+    if (words.length > 1) {
+      return (words[0][0] + words[1][0]).toUpperCase()
+    }
+    return program.name.substring(0, 2).toUpperCase()
+  }
+
+  return (
+    <div
+      className={`bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg ${isHovered ? "border-green-400" : ""}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Action Buttons */}
+      <div className="flex justify-end p-3">
+        <div className="flex space-x-2">
+          <button onClick={onEdit} className="text-gray-400 hover:text-blue-500 p-1 transition-colors" title="Edit">
+            <FaEdit size={16} />
+          </button>
+          <button onClick={onDelete} className="text-gray-400 hover:text-red-500 p-1 transition-colors" title="Delete">
+            <FaTrash size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Circle with Program Initials */}
+      <div className="flex flex-col items-center justify-center p-6 pt-0">
+        <div
+          className={`w-20 h-20 rounded-full bg-green-500 flex items-center justify-center mb-4 transition-all duration-300 ${isHovered ? "transform scale-110" : ""}`}
+        >
+          <span className="text-white font-bold text-xl">{getInitials()}</span>
+        </div>
+        <h2 className="text-lg font-bold text-gray-800 text-center mb-2">{program.name}</h2>
+        <p className="text-sm text-gray-500 text-center mb-2">{program.category}</p>
+        <div className="flex items-center justify-center text-sm text-gray-500">
+          <Clock className="w-4 h-4 mr-1 text-green-500" />
+          <span>{program.durationYears} years</span>
+        </div>
+      </div>
+
+      {/* Program Details - Visible on Hover */}
+      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isHovered ? "max-h-96" : "max-h-0"}`}>
+        <div className="p-6 pt-0 border-t border-gray-100">
+          <div className="grid grid-cols-1 gap-3">
+            <div className="flex items-center gap-3">
+              <Calendar className="text-green-500 w-4 h-4" />
+              <div>
+                <p className="text-xs text-gray-500">Start Date</p>
+                <p className="text-sm font-medium text-gray-800">{program.startDate}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <User className="text-green-500 w-4 h-4" />
+              <div>
+                <p className="text-xs text-gray-500">Program Head</p>
+                <p className="text-sm font-medium text-gray-800">{program.programHead}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Mail className="text-green-500 w-4 h-4" />
+              <div>
+                <p className="text-xs text-gray-500">Contact Email</p>
+                <p className="text-sm font-medium text-gray-800">{program.contactEmail}</p>
+              </div>
+            </div>
+
+            {program.contactPhone && (
+              <div className="flex items-center gap-3">
+                <Phone className="text-green-500 w-4 h-4" />
+                <div>
+                  <p className="text-xs text-gray-500">Contact Phone</p>
+                  <p className="text-sm font-medium text-gray-800">{program.contactPhone}</p>
+                </div>
+              </div>
+            )}
+
+            {program.description && (
+              <div className="flex items-start gap-3 mt-2">
+                <FileText className="text-green-500 w-4 h-4 mt-1" />
+                <div>
+                  <p className="text-xs text-gray-500">Description</p>
+                  <p className="text-sm font-medium text-gray-800">{program.description}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function DepartmentDetail() {
-  const [department, setDepartment] = useState<Department | null>(null);
-  const [programs, setPrograms] = useState<Program[]>([]); // Change to an array
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{ message: string; details?: string } | null>(null);
-  const params = useParams();
-  const router = useRouter();
-  const id = params.slug as string;
+  const [department, setDepartment] = useState<Department | null>(null)
+  const [programs, setPrograms] = useState<Program[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<{ message: string; details?: string } | null>(null)
+  const params = useParams()
+  const router = useRouter()
+  const id = params.slug as string
 
   const checkResponseType = async (response: Response) => {
-    const contentType = response.headers.get("content-type");
+    const contentType = response.headers.get("content-type")
     if (!contentType || !contentType.includes("application/json")) {
-      const text = await response.text();
-      throw new Error(`Expected JSON response but got ${contentType}\nResponse: ${text}`);
+      const text = await response.text()
+      throw new Error(`Expected JSON response but got ${contentType}\nResponse: ${text}`)
     }
-    return response;
-  };
+    return response
+  }
 
   const fetchWithErrorHandling = async (url: string) => {
-    const response = await fetch(url);
-    await checkResponseType(response);
-    
+    const response = await fetch(url)
+    await checkResponseType(response)
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      const errorData = await response.json()
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
     }
-    
-    return response.json();
-  };
+
+    return response.json()
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (!id) {
-          setError({ message: "Department ID is missing" });
-          return;
+          setError({ message: "Department ID is missing" })
+          return
         }
-  
+
         // Fetch department data
-        const deptData: Department = await fetchWithErrorHandling(`/api/department/${id}`);
-        console.log("Department Data:", deptData); // Debugging log
-        setDepartment(deptData);
-  
+        const deptData: Department = await fetchWithErrorHandling(`/api/department/${id}`)
+        console.log("Department Data:", deptData)
+        setDepartment(deptData)
+
         // Attempt to fetch program data
         try {
-          const programData: Program[] = await fetchWithErrorHandling(`/api/program/${id}`);
-          console.log("Program Data:", programData); // Debugging log
-          setPrograms(programData);
+          const programData: Program[] = await fetchWithErrorHandling(`/api/program/${id}`)
+          console.log("Program Data:", programData)
+          setPrograms(programData)
         } catch (programError) {
-          console.warn("Failed to fetch programs:", programError);
-          setPrograms([]); // Ensure programs are an empty array if fetch fails
+          console.warn("Failed to fetch programs:", programError)
+          setPrograms([])
         }
-  
-        setError(null);
+
+        setError(null)
       } catch (err) {
-        console.error("Error fetching department:", err);
-        let errorMessage = "Error fetching department data";
-        let errorDetails = "";
-  
+        console.error("Error fetching department:", err)
+        let errorMessage = "Error fetching department data"
+        let errorDetails = ""
+
         if (err instanceof Error) {
-          errorMessage = err.message;
-          errorDetails = err.stack || "";
+          errorMessage = err.message
+          errorDetails = err.stack || ""
         }
-  
+
         setError({
           message: errorMessage,
           details: errorDetails,
-        });
+        })
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-  
-    fetchData();
-  }, [id]);
-  
+    }
+
+    fetchData()
+  }, [id])
+
   const handleRetry = () => {
-    setLoading(true);
-    setError(null);
-    window.location.reload();
-  };
+    setLoading(true)
+    setError(null)
+    window.location.reload()
+  }
 
   const handleAddNewProgram = () => {
-    console.log(`${id}`);
-    // Navigate to a page or open a modal for adding a new program
-    router.push(`/admin/Add-program/${id}`);
-  };
+    console.log(`${id}`)
+    router.push(`/admin/Add-program/${id}`)
+  }
 
   const handleEdit = (programId: string) => {
-    router.push(`/admin/Edit-program/${programId}/${id}`);
-  };
+    router.push(`/admin/Edit-program/${programId}/${id}`)
+  }
 
   const handleDelete = async (programId: string) => {
-    const confirmation = window.confirm("Are you sure you want to delete this program?");
+    const confirmation = window.confirm("Are you sure you want to delete this program?")
     if (confirmation) {
       try {
         const response = await fetch(`/api/program/${programId}`, {
           method: "DELETE",
-        });
+        })
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Error deleting program");
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Error deleting program")
         }
-        setPrograms((prevPrograms) => prevPrograms.filter((program) => program._id !== programId));
-        alert("Program deleted successfully!");
+        setPrograms((prevPrograms) => prevPrograms.filter((program) => program._id !== programId))
+        alert("Program deleted successfully!")
       } catch (error) {
-        alert("Error deleting program: " + error.message);
+        alert("Error deleting program: " + error.message)
       }
     }
-  };
+  }
+
+  // Get department initials (up to 2 characters)
+  const getDepartmentInitials = () => {
+    if (!department) return ""
+
+    const words = department.name.split(" ")
+    if (words.length > 1) {
+      return (words[0][0] + words[1][0]).toUpperCase()
+    }
+    return department.name.substring(0, 2).toUpperCase()
+  }
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -175,7 +293,7 @@ export default function DepartmentDetail() {
               </pre>
             </details>
           )}
-          <button 
+          <button
             onClick={handleRetry}
             className="mt-4 bg-red-100 text-red-700 px-4 py-2 rounded hover:bg-red-200 transition-colors"
           >
@@ -183,7 +301,7 @@ export default function DepartmentDetail() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   if (!department) {
@@ -191,100 +309,152 @@ export default function DepartmentDetail() {
       <div className="flex justify-center items-center min-h-screen">
         <p className="text-xl">Department not found</p>
       </div>
-    );
+    )
   }
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-semibold text-green-600">
-              {department.honorific} {department.hodName} - {department.name}
-            </h1>
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Department Card with Circle Design */}
+        <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200 mb-10">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-28 h-28 rounded-full bg-green-500 flex items-center justify-center mb-4">
+              <span className="text-white font-bold text-3xl">{getDepartmentInitials()}</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800 text-center mb-1">{department.name}</h1>
+            <p className="text-lg text-gray-600 text-center mb-6">
+              {department.honorific} {department.hodName}
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p className="mb-3">
-                <span className="font-bold">Category:</span> {department.category}
-              </p>
-              <p className="mb-3">
-                <span className="font-bold">Start Date:</span> {department.startDate}
-              </p>
-              <p className="mb-3">
-                <span className="font-bold">CNIC:</span> {department.cnic}
-              </p>
-              <p className="mb-3">
-                <span className="font-bold">Email:</span> {department.email}
-              </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="flex items-start gap-3">
+              <Tag className="text-green-500 w-5 h-5 mt-1" />
+              <div>
+                <p className="text-sm text-gray-500">Category</p>
+                <p className="font-medium text-gray-800">{department.category}</p>
+              </div>
             </div>
-            <div>
-              <p className="mb-3">
-                <span className="font-bold">Phone:</span> {department.phone}
-              </p>
-              {department.landLine && (
-                <p className="mb-3">
-                  <span className="font-bold">Land Line:</span> {department.landLine}
-                </p>
-              )}
-              <p className="mb-3">
-                <span className="font-bold">Focal Person Name:</span> {department.focalPersonHonorific} {department.focalPersonName}
-              </p>
-              <p className="mb-3">
-                <span className="font-bold">Focal Person cnic:</span>{department.focalPersonCnic}
-              </p>
-              <p className="mb-3">
-                <span className="font-bold">Focal Person Email:</span>{department.focalPersonEmail}
-              </p>
+
+            <div className="flex items-start gap-3">
+              <Calendar className="text-green-500 w-5 h-5 mt-1" />
+              <div>
+                <p className="text-sm text-gray-500">Start Date</p>
+                <p className="font-medium text-gray-800">{department.startDate}</p>
+              </div>
             </div>
+
+            <div className="flex items-start gap-3">
+              <FileText className="text-green-500 w-5 h-5 mt-1" />
+              <div>
+                <p className="text-sm text-gray-500">CNIC</p>
+                <p className="font-medium text-gray-800">{department.cnic}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Mail className="text-green-500 w-5 h-5 mt-1" />
+              <div>
+                <p className="text-sm text-gray-500">Email</p>
+                <p className="font-medium text-gray-800">{department.email}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Phone className="text-green-500 w-5 h-5 mt-1" />
+              <div>
+                <p className="text-sm text-gray-500">Phone</p>
+                <p className="font-medium text-gray-800">{department.phone}</p>
+              </div>
+            </div>
+
+            {department.landLine && (
+              <div className="flex items-start gap-3">
+                <Phone className="text-green-500 w-5 h-5 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-500">Land Line</p>
+                  <p className="font-medium text-gray-800">{department.landLine}</p>
+                </div>
+              </div>
+            )}
+
+            {department.focalPersonName && (
+              <div className="flex items-start gap-3">
+                <User className="text-green-500 w-5 h-5 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-500">Focal Person</p>
+                  <p className="font-medium text-gray-800">
+                    {department.focalPersonHonorific} {department.focalPersonName}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {department.focalPersonEmail && (
+              <div className="flex items-start gap-3">
+                <Mail className="text-green-500 w-5 h-5 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-500">Focal Person Email</p>
+                  <p className="font-medium text-gray-800">{department.focalPersonEmail}</p>
+                </div>
+              </div>
+            )}
+
+            {department.focalPersonCnic && (
+              <div className="flex items-start gap-3">
+                <FileText className="text-green-500 w-5 h-5 mt-1" />
+                <div>
+                  <p className="text-sm text-gray-500">Focal Person CNIC</p>
+                  <p className="font-medium text-gray-800">{department.focalPersonCnic}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        <h2 className="text-xl font-semibold text-green-600 mb-4">Program Details</h2>
-        <button 
-          onClick={handleAddNewProgram}
-          className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition-colors mb-8"
-        >
-          Add New Program
-        </button>
-        {programs.length > 0 ? (
-          programs.map((program, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-lg p-8 border border-green-500 mb-8">
-              <h2 className="text-xl font-semibold text-green-600 mb-4">Program {index+1}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <p><span className="font-bold">Program Name:</span> {program.name}</p>  
-                <p><span className="font-bold">Start Date:</span> {program.startDate}</p>
-                <p><span className="font-bold">Category:</span> {program.category}</p>
-                <p><span className="font-bold">Duration:</span> {program.durationYears} years</p>
-                {program.description && (
-                  <p><span className="font-bold">Description:</span> {program.description}</p>
-                )}
-                <p><span className="font-bold">Contact Email:</span> {program.contactEmail}</p>
-                {program.contactPhone && (
-                  <p><span className="font-bold">Contact Phone:</span> {program.contactPhone}</p>
-                )}
-                <p><span className="font-bold">Program Head:</span> {program.programHead}</p>
-                {program.programHeadContact && (
-                  <div>
-                    <p><span className="font-bold">Program Head Email:</span> {program.programHeadContact.email}</p>
-                    <p><span className="font-bold">Program Head Phone:</span> {program.programHeadContact.phone}</p>
-                  </div>
-                )}
-              </div>
-              <div className="flex justify-end gap-4">
-                <button onClick={() => handleEdit(program._id)} className="text-blue-500 hover:underline">
-                  <FaEdit className="inline mr-2" /> Edit
-                </button>
-                <button onClick={() => handleDelete(program._id)} className="text-red-500 hover:underline">
-                  <FaTrash className="inline mr-2" /> Delete
-                </button>
-              </div>
+        {/* Programs Section */}
+        <div className="mb-10">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-green-600 flex items-center">
+              <BookOpen className="mr-2 h-6 w-6" />
+              Programs
+            </h2>
+            <button
+              onClick={handleAddNewProgram}
+              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-300 flex items-center gap-2"
+            >
+              <Plus size={18} />
+              Add New Program
+            </button>
+          </div>
+
+          {programs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {programs.map((program) => (
+                <ProgramCard
+                  key={program._id}
+                  program={program}
+                  onEdit={() => handleEdit(program._id)}
+                  onDelete={() => handleDelete(program._id)}
+                />
+              ))}
             </div>
-          ))
-        ) : (
-          <p>No programs found.</p>
-        )}
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-lg shadow p-12 text-center">
+              <BookOpen className="mx-auto h-12 w-12 text-green-500 mb-4" />
+              <p className="text-gray-600 text-lg">No programs available for this department.</p>
+              <button
+                onClick={handleAddNewProgram}
+                className="mt-6 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md transition duration-300 inline-flex items-center gap-2"
+              >
+                <Plus size={18} />
+                Add Your First Program
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
-  );
+  )
 }
+

@@ -1,487 +1,489 @@
-  "use client";
+"use client"
 
-  import { useEffect, useState } from "react";
-  import { useParams, useRouter } from "next/navigation";
-  import * as XLSX from "xlsx";
-  import Layout from "@/app/components/Layout";
-  import BatchSummary from '@/app/admin/Batch/[slug]/page';
+import type React from "react"
 
-  interface Student {
-    _id: string;
-    name: string;
-    department: string;
-    batch: string;
-    didInternship: boolean;
-    registrationNumber: string;
-    section: string;
-    email: string;
-  }
-  interface Department {
-    _id: string;
-    name: string;
-    startDate: string;
-    category: string;
-    hodName: string;
-    honorific: string;
-    cnic: string;
-    email: string;
-    phone: string;
-    landLine?: string;
-    address: string;
-    province: string;
-    city: string;
-  }
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import * as XLSX from "xlsx"
+import { Edit, Mail, Trash2, Upload, ChevronRight } from "lucide-react"
+import Layout from "@/app/components/Layout"
 
-  const Filter = ({
-    label,
-    value,
-    options,
-    onChange,
-  }: {
-    label: string;
-    value: string;
-    options: string[];
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  }) => (
-    <div>
-      <label htmlFor={label} className="text-green-600 font-semibold">
-        {label}:
-      </label>
-      <select
-        id={label}
-        value={value}
-        onChange={onChange}
-        className="border border-gray-300 p-2 rounded-lg"
-      >
-        <option value="All">All</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
+interface Student {
+  _id: string
+  name: string
+  department: string
+  batch: string
+  didInternship: boolean
+  registrationNumber: string
+  section: string
+  email: string
+}
 
-  const StudentsPage: React.FC = () => {
-    const [students, setStudents] = useState<Student[]>([]);
-    const [filteredStudents, setFilteredStudents] = useState<Student[]>([]);
-    const [selectedInternshipStatus, setSelectedInternshipStatus] = useState<string>("All");
-    const [batches, setBatches] = useState<string[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [selectedBatch, setSelectedBatch] = useState<string>("All");
-    const [selectedSection, setSelectedSection] = useState<string>("All");
-    const [error, setError] = useState<string | null>(null);
-    const [sections, setSections] = useState<string[]>([]); // Added state for sections
+interface Department {
+  _id: string
+  name: string
+  startDate: string
+  category: string
+  hodName: string
+  honorific: string
+  cnic: string
+  email: string
+  phone: string
+  landLine?: string
+  address: string
+  province: string
+  city: string
+}
 
-    const [department, setDepartment] = useState<Department | null>(null);
-    const params = useParams();
-    const DepartmentID = params.departmentid as string;
-    const CurrentBatch = params.batch as string;
+const FilterSelect = ({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: string
+  options: string[]
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
+}) => (
+  <div className="flex items-center space-x-2">
+    <label htmlFor={label} className="text-sm font-medium text-gray-700">
+      {label}:
+    </label>
+    <select
+      id={label}
+      value={value}
+      onChange={onChange}
+      className="border border-gray-300 rounded-md text-sm p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+    >
+      <option value="All">All</option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+)
 
+const StudentsPage: React.FC = () => {
+  const [students, setStudents] = useState<Student[]>([])
+  const [filteredStudents, setFilteredStudents] = useState<Student[]>([])
+  const [selectedInternshipStatus, setSelectedInternshipStatus] = useState<string>("All")
+  const [batches, setBatches] = useState<string[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [selectedBatch, setSelectedBatch] = useState<string>("All")
+  const [selectedSection, setSelectedSection] = useState<string>("All")
+  const [error, setError] = useState<string | null>(null)
+  const [sections, setSections] = useState<string[]>([])
+  const [department, setDepartment] = useState<Department | null>(null)
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [file, setFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
 
+  const params = useParams()
+  const router = useRouter()
+  const departmentId = params.departmentid as string
+  const currentBatch = params.batch as string
 
-    const [newStudent, setNewStudent] = useState<Student>({
-      _id: "",
-      name: "",
-      department: "",
-      batch: "",
-      didInternship: false,
-      registrationNumber: "",
-      section: "",
-      email: "",
-    });
-    const [editingStudent, setEditingStudent] = useState<Student | null>(null);
-    const [showModal, setShowModal] = useState<boolean>(false);
-
-    const [file, setFile] = useState<File | null>(null);
-    const [uploading, setUploading] = useState(false);
-
-    useEffect(() => {
-      const fetchStudents = async () => {
-        try {
-          const res = await fetch("/api/students");
-          if (!res.ok) throw new Error("Failed to fetch data");
-          const data: Student[] = await res.json();
-
-          const ress = await fetch(`/api/department/${DepartmentID}`);
-          if (!ress.ok) throw new Error("Failed to fetch department data");
-          const departmentData: Department = await ress.json();
-          setDepartment(departmentData);
-
-          const filteredByDepartment = data.filter(
-            (student) => student.department === departmentData.name
-          );
-          setStudents(filteredByDepartment);
-          setFilteredStudents(filteredByDepartment);
-
-
-          const uniqueSections = Array.from(
-            new Set(filteredByDepartment.map((student) => student.section))
-          );
-          // Extract unique batches for filter options
-          const uniqueBatches = Array.from(
-            new Set(filteredByDepartment.map((student) => student.batch))
-          );
-          setBatches(uniqueBatches);
-          setSections(uniqueSections); // Set sections for filter
-
-        } catch (err) {
-          setError(`Error fetching data ${DepartmentID} `);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchStudents();
-    }, [DepartmentID]);
-
-    useEffect(() => {
-      let filtered = students;
-
-      if (selectedInternshipStatus !== "All") {
-        const didInternship = selectedInternshipStatus === "Yes";
-        filtered = filtered.filter(
-          (student) => student.didInternship === didInternship
-        );
-      }
-
-      if (selectedBatch !== "All") {
-        filtered = filtered.filter((student) => student.batch === selectedBatch);
-      }
-
-      setFilteredStudents(filtered);
-    }, [selectedInternshipStatus, selectedBatch, students]);
-
-    const deleteStudent = async (id: string) => {
+  useEffect(() => {
+    const fetchStudents = async () => {
       try {
-        const response = await fetch(`/api/students`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        });
-        if (response.ok) {
-          setStudents((prev) => prev.filter((student) => student._id !== id));
-        } else {
-          console.error("Failed to delete student");
-        }
-      } catch (error) {
-        console.error("Error deleting student:", error);
-      }
-    };
+        const res = await fetch("/api/students")
+        if (!res.ok) throw new Error("Failed to fetch data")
+        const data: Student[] = await res.json()
 
-    const handleAddStudent = async (e: React.FormEvent) => {
-      e.preventDefault();
-      try {
-        const res = await fetch("/api/students", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newStudent),
-        });
-        if (res.ok) {
-          const data: Student = await res.json();
-          setStudents([...students, data]);
-          setShowModal(false);
-        } else {
-          console.error("Failed to add student");
-        }
+        const ress = await fetch(`/api/department/${departmentId}`)
+        if (!ress.ok) throw new Error("Failed to fetch department data")
+        const departmentData: Department = await ress.json()
+        setDepartment(departmentData)
+
+        const filteredByDepartment = data.filter((student) => student.department === departmentData.name)
+        setStudents(filteredByDepartment)
+        setFilteredStudents(filteredByDepartment)
+
+        const uniqueSections = Array.from(new Set(filteredByDepartment.map((student) => student.section)))
+        // Extract unique batches for filter options
+        const uniqueBatches = Array.from(new Set(filteredByDepartment.map((student) => student.batch)))
+        setBatches(uniqueBatches)
+        setSections(uniqueSections) // Set sections for filter
       } catch (err) {
-        console.error("Error adding student:", err);
-      }
-    };
-
-    const handleUpdateStudent = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!editingStudent) return;
-      try {
-        const res = await fetch(`/api/students`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: editingStudent._id, ...editingStudent }),
-        });
-        if (res.ok) {
-          setStudents((prev) =>
-            prev.map((student) =>
-              student._id === editingStudent._id ? editingStudent : student
-            )
-          );
-          setShowModal(false);
-        } else {
-          console.error("Failed to update student");
-        }
-      } catch (err) {
-        console.error("Error updating student:", err);
-      }
-    };
-
-    const openUploadModal = () => {
-      setShowModal(true);
-    };
-
-    const closeModal = () => {
-      setShowModal(false);
-    };
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFile = event.target.files?.[0];
-      if (selectedFile) setFile(selectedFile);
-    };
-
-    const handleUpload = async () => {
-      if (!file) {
-        alert("Please select a file first.");
-        return;
-      }
-    
-      setUploading(true);
-      try {
-        // Static batch name (can be changed dynamically as needed)
-        const batch = CurrentBatch;
-        const departmentName = department?.name || "Unknown Department";
-        // Call the general function with dynamic batch and file
-        await handleFileUpload(file, batch, departmentName);
-    
-      } catch (error) {
-        console.error("Upload error:", error);
-        alert("Failed to upload data.");
+        setError(`Error fetching data ${departmentId}`)
       } finally {
-        setUploading(false);
-      }
-    };
-
-    const sendMailToAll = async () => {
-    
-       // Filter students by batch (replace 'selectedBatch' with your actual batch condition)
-  const studentsInSelectedBatch = filteredStudents.filter(
-    (student) => student.batch === CurrentBatch // Assuming 'batch' is a field in your student object
-  );
-
-  // Loop through each student in the selected batch and send an email individually
-  for (let student of studentsInSelectedBatch) {
-    const email = student.email;
-
-    if (email) {
-      
-
-      try {
-        // Send the email list to your API or email service
-        const generateRandomPassword = () => {
-          return Math.random().toString(36).slice(-8);
-        };
-      
-        // Generate passwords for Coordinator and Focal Person
-        const StudentPassword = generateRandomPassword();
-      
-        // Register Focal Person with a random password
-        const facultyResponse = await fetch('/api/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: email,
-            password: StudentPassword,
-            role: 'Student',
-          }),
-        });
-    
-        if (!facultyResponse.ok) {
-          throw new Error('Error registering Student Person');
-        }
-        console.log('Student Person registered');
-    
-        // Send email notifications for both users
-        const emailResponse = await fetch('/api/sendEmail-Student', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            StudentEmail: email,
-            StudentPassword: StudentPassword,
-          }),
-        });
-      
-        if (!emailResponse.ok) {
-          throw new Error('Error sending email');
-        }
-        console.log('Emails sent successfully');
-      } catch (error) {
-        console.error(error.message);
+        setLoading(false)
       }
     }
-    };
-  };
-    
-    // General file upload handler
-    const handleFileUpload = async (file: File, batch: string, department:string) => {
-      try {
-        // Parse the Excel file to JSON
-        const data = await file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: "array" });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData: Student[] = XLSX.utils.sheet_to_json(worksheet);
-    
-        // Add the batch attribute to each student
-        const studentsWithBatch = jsonData.map((student) => ({
-          ...student,
-          batch,
-          department,
-        }));
-    
-        // Validate file and data
-        if (!file || studentsWithBatch.length === 0) {
-          alert("Please provide a valid file and batch information.");
-          return;
-        }
-    
-        // Prepare form data to send with the file
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("students", JSON.stringify(studentsWithBatch));
-    
-        // Upload the formData
-        const response = await fetch("/api/upload-students", {
-          method: "POST",
-          body: formData,
-        });
-    
-        console.log("Response status:", response.status);
-    
-        if (!response.ok) {
-          const error = await response.json();
-          console.error(`Failed to upload students: ${error.error}`);
-          alert(`Failed to upload students: ${error.error}`);
-          return;
-        }
-    
-        alert("Data uploaded successfully.");
-        setShowModal(false); // Close the modal after successful upload
-      } catch (error) {
-        console.error("Upload error:", error);
-        alert("Failed to upload data.");
+    fetchStudents()
+  }, [departmentId])
+
+  useEffect(() => {
+    let filtered = students
+
+    if (selectedInternshipStatus !== "All") {
+      const didInternship = selectedInternshipStatus === "Yes"
+      filtered = filtered.filter((student) => student.didInternship === didInternship)
+    }
+
+    if (selectedSection !== "All") {
+      filtered = filtered.filter((student) => student.section === selectedSection)
+    }
+
+    setFilteredStudents(filtered)
+  }, [selectedInternshipStatus, selectedSection, students])
+
+  const deleteStudent = async (id: string) => {
+    try {
+      const response = await fetch(`/api/students`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      })
+      if (response.ok) {
+        setStudents((prev) => prev.filter((student) => student._id !== id))
+        setFilteredStudents((prev) => prev.filter((student) => student._id !== id))
+      } else {
+        console.error("Failed to delete student")
       }
-    };
-    
+    } catch (error) {
+      console.error("Error deleting student:", error)
+    }
+  }
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0]
+    if (selectedFile) setFile(selectedFile)
+  }
 
+  const handleUpload = async () => {
+    if (!file) {
+      alert("Please select a file first.")
+      return
+    }
+
+    setUploading(true)
+    try {
+      const batch = currentBatch
+      const departmentName = department?.name || "Unknown Department"
+      await handleFileUpload(file, batch, departmentName)
+    } catch (error) {
+      console.error("Upload error:", error)
+      alert("Failed to upload data.")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const sendMailToAll = async () => {
+    const studentsInSelectedBatch = filteredStudents.filter((student) => student.batch === currentBatch)
+
+    for (const student of studentsInSelectedBatch) {
+      const email = student.email
+
+      if (email) {
+        try {
+          const generateRandomPassword = () => {
+            return Math.random().toString(36).slice(-8)
+          }
+
+          const StudentPassword = generateRandomPassword()
+
+          const facultyResponse = await fetch("/api/register", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: email,
+              password: StudentPassword,
+              role: "Student",
+            }),
+          })
+
+          if (!facultyResponse.ok) {
+            throw new Error("Error registering Student Person")
+          }
+          console.log("Student Person registered")
+
+          const emailResponse = await fetch("/api/sendEmail-Student", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              StudentEmail: email,
+              StudentPassword: StudentPassword,
+            }),
+          })
+
+          if (!emailResponse.ok) {
+            throw new Error("Error sending email")
+          }
+          console.log("Emails sent successfully")
+        } catch (error) {
+          console.error(error.message)
+        }
+      }
+    }
+  }
+
+  const handleFileUpload = async (file: File, batch: string, department: string) => {
+    try {
+      const data = await file.arrayBuffer()
+      const workbook = XLSX.read(data, { type: "array" })
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]]
+      const jsonData: Student[] = XLSX.utils.sheet_to_json(worksheet)
+
+      const studentsWithBatch = jsonData.map((student) => ({
+        ...student,
+        batch,
+        department,
+      }))
+
+      if (!file || studentsWithBatch.length === 0) {
+        alert("Please provide a valid file and batch information.")
+        return
+      }
+
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("students", JSON.stringify(studentsWithBatch))
+
+      const response = await fetch("/api/upload-students", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        console.error(`Failed to upload students: ${error.error}`)
+        alert(`Failed to upload students: ${error.error}`)
+        return
+      }
+
+      alert("Data uploaded successfully.")
+      setShowModal(false)
+
+      // Refresh the student list
+      const res = await fetch("/api/students")
+      if (res.ok) {
+        const data: Student[] = await res.json()
+        const filteredByDepartment = data.filter((student) => student.department === department)
+        setStudents(filteredByDepartment)
+        setFilteredStudents(filteredByDepartment)
+      }
+    } catch (error) {
+      console.error("Upload error:", error)
+      alert("Failed to upload data.")
+    }
+  }
+
+  if (loading)
     return (
-      <Layout>
-<div className="max-w-6xl mx-auto p-6">
-    <h1 className="text-3xl font-semibold text-green-600 mb-8">
-      Students in Department: {department?.name}
-    </h1>
-    <div className="flex justify-between mb-6">
-      <div className="flex space-x-4">
-        <Filter
-          label="Internship Status"
-          value={selectedInternshipStatus}
-          options={["Yes", "No"]}
-          onChange={(e) => setSelectedInternshipStatus(e.target.value)}
-        />
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
       </div>
-      <div className="space-x-4">
-        <button
-          onClick={openUploadModal}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-        >
-          Add New Student
-        </button>
-        <button
-          onClick={sendMailToAll}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          Send Mail to All
-        </button>
+    )
+
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-500">{error}</div>
       </div>
-    </div>
+    )
 
-        
+  const studentsInCurrentBatch = filteredStudents.filter((student) => student.batch === currentBatch)
 
-        <table className="min-w-full table-auto border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200">
-            <th className="py-2 px-4 text-left">Reg.No</th>
-              <th className="py-2 px-4 text-left">Name</th>
-              <th className="py-2 px-4 text-left">Section</th>
+  return (
+    <Layout>
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center text-sm text-gray-500 mb-4">
+          <span
+            className="hover:text-gray-700 cursor-pointer"
+            onClick={() => router.push(`/admin/Batch/${departmentId}`)}
+          >
+            Batches
+          </span>
+          <ChevronRight className="mx-2 h-4 w-4" />
+          <span className="font-medium text-green-600">{currentBatch}</span>
+        </div>
 
-              <th className="py-2 px-4 text-left">Batch</th>
-              <th className="py-2 px-4 text-left">Internship</th>
-              <th className="py-2 px-4 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-            {filteredStudents .filter((student) => student.batch === CurrentBatch)
-            .map((student) => (
-              <tr key={student._id} className="border-b border-gray-300">
-                <td className="py-2 px-4">{student.registrationNumber}</td>
-                <td className="py-2 px-4">{student.name}</td>
-                <td className="py-2 px-4">{student.section}</td>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-semibold text-gray-800">
+            {department?.name} - {currentBatch} Students
+          </h1>
 
-                <td className="py-2 px-4">{student.batch}</td>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Students
+            </button>
+            <button
+              onClick={sendMailToAll}
+              className="flex items-center px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors"
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Send Mail to All
+            </button>
+          </div>
+        </div>
 
-                <td className="py-2 px-4">
-                  {student.didInternship ? "Yes" : "No"}
-                </td>
-                <td className="py-2 px-4 space-x-4">
-                  {/* <button
-                    onClick={() => {
-                      setEditingStudent(student);
-                      setShowModal(true);
-                    }}
-                    className="text-blue-500"
+        {/* Filters */}
+        <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex flex-wrap gap-4">
+          <FilterSelect
+            label="Internship Status"
+            value={selectedInternshipStatus}
+            options={["Yes", "No"]}
+            onChange={(e) => setSelectedInternshipStatus(e.target.value)}
+          />
+
+          {sections.length > 0 && (
+            <FilterSelect
+              label="Section"
+              value={selectedSection}
+              options={sections}
+              onChange={(e) => setSelectedSection(e.target.value)}
+            />
+          )}
+        </div>
+
+        {/* Students Table */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Edit
-                  </button> */}
-                  <button
-                    onClick={() => deleteStudent(student._id)}
-                    className="text-red-500"
+                    Reg. No
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Section
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Batch
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Internship
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {studentsInCurrentBatch.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      No students available
+                    </td>
+                  </tr>
+                ) : (
+                  studentsInCurrentBatch.map((student) => (
+                    <tr key={student._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {student.registrationNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.section}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.batch}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            student.didInternship ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {student.didInternship ? "Yes" : "No"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-3">
+                          <button className="text-green-500 hover:text-green-700" title="Edit Student">
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button className="text-indigo-500 hover:text-indigo-700" title="Send Email">
+                            <Mail className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => deleteStudent(student._id)}
+                            className="text-red-500 hover:text-red-700"
+                            title="Delete Student"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-        {showModal && (
-          <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
-              <h2 className="text-2xl font-semibold text-green-600 mb-4">
-                Upload Students Data
-              </h2>
+      {/* Upload Students Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Upload Students Data</h2>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Excel File (.xlsx, .xls)</label>
               <input
                 type="file"
                 accept=".xlsx,.xls"
                 onChange={handleFileChange}
-                className="mb-4"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-              <div className="flex justify-between">
-                <button
-                  onClick={handleUpload}
-                  disabled={uploading}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
-                >
-                  {uploading ? "Uploading..." : "Upload"}
-                </button>
-                <button
-                  onClick={closeModal}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-                >
-                  Close
-                </button>
-              </div>
+              <p className="mt-1 text-xs text-gray-500">Upload an Excel file containing student information</p>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpload}
+                disabled={uploading || !file}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                {uploading ? "Uploading..." : "Upload"}
+              </button>
             </div>
           </div>
-        )}
-      </div>
-      </Layout>
+        </div>
+      )}
+    </Layout>
+  )
+}
 
-    );
-  
-  };
+export default StudentsPage
 
-  export default StudentsPage;

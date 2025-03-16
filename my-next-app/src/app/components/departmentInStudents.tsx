@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DepartmentDashboard from "@/app/components/departmentForm";
 
 interface Department {
   _id: string;
@@ -15,14 +14,14 @@ interface Department {
   email: string;
   phone: string;
   landLine?: string;
-  focalPersonName: '',
-  focalPersonHonorific: 'Mr.',
-  focalPersonCnic: '',
-  focalPersonEmail: '',
-  focalPersonPhone: '',
+  focalPersonName: string;
+  focalPersonHonorific: string;
+  focalPersonCnic: string;
+  focalPersonEmail: string;
+  focalPersonPhone: string;
 }
 
-const DepartmentListiInStudents: React.FC = () => {
+const DepartmentListInStudents: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,64 +46,58 @@ const DepartmentListiInStudents: React.FC = () => {
   };
 
   const handleDepartmentClick = (id: string) => {
-    router.push(`/admin/Batch/${id}`); // Navigate to department detail page
+    router.push(`/admin/Batch/${id}`);
+  };
+
+  // Function to get initials from department name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
   };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-600">{error}</p>;
 
   return (
-    <div className="max-w-8xl mx-auto w-full">
-      <h1 className="text-lg font-semibold mb-6">Departments</h1>
+    <div className="max-w-7xl mx-auto w-full p-6">
+      <h3 className="text-1xl mb-4">Click on Department to view details</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {departments.length === 0 ? (
           <p>No departments available.</p>
         ) : (
           departments.map((dept) => (
             <div
               key={dept._id}
-              onClick={() => handleDepartmentClick(dept._id)}
-              role="button"
-              tabIndex={0}
-              className="p-4 bg-white border rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleDepartmentClick(dept._id);
-                }
-              }}
+              className="bg-white rounded-lg shadow-md p-6 relative transition-all duration-300 border border-transparent hover:border-green-500 hover:shadow-lg"
             >
-              <h2 className="text-green-600 font-semibold text-lg mb-2">
-                {dept.honorific} {dept.hodName} - {dept.name}
-              </h2>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Category:</span> {dept.category}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Start Date:</span> {dept.startDate}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">CNIC:</span> {dept.cnic}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Email:</span> {dept.email}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Phone:</span> {dept.phone}
-              </p>
-              {dept.landLine && (
-                <p className="text-sm text-gray-600">
-                  <span className="font-bold">Land Line:</span> {dept.landLine}
+              <div
+                onClick={() => handleDepartmentClick(dept._id)}
+                className="flex flex-col items-center cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleDepartmentClick(dept._id);
+                  }
+                }}
+              >
+                <div className="w-24 h-24 rounded-full bg-green-400 flex items-center justify-center mb-4 transition-transform duration-300 hover:scale-105">
+                  <span className="text-white text-2xl font-bold">
+                    {getInitials(dept.name)}
+                  </span>
+                </div>
+                <h2 className="text-center font-bold text-gray-800 mb-1">
+                  {dept.name}
+                </h2>
+                <p className="text-center text-sm text-gray-600">
+                  {dept.honorific} {dept.hodName}
                 </p>
-              )}
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Focal Person Name:</span>{dept.focalPersonHonorific} {dept.focalPersonName}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Focal Person cnic:</span>{dept.focalPersonCnic}
-              </p>
-              <p className="text-sm text-gray-600">
-                <span className="font-bold">Focal Person Email:</span>{dept.focalPersonEmail}</p>
+              </div>
             </div>
           ))
         )}
@@ -113,4 +106,4 @@ const DepartmentListiInStudents: React.FC = () => {
   );
 };
 
-export default DepartmentListiInStudents;
+export default DepartmentListInStudents;

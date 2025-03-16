@@ -1,76 +1,87 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Layout from "@/app/components/Layout";
+import type React from "react"
+
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { Eye, Edit, Mail, Trash2, Plus } from "lucide-react"
+import Layout from "@/app/components/Layout"
 
 interface Student {
-  _id: string;
-  name: string;
-  department: string;
-  batch: string;
-  didInternship: boolean;
-  registrationNumber: string;
-  section: string;
+  _id: string
+  name: string
+  department: string
+  batch: string
+  didInternship: boolean
+  registrationNumber: string
+  section: string
 }
 
 interface Batch {
-  batch: string;
-  total: number;
-  didInternship: number;
-  missingInternship: number;
-  totalSections: number;
+  batch: string
+  total: number
+  didInternship: number
+  missingInternship: number
+  totalSections: number
+}
+
+interface Department {
+  _id: string
+  name: string
 }
 
 const BatchSummary: React.FC = () => {
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [newBatchName, setNewBatchName] = useState<string>("");
-  const [showAddBatchModal, setShowAddBatchModal] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [batches, setBatches] = useState<Batch[]>([])
+  const [department, setDepartment] = useState<Department | null>(null)
+  const [newBatchName, setNewBatchName] = useState<string>("")
+  const [showAddBatchModal, setShowAddBatchModal] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const router = useRouter();
-  const params = useParams();
-  const departmentId = params.slug as string;
+  const router = useRouter()
+  const params = useParams()
+  const departmentId = params.slug as string
 
   const handleViewDetails = (batch: string) => {
-    router.push(`/admin/Students/${departmentId}/${batch}`);
-  };
+    router.push(`/admin/Students/${departmentId}/${batch}`)
+  }
 
   const fetchBatchData = async () => {
     try {
-      const res = await fetch("/api/students");
-      if (!res.ok) throw new Error("Failed to fetch students");
+      const res = await fetch("/api/students")
+      if (!res.ok) throw new Error("Failed to fetch students")
 
-      const students: Student[] = await res.json();
+      const students: Student[] = await res.json()
 
-      const departmentRes = await fetch(`/api/department/${departmentId}`);
-      if (!departmentRes.ok) throw new Error("Failed to fetch department");
+      const departmentRes = await fetch(`/api/department/${departmentId}`)
+      if (!departmentRes.ok) throw new Error("Failed to fetch department")
 
-      const department = await departmentRes.json();
-      const departmentStudents = students.filter(
-        (student) => student.department === department.name
-      );
+      const department = await departmentRes.json()
+      setDepartment(department)
 
-      const batchSummary = departmentStudents.reduce((acc, student) => {
-        const batchData = acc.find((item) => item.batch === student.batch);
-        if (batchData) {
-          batchData.total++;
-          if (student.didInternship) batchData.didInternship++;
-          if (!batchData.sections.includes(student.section)) {
-            batchData.sections.push(student.section);
+      const departmentStudents = students.filter((student) => student.department === department.name)
+
+      const batchSummary = departmentStudents.reduce(
+        (acc, student) => {
+          const batchData = acc.find((item) => item.batch === student.batch)
+          if (batchData) {
+            batchData.total++
+            if (student.didInternship) batchData.didInternship++
+            if (!batchData.sections.includes(student.section)) {
+              batchData.sections.push(student.section)
+            }
+          } else {
+            acc.push({
+              batch: student.batch,
+              total: 1,
+              didInternship: student.didInternship ? 1 : 0,
+              sections: [student.section],
+            })
           }
-        } else {
-          acc.push({
-            batch: student.batch,
-            total: 1,
-            didInternship: student.didInternship ? 1 : 0,
-            sections: [student.section],
-          });
-        }
-        return acc;
-      }, [] as { batch: string; total: number; didInternship: number; sections: string[] }[]);
+          return acc
+        },
+        [] as { batch: string; total: number; didInternship: number; sections: string[] }[],
+      )
 
       setBatches(
         batchSummary.map((batch) => ({
@@ -79,37 +90,37 @@ const BatchSummary: React.FC = () => {
           didInternship: batch.didInternship,
           missingInternship: batch.total - batch.didInternship,
           totalSections: batch.sections.length,
-        }))
-      );
+        })),
+      )
     } catch (err) {
-      setError("Error fetching batch data.");
+      setError("Error fetching batch data.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleAddBatch = async () => {
     if (!newBatchName.trim()) {
-      alert("Batch name cannot be empty.");
-      return;
+      alert("Batch name cannot be empty.")
+      return
     }
 
     try {
-      const response = await fetch('/api/Batch', {
-        method: 'POST',
+      const response = await fetch("/api/Batch", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           batchName: newBatchName,
           departmentId: departmentId,
         }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to add batch');
+        throw new Error(data.message || "Failed to add batch")
       }
 
       // Add the new batch to the table if the API call is successful
@@ -122,109 +133,189 @@ const BatchSummary: React.FC = () => {
           missingInternship: 0,
           totalSections: 0,
         },
-      ]);
+      ])
 
       // Reset modal state
-      setNewBatchName("");
-      setShowAddBatchModal(false);
+      setNewBatchName("")
+      setShowAddBatchModal(false)
     } catch (error) {
-      console.error('Error adding batch:', error);
-      alert('Error adding batch. Please try again.');
+      console.error("Error adding batch:", error)
+      alert("Error adding batch. Please try again.")
     }
-  };
+  }
 
   useEffect(() => {
-    fetchBatchData();
-  }, [departmentId]);
+    fetchBatchData()
+  }, [departmentId])
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    )
+
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-500">{error}</div>
+      </div>
+    )
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-semibold text-green-600 mb-8">
-          Batch Summary for Department
-        </h1>
-        
-        {/* Button to open modal */}
-        <button
-          onClick={() => setShowAddBatchModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Add Batch
-        </button>
+      <div className="max-w-7xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-semibold text-gray-800">{department?.name} - Batch Summary</h1>
 
-        {/* Modal */}
-        {showAddBatchModal && (
-          <div className="fixed inset-0 bg-gray-700 bg-opacity-75 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-lg w-80">
-              <h2 className="text-lg font-semibold mb-4">Add New Batch</h2>
+          <button
+            onClick={() => setShowAddBatchModal(true)}
+            className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Batch
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Total Students
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Completed Internship
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Missing Internship
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Total Sections
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {batches.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      No batches available
+                    </td>
+                  </tr>
+                ) : (
+                  batches.map((batch) => (
+                    <tr key={batch.batch} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{batch.batch}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{batch.total}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          {batch.didInternship}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            batch.missingInternship > 0 ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {batch.missingInternship}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{batch.totalSections}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={() => handleViewDetails(batch.batch)}
+                            className="text-blue-500 hover:text-blue-700"
+                            title="View Details"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
+                          <button className="text-green-500 hover:text-green-700" title="Edit Batch">
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button className="text-indigo-500 hover:text-indigo-700" title="Send Email">
+                            <Mail className="w-5 h-5" />
+                          </button>
+                          <button className="text-red-500 hover:text-red-700" title="Delete Batch">
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Add Batch Modal */}
+      {showAddBatchModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Batch</h2>
+
+            <div className="mb-4">
+              <label htmlFor="batchName" className="block text-sm font-medium text-gray-700 mb-1">
+                Batch Name
+              </label>
               <input
+                id="batchName"
                 type="text"
                 placeholder="Enter batch name"
                 value={newBatchName}
                 onChange={(e) => setNewBatchName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => setShowAddBatchModal(false)}
-                  className="px-4 py-2 bg-gray-400 text-white rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddBatch}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Add Batch
-                </button>
-              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowAddBatchModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddBatch}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              >
+                Add Batch
+              </button>
             </div>
           </div>
-        )}
-
-        <table className="min-w-full table-auto border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="py-2 px-4 text-left">Batch</th>
-              <th className="py-2 px-4 text-left">Total Students</th>
-              <th className="py-2 px-4 text-left">Completed Internship</th>
-              <th className="py-2 px-4 text-left">Missing Internship</th>
-              <th className="py-2 px-4 text-left">Total Sections</th>
-              <th className="py-2 px-4 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {batches.map((batch) => (
-              <tr key={batch.batch} className="border-b border-gray-300">
-                <td className="py-2 px-4">{batch.batch}</td>
-                <td className="py-2 px-4">{batch.total}</td>
-                <td className="py-2 px-4 text-blue">{batch.didInternship}</td>
-                <td
-                  className={`py-2 px-4 ${
-                    batch.missingInternship > 0 ? "text-blue-600" : "text-red-600"
-                  }`}
-                >
-                  {batch.missingInternship}
-                </td>
-                <td className="py-2 px-4">{batch.totalSections}</td>
-                <td className="py-2 px-4">
-                  <button
-                    onClick={() => handleViewDetails(batch.batch)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
-                  >
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        </div>
+      )}
     </Layout>
-  );
-};
+  )
+}
 
-export default BatchSummary;
+export default BatchSummary
+
