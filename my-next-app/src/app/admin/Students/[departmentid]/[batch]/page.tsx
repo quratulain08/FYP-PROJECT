@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import * as XLSX from "xlsx"
-import { Edit, Mail, Trash2, Upload, ChevronRight } from "lucide-react"
+import { Edit, Mail, Trash2, Upload, ChevronRight, Users, CheckCircle, XCircle } from "lucide-react"
 import Layout from "@/app/components/Layout"
 
 interface Student {
@@ -72,7 +72,6 @@ const StudentsPage: React.FC = () => {
   const [selectedInternshipStatus, setSelectedInternshipStatus] = useState<string>("All")
   const [batches, setBatches] = useState<string[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const [selectedBatch, setSelectedBatch] = useState<string>("All")
   const [selectedSection, setSelectedSection] = useState<string>("All")
   const [error, setError] = useState<string | null>(null)
   const [sections, setSections] = useState<string[]>([])
@@ -132,20 +131,22 @@ const StudentsPage: React.FC = () => {
   }, [selectedInternshipStatus, selectedSection, students])
 
   const deleteStudent = async (id: string) => {
-    try {
-      const response = await fetch(`/api/students`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      })
-      if (response.ok) {
-        setStudents((prev) => prev.filter((student) => student._id !== id))
-        setFilteredStudents((prev) => prev.filter((student) => student._id !== id))
-      } else {
-        console.error("Failed to delete student")
+    if (window.confirm("Are you sure you want to delete this student?")) {
+      try {
+        const response = await fetch(`/api/students`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        })
+        if (response.ok) {
+          setStudents((prev) => prev.filter((student) => student._id !== id))
+          setFilteredStudents((prev) => prev.filter((student) => student._id !== id))
+        } else {
+          console.error("Failed to delete student")
+        }
+      } catch (error) {
+        console.error("Error deleting student:", error)
       }
-    } catch (error) {
-      console.error("Error deleting student:", error)
     }
   }
 
@@ -174,55 +175,58 @@ const StudentsPage: React.FC = () => {
   }
 
   const sendMailToAll = async () => {
-    const studentsInSelectedBatch = filteredStudents.filter((student) => student.batch === currentBatch)
+    if (window.confirm("Are you sure you want to send emails to all students in this batch?")) {
+      const studentsInSelectedBatch = filteredStudents.filter((student) => student.batch === currentBatch)
 
-    for (const student of studentsInSelectedBatch) {
-      const email = student.email
+      for (const student of studentsInSelectedBatch) {
+        const email = student.email
 
-      if (email) {
-        try {
-          const generateRandomPassword = () => {
-            return Math.random().toString(36).slice(-8)
+        if (email) {
+          try {
+            const generateRandomPassword = () => {
+              return Math.random().toString(36).slice(-8)
+            }
+
+            const StudentPassword = generateRandomPassword()
+
+            const facultyResponse = await fetch("/api/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: email,
+                password: StudentPassword,
+                role: "Student",
+              }),
+            })
+
+            if (!facultyResponse.ok) {
+              throw new Error("Error registering Student Person")
+            }
+            console.log("Student Person registered")
+
+            const emailResponse = await fetch("/api/sendEmail-Student", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                StudentEmail: email,
+                StudentPassword: StudentPassword,
+              }),
+            })
+
+            if (!emailResponse.ok) {
+              throw new Error("Error sending email")
+            }
+            console.log("Emails sent successfully")
+          } catch (error) {
+            console.error(error.message)
           }
-
-          const StudentPassword = generateRandomPassword()
-
-          const facultyResponse = await fetch("/api/register", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: email,
-              password: StudentPassword,
-              role: "Student",
-            }),
-          })
-
-          if (!facultyResponse.ok) {
-            throw new Error("Error registering Student Person")
-          }
-          console.log("Student Person registered")
-
-          const emailResponse = await fetch("/api/sendEmail-Student", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              StudentEmail: email,
-              StudentPassword: StudentPassword,
-            }),
-          })
-
-          if (!emailResponse.ok) {
-            throw new Error("Error sending email")
-          }
-          console.log("Emails sent successfully")
-        } catch (error) {
-          console.error(error.message)
         }
       }
+      alert("Emails sent successfully!")
     }
   }
 
@@ -277,6 +281,16 @@ const StudentsPage: React.FC = () => {
     }
   }
 
+  // Get initials from student name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2)
+  }
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen">
@@ -292,6 +306,12 @@ const StudentsPage: React.FC = () => {
     )
 
   const studentsInCurrentBatch = filteredStudents.filter((student) => student.batch === currentBatch)
+
+  // Calculate summary statistics
+  const totalStudents = studentsInCurrentBatch.length
+  const completedInternships = studentsInCurrentBatch.filter((student) => student.didInternship).length
+  const pendingInternships = totalStudents - completedInternships
+  const uniqueSectionsCount = new Set(studentsInCurrentBatch.map((student) => student.section)).size
 
   return (
     <Layout>
@@ -332,6 +352,57 @@ const StudentsPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                <Users className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
+                <p className="text-2xl font-semibold text-gray-900">{totalStudents}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <CheckCircle className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Completed Internships</p>
+                <p className="text-2xl font-semibold text-gray-900">{completedInternships}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                <XCircle className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Pending Internships</p>
+                <p className="text-2xl font-semibold text-gray-900">{pendingInternships}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                <Users className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Sections</p>
+                <p className="text-2xl font-semibold text-gray-900">{uniqueSectionsCount}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-6 flex flex-wrap gap-4">
           <FilterSelect
@@ -353,6 +424,10 @@ const StudentsPage: React.FC = () => {
 
         {/* Students Table */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Students List</h3>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
@@ -361,13 +436,13 @@ const StudentsPage: React.FC = () => {
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Reg. No
+                    Name
                   </th>
                   <th
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Name
+                    Reg. No
                   </th>
                   <th
                     scope="col"
@@ -405,10 +480,20 @@ const StudentsPage: React.FC = () => {
                 ) : (
                   studentsInCurrentBatch.map((student) => (
                     <tr key={student._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <span className="text-white font-medium">{getInitials(student.name)}</span>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                            <div className="text-sm text-gray-500">{student.email}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {student.registrationNumber}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.section}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.batch}</td>
                       <td className="px-6 py-4 whitespace-nowrap">

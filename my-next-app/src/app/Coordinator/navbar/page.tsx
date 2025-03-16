@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { FaUniversity, FaUser, FaChalkboardTeacher, FaUsers, FaSignOutAlt } from "react-icons/fa"
+import { FaUniversity, FaUser, FaChalkboardTeacher, FaUsers, FaSignOutAlt,FaTachometerAlt } from "react-icons/fa"
 
 const Navbar: React.FC = () => {
   const [email, setEmail] = useState<string | null>(null)
@@ -24,6 +24,11 @@ const Navbar: React.FC = () => {
   }
 
   const navItems = [
+    {
+      path: "/Coordinator/Dashboard",
+      label: "Dashboard",
+      icon: <FaTachometerAlt className="text-gray-700" />, // Dashboard icon
+    },
     {
       path: "/Coordinator/Internships",
       label: "Internships",
@@ -52,7 +57,7 @@ const Navbar: React.FC = () => {
       <nav className="bg-white border-b border-gray-300 shadow-sm">
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/nceac-logo.jpg" alt="NCAA Logo" className="h-12 mr-3" />
+            <img src="/air-university-logo-1.png" alt="NCAA Logo" className="h-12 mr-3" />
             <h1 className="text-lg md:text-xl text-gray-700 font-normal">Air University, Islamabad</h1>
           </div>
           <div className="flex items-center">

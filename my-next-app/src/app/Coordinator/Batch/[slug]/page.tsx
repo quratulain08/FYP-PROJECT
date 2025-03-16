@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Layout from "@/app/components/Layout";
+import { Eye, Plus, BookOpen, Users, CheckCircle, XCircle, ChevronRight } from 'lucide-react';
 import CoordinatorLayout from "../../CoordinatorLayout";
 
 interface Student {
@@ -23,13 +23,18 @@ interface Batch {
   totalSections: number;
 }
 
+interface Department {
+  _id: string;
+  name: string;
+}
+
 const BatchSummary: React.FC = () => {
   const [batches, setBatches] = useState<Batch[]>([]);
+  const [department, setDepartment] = useState<Department | null>(null);
   const [newBatchName, setNewBatchName] = useState<string>("");
   const [showAddBatchModal, setShowAddBatchModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
 
   const router = useRouter();
   const params = useParams();
@@ -50,6 +55,8 @@ const BatchSummary: React.FC = () => {
       if (!departmentRes.ok) throw new Error("Failed to fetch department");
 
       const department = await departmentRes.json();
+      setDepartment(department);
+      
       const departmentStudents = students.filter(
         (student) => student.department === department.name
       );
@@ -138,93 +145,204 @@ const BatchSummary: React.FC = () => {
     fetchBatchData();
   }, [departmentId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
+    </div>
+  );
 
   return (
     <CoordinatorLayout>
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-semibold text-green-600 mb-8">
-          Batch Summary for Department
-        </h1>
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center text-sm text-gray-500 mb-4">
+          <span>Departments</span>
+          <ChevronRight className="mx-2 h-4 w-4" />
+          <span className="font-medium text-green-600">{department?.name}</span>
+        </div>
         
-        {/* Button to open modal */}
-        <button
-          onClick={() => setShowAddBatchModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Add Batch
-        </button>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-800">
+            {department?.name} - Batch Summary
+          </h1>
+          
+          <button
+            onClick={() => setShowAddBatchModal(true)}
+            className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Batch
+          </button>
+        </div>
 
-        {/* Modal */}
-        {showAddBatchModal && (
-          <div className="fixed inset-0 bg-gray-700 bg-opacity-75 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-lg w-80">
-              <h2 className="text-lg font-semibold mb-4">Add New Batch</h2>
-              <input
-                type="text"
-                placeholder="Enter batch name"
-                value={newBatchName}
-                onChange={(e) => setNewBatchName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4"
-              />
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => setShowAddBatchModal(false)}
-                  className="px-4 py-2 bg-gray-400 text-white rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddBatch}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Add Batch
-                </button>
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Batches</p>
+                <p className="text-2xl font-semibold text-gray-900">{batches.length}</p>
               </div>
             </div>
           </div>
-        )}
-
-        <table className="min-w-full table-auto border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="py-2 px-4 text-left">Batch</th>
-              <th className="py-2 px-4 text-left">Total Students</th>
-              <th className="py-2 px-4 text-left">Completed Internship</th>
-              <th className="py-2 px-4 text-left">Missing Internship</th>
-              <th className="py-2 px-4 text-left">Total Sections</th>
-              <th className="py-2 px-4 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {batches.map((batch) => (
-              <tr key={batch.batch} className="border-b border-gray-300">
-                <td className="py-2 px-4">{batch.batch}</td>
-                <td className="py-2 px-4">{batch.total}</td>
-                <td className="py-2 px-4 text-blue">{batch.didInternship}</td>
-                <td
-                  className={`py-2 px-4 ${
-                    batch.missingInternship > 0 ? "text-blue-600" : "text-red-600"
-                  }`}
-                >
-                  {batch.missingInternship}
-                </td>
-                <td className="py-2 px-4">{batch.totalSections}</td>
-                <td className="py-2 px-4">
-                  <button
-                    onClick={() => handleViewDetails(batch.batch)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600"
-                  >
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <Users className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {batches.reduce((sum, batch) => sum + batch.total, 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <CheckCircle className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Completed Internships</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {batches.reduce((sum, batch) => sum + batch.didInternship, 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Batch Table */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Batch Summary</h3>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Students
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Completed Internship
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Missing Internship
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Sections
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {batches.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      No batches available
+                    </td>
+                  </tr>
+                ) : (
+                  batches.map((batch) => (
+                    <tr key={batch.batch} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {batch.batch}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {batch.total}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          {batch.didInternship}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          batch.missingInternship > 0 
+                            ? "bg-red-100 text-red-800" 
+                            : "bg-green-100 text-green-800"
+                        }`}>
+                          {batch.missingInternship}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {batch.totalSections}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => handleViewDetails(batch.batch)}
+                          className="flex items-center text-green-600 hover:text-green-900 font-medium"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-      </CoordinatorLayout>
+
+      {/* Add Batch Modal */}
+      {showAddBatchModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Batch</h2>
+            
+            <div className="mb-4">
+              <label htmlFor="batchName" className="block text-sm font-medium text-gray-700 mb-1">
+                Batch Name
+              </label>
+              <input
+                id="batchName"
+                type="text"
+                placeholder="e.g., 2023-2027"
+                value={newBatchName}
+                onChange={(e) => setNewBatchName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowAddBatchModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddBatch}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+              >
+                Add Batch
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </CoordinatorLayout>
   );
 };
 

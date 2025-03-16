@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Eye, Edit, Mail, Trash2, Plus } from "lucide-react"
+import { Eye, Edit, Mail, Trash2, Plus, BookOpen, Users, CheckCircle, ChevronRight } from "lucide-react"
 import Layout from "@/app/components/Layout"
 
 interface Student {
@@ -162,9 +162,23 @@ const BatchSummary: React.FC = () => {
       </div>
     )
 
+  // Calculate summary statistics
+  const totalStudents = batches.reduce((sum, batch) => sum + batch.total, 0)
+  const totalCompletedInternships = batches.reduce((sum, batch) => sum + batch.didInternship, 0)
+  const totalMissingInternships = batches.reduce((sum, batch) => sum + batch.missingInternship, 0)
+
   return (
     <Layout>
       <div className="max-w-7xl mx-auto p-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center text-sm text-gray-500 mb-4">
+          <span className="hover:text-gray-700 cursor-pointer" onClick={() => router.push("/admin/Department")}>
+            Departments
+          </span>
+          <ChevronRight className="mx-2 h-4 w-4" />
+          <span className="font-medium text-green-600">{department?.name}</span>
+        </div>
+
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold text-gray-800">{department?.name} - Batch Summary</h1>
 
@@ -177,7 +191,62 @@ const BatchSummary: React.FC = () => {
           </button>
         </div>
 
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <BookOpen className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Batches</p>
+                <p className="text-2xl font-semibold text-gray-900">{batches.length}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                <Users className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Students</p>
+                <p className="text-2xl font-semibold text-gray-900">{totalStudents}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <CheckCircle className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Completed Internships</p>
+                <p className="text-2xl font-semibold text-gray-900">{totalCompletedInternships}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                <CheckCircle className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Missing Internships</p>
+                <p className="text-2xl font-semibold text-gray-900">{totalMissingInternships}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">Batch Summary</h3>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
