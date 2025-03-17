@@ -76,45 +76,6 @@ const FacultyLayout = ({ children }: { children: React.ReactNode }) => {
               <BookOpen className="h-5 w-5 mr-2" />
               <span>My Internships</span>
             </button>
-
-            {/* <button
-              onClick={() => router.push("/FacultySupervisor/tasks")}
-              className={`flex items-center px-4 py-3 ${
-                isActive("/FacultySupervisor/tasks")
-                  ? "border-b-2 border-green-600 text-green-600"
-                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
-              }`}
-              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-            >
-              <FileText className="h-5 w-5 mr-2" />
-              <span>Tasks</span>
-            </button>
-
-            <button
-              onClick={() => router.push("/FacultySupervisor/students")}
-              className={`flex items-center px-4 py-3 ${
-                isActive("/FacultySupervisor/students")
-                  ? "border-b-2 border-green-600 text-green-600"
-                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
-              }`}
-              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-            >
-              <Users className="h-5 w-5 mr-2" />
-              <span>Students</span>
-            </button>
-
-            <button
-              onClick={() => router.push("/FacultySupervisor/dashboard")}
-              className={`flex items-center px-4 py-3 ${
-                isActive("/FacultySupervisor/dashboard")
-                  ? "border-b-2 border-green-600 text-green-600"
-                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
-              }`}
-              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-            >
-              <Home className="h-5 w-5 mr-2" />
-              <span>Dashboard</span>
-            </button> */}
           </div>
         </div>
       </div>

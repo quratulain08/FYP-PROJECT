@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { LogOut, User, BookOpen, Briefcase, Home, FileText, Users } from "lucide-react";
 import Link from 'next/link';
 import { FaHome, FaUniversity, FaFolder, FaUsers, FaChalkboardTeacher, FaUser } from 'react-icons/fa';
 import { MdKeyboardArrowDown } from 'react-icons/md';
@@ -18,40 +20,72 @@ const Navbar: React.FC = () => {
       window.location.href = '/Login';
     }, 0);
   };
-
+  const router = useRouter();
+  const pathname = usePathname();
+  const isActive = (path: string) => pathname === path;
   return (
     <>
-      <nav className="bg-white border-b border-gray-300 shadow-sm">
-        <div className="container mx-auto px-4 py-1 flex justify-between items-center">
+      <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/nceac-logo.jpg" alt="NCAA Logo" className="h-12 mr-3" />
-            <h1 className="text-lg text-gray-700 font-normal">Air University, Islamabad</h1>
+            <img src="/air-university-logo-1.png" alt="Air University Logo" className="h-12 mr-3" />
+            <h1
+              className="text-lg md:text-xl text-gray-800 font-medium"
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              Air University, Islamabad
+            </h1>
           </div>
           <div className="flex items-center">
-            <span className="mr-2 text-gray-700">{email ?? 'Guest'}</span>
-            <button 
-              onClick={handleLogout} 
-              className="text-red-500 hover:text-red-700 transition duration-150"
+            <div className="hidden md:flex items-center mr-4 bg-gray-100 px-3 py-1.5 rounded-full">
+              <User className="text-gray-600 mr-2 h-4 w-4" />
+              <span className="text-gray-700 font-medium" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                {email ?? "Guest"} <span className="text-green-600">(EnterpriseCell)</span>
+              </span>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md transition duration-150"
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
             >
-              Logout
+              <LogOut className="mr-1 h-4 w-4" />
+              <span>Logout</span>
             </button>
           </div>
         </div>
       </nav>
 
-      <nav className="bg-white border-b border-gray-300 shadow-sm">
-        <div className="container mx-auto px-2 py-1 flex justify-between items-center">
-          <div className="flex space-x-8">
-            <Link href="/InterpriseCell/dashboard" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-blue-500 mb-2"><FaHome /></span>
-              <span className="text-sm">Dashboard</span>
-            </Link>
-          
-            <Link href="/InterpriseCell/Internships" className="flex flex-col items-center text-gray-700 hover:text-white hover:bg-green-500 px-3 py-2 rounded">
-              <span className="text-2xl text-green-500 mb-2"><FaUniversity /></span>
-              <span className="text-sm">Internships</span>
-              <span className="text-sm text-gray-700 ml-1"><MdKeyboardArrowDown /></span>
-            </Link>
+      <nav className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto">
+          <div className="flex overflow-x-auto hide-scrollbar">
+
+            <button
+              onClick={() => router.push("/InterpriseCell/dashboard")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("InterpriseCell/dashboard")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Home className="h-5 w-5 mr-2" />
+              <span>DashBoard</span>
+            </button>
+
+            <button
+              onClick={() => router.push("/InterpriseCell/Internships")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/InterpriseCell/Internships")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Briefcase className="h-5 w-5 mr-2" />
+              <span>Internships</span>
+            </button>
+
+    
           </div>
         </div>
       </nav>
