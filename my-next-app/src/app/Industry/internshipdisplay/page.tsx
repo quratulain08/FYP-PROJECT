@@ -217,7 +217,7 @@ const InternshipDisplay = () => {
           </div>
         </div>
 
-        <div className="flex justify-end mb-6">
+        {/* <div className="flex justify-end mb-6">
           <button
             onClick={() => router.push("/Industry/createinternship")}
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200"
@@ -226,7 +226,7 @@ const InternshipDisplay = () => {
             <Plus className="h-4 w-4" />
             <span>Create Internship</span>
           </button>
-        </div>
+        </div> */}
 
         {filteredInternships.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">

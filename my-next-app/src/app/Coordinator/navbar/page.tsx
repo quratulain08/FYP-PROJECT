@@ -3,13 +3,14 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { FaUniversity, FaUser, FaChalkboardTeacher, FaUsers, FaSignOutAlt,FaTachometerAlt } from "react-icons/fa"
+import { usePathname, useRouter } from "next/navigation"
+import { LogOut, User, BookOpen, Home, Users, Briefcase, Settings } from "lucide-react"
+import Navbar from "@/app/admin/navbar/page"
 
-const Navbar: React.FC = () => {
+const navbar = ({ children }: { children: React.ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null)
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("email")
@@ -23,53 +24,37 @@ const Navbar: React.FC = () => {
     }, 0)
   }
 
-  const navItems = [
-    {
-      path: "/Coordinator/Dashboard",
-      label: "Dashboard",
-      icon: <FaTachometerAlt className="text-gray-700" />, // Dashboard icon
-    },
-    {
-      path: "/Coordinator/Internships",
-      label: "Internships",
-      icon: <FaUniversity className="text-gray-700" />,
-    },
-    {
-      path: "/Coordinator/Profile",
-      label: "Profile",
-      icon: <FaUser className="text-gray-700" />,
-    },
-    {
-      path: "/Coordinator/Faculty",
-      label: "Faculty Directory",
-      icon: <FaChalkboardTeacher className="text-gray-700" />,
-    },
-    {
-      path: "/Coordinator/student",
-      label: "Students Directory",
-      icon: <FaUsers className="text-gray-700" />,
-    },
-  ]
+  const isActive = (path: string) => {
+    return pathname?.startsWith(path)
+  }
 
   return (
-    <div className="sticky top-0 z-50">
+    <div>
       {/* Top Navbar */}
-      <nav className="bg-white border-b border-gray-300 shadow-sm">
+      <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/air-university-logo-1.png" alt="NCAA Logo" className="h-12 mr-3" />
-            <h1 className="text-lg md:text-xl text-gray-700 font-normal">Air University, Islamabad</h1>
+            <img src="/air-university-logo-1.png" alt="Air University Logo" className="h-12 mr-3" />
+            <h1
+              className="text-lg md:text-xl text-gray-800 font-medium"
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              Air University, Islamabad
+            </h1>
           </div>
           <div className="flex items-center">
             <div className="hidden md:flex items-center mr-4 bg-gray-100 px-3 py-1.5 rounded-full">
-              <FaUser className="text-green-600 mr-2" />
-              <span className="text-gray-700">{email ?? "Guest"}</span>
+              <User className="text-gray-600 mr-2 h-4 w-4" />
+              <span className="text-gray-700 font-medium" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                {email ?? "Guest"} <span className="text-green-600">(Coordinator)</span>
+              </span>
             </div>
             <button
               onClick={handleLogout}
               className="flex items-center text-white bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md transition duration-150"
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
             >
-              <FaSignOutAlt className="mr-1" />
+              <LogOut className="mr-1 h-4 w-4" />
               <span>Logout</span>
             </button>
           </div>
@@ -77,31 +62,82 @@ const Navbar: React.FC = () => {
       </nav>
 
       {/* Main Navigation */}
-      <nav className="bg-white border-b border-gray-300 shadow-sm">
-        <div className="container mx-auto px-2 py-1">
-          <div className="flex justify-between items-center overflow-x-auto hide-scrollbar">
-            <div className="flex space-x-8">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className={`flex flex-col items-center px-3 py-2 rounded transition-all duration-200 ${
-                    pathname === item.path
-                      ? "bg-green-500 text-white"
-                      : "text-gray-700 hover:bg-green-500 hover:text-white"
-                  }`}
-                >
-                  <span className="text-2xl mb-2">{item.icon}</span>
-                  <span className="text-sm">{item.label}</span>
-                </Link>
-              ))}
-            </div>
+      <nav className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto">
+          <div className="flex overflow-x-auto hide-scrollbar">
+            <button
+              onClick={() => router.push("/Coordinator/Dashboard")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Coordinator/Dashboard")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Home className="h-5 w-5 mr-2" />
+              <span>Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => router.push("/Coordinator/Internships")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Coordinator/Internships")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Briefcase className="h-5 w-5 mr-2" />
+              <span>Internships</span>
+            </button>
+
+            <button
+              onClick={() => router.push("/Coordinator/Faculty")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Coordinator/Faculty")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <BookOpen className="h-5 w-5 mr-2" />
+              <span>Faculty Directory</span>
+            </button>
+
+            <button
+              onClick={() => router.push("/Coordinator/student")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Coordinator/student")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Users className="h-5 w-5 mr-2" />
+              <span>Students Directory</span>
+            </button>
+
+            <button
+              onClick={() => router.push("/Coordinator/Profile")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Coordinator/Profile")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Settings className="h-5 w-5 mr-2" />
+              <span>Profile</span>
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* Main Content */}
+      <main>{children}</main>
     </div>
   )
 }
 
-export default Navbar
+export default navbar
 
