@@ -78,9 +78,9 @@ const TaskSubmission = () => {
     }
   }
 
-  const fetchStudentDetails = async () => {
-    const email = "ammary9290111@gmail.com" // Replace with actual logic to get the email
-
+  const FetchStudentDetails = async () => {
+    const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
+  
     try {
       // Fetch student data by email
       const response = await fetch(`/api/StudentByemail/${email}`)

@@ -8,23 +8,25 @@ import { ObjectId } from "mongoose";
 // Utility to check if a string is a valid MongoDB ObjectId
 const isValidObjectId = (id: string) => Types.ObjectId.isValid(id);
 interface Task {
-    _id: ObjectId | string;
-    title: string;
-    marks: number;
-  }
-  
-  interface Submission {
-    taskId: ObjectId | string;
-    studentId: ObjectId | string;
-    grade: number;
-  }
+  _id: ObjectId | string;
+  title: string;
+  marks: number;
+}
+
+interface Submission {
+  taskId: ObjectId | string;
+  studentId: ObjectId | string;
+  grade: number;
+}
 // GET - Fetch all tasks and submissions for a student
 export async function GET(
   request: Request,
   { params }: { params: { internshipId: string; studentId: string } }
 ) {
   const { internshipId, studentId } = params;
-
+  console.log("internshipId:", internshipId);
+  console.log("studentId:", studentId);
+  
   if (!isValidObjectId(internshipId) || !isValidObjectId(studentId)) {
     return NextResponse.json(
       { message: "Invalid internship or student ID" },
@@ -36,14 +38,22 @@ export async function GET(
     await connectToDatabase();
      // Fetch tasks and submissions
     // Fetch tasks and submissions with explicit typing
-    const tasks: Task[] = await Task.find({ internshipId ,studentId }).lean();
-    const submissions: Submission[] = await Submission.find({ studentId }).lean();
-
+    const tasks: Task[] = await Task.find({
+      internshipId: new Types.ObjectId(internshipId),
+      studentId: new Types.ObjectId(studentId),
+    }).lean();
+    
+    const submissions: Submission[] = await Submission.find({
+      studentId: new Types.ObjectId(studentId),
+    }).lean();
+    
     const result = tasks.map((task) => {
       const submission = submissions.find(
         (sub) => sub.taskId.toString() === task._id.toString() // Convert both IDs to strings
       );
-
+      console.log("✅ Tasks fetched:", tasks);
+      console.log("✅ Submissions fetched:", submissions);
+      
       return {
         taskTitle: task.title,
         totalMarks: task.marks,

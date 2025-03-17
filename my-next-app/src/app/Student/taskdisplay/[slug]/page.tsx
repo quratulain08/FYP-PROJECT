@@ -133,59 +133,44 @@ const TaskDisplay = () => {
   }
 
   const handleTaskClick = (taskId: string) => {
-    router.push(`/Student/tasksubmission/${taskId}`)
-  }
+    router.push(`/Student/tasksubmission/${taskId}`);
+  };
 
-  const handleGoBack = () => {
-    router.back()
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
 
-  const formatDate = (dateString: string) => {
-    try {
-      const options: Intl.DateTimeFormatOptions = {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+      setLoading(true); // Set loading to true before fetching data
+      try {
+       // Fetch student data by email
+      const responsee = await fetch(`/api/StudentByemail/${email}`);
+      if (!responsee.ok) throw new Error("Failed to fetch student details");
+  
+      const dataa = await responsee.json();
+      setStudents(dataa);
+  
+      if (dataa.length === 0) {
+        throw new Error("No students found with the provided email");
       }
-      return new Date(dateString).toLocaleDateString(undefined, options)
-    } catch (e) {
-      return dateString
-    }
-  }
+  
+      const adminid = dataa._id; // // Assuming you want the first student in the array
+        setAdminId(adminid); // Set the adminId state
 
-  if (loading) {
-    return (
-      <StudentLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-          </div>
-        </div>
-      </StudentLayout>
-    )
-  }
+        // Fetch tasks and assigned students if activeTab and slug are valid
+        if (activeTab === "internship" && slug) {
+          await fetchTasks();
+          await FetchAssignedStudent();
+        }
+      } catch (err: unknown) {
+        console.log(err);
+        setError("Error fetching internships.");
+      } finally {
+        setLoading(false); // Ensure loading is stopped in all cases
+      }
+    };
 
-  if (error || !internship) {
-    return (
-      <StudentLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <p style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{error || "Internship not found"}</p>
-          </div>
-          <button
-            onClick={handleGoBack}
-            className="flex items-center text-green-600 hover:text-green-700"
-            style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Go Back
-          </button>
-        </div>
-      </StudentLayout>
-    )
-  }
+    fetchData(); // Call the async function
+  }, [activeTab, slug]); // Dependencies
 
   return (
     <StudentLayout>

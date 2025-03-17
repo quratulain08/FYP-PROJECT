@@ -40,8 +40,8 @@ const InternshipDisplay = () => {
   }, [])
 
   const fetchInternships = async () => {
-    const email = "ammary9290111@gmail.com" // Replace with actual logic to get the email
-
+    const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
+  
     try {
       setLoading(true)
       // Fetch student data by email
