@@ -133,7 +133,7 @@ const InternshipDetails: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const email = "ammary9290111@gmail.com"; // Replace with actual logic to get the email
+      const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
 
       setLoading(true); // Set loading to true before fetching data
       try {
