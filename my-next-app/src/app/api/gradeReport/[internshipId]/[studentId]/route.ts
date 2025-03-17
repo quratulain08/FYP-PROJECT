@@ -40,8 +40,9 @@ export async function GET(
     // Fetch tasks and submissions with explicit typing
     const tasks: Task[] = await Task.find({
       internshipId: new Types.ObjectId(internshipId),
-      studentId: new Types.ObjectId(studentId),
+      assignedStudents: new Types.ObjectId(studentId),
     }).lean();
+    
     
     const submissions: Submission[] = await Submission.find({
       studentId: new Types.ObjectId(studentId),
