@@ -44,7 +44,7 @@ const TaskSubmission = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        await Promise.all([fetchTaskDetails(), fetchStudentDetails()])
+        await Promise.all([fetchTaskDetails(), FetchStudentDetails()])
       } catch (err) {
         console.error("Error fetching data:", err)
         setError(err instanceof Error ? err.message : "An unexpected error occurred")
