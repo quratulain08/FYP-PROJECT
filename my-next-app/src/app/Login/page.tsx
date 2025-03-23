@@ -7,11 +7,14 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null); // Reset error state
+    setError(null);
 
     try {
       const response = await fetch("/api/login", {
@@ -29,18 +32,15 @@ const Login: React.FC = () => {
       const data = await response.json();
       console.log("Login successful:", data);
 
-      // Store the token and email in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("email", email); // Store email
-      localStorage.setItem("role", data.user.role); // Store user role
+      localStorage.setItem("email", email);
+      localStorage.setItem("role", data.user.role);
 
       const userRole = localStorage.getItem("role");
 
-      // Ensure the role value is a string
       if (userRole) {
-        console.log("User Role from localStorage:", userRole); // Debugging step
+        console.log("User Role from localStorage:", userRole);
 
-        // Navigate based on user role
         switch (userRole.toLowerCase()) {
           case "admin":
             router.push("/admin/dashboard");
@@ -58,7 +58,7 @@ const Login: React.FC = () => {
             router.push("/Student/navbar");
             break;
           default:
-            router.push("/dashboard"); // Default page if no specific role matches
+            router.push("/dashboard");
         }
       } else {
         setError("Role not found. Please log in again.");
@@ -69,6 +69,33 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    setShowForgotPassword(true);
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await fetch("/api/forget-Password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        setResetMessage(data.error || "Failed to send reset link.");
+        return;
+      }
+  
+      setResetMessage("✅ Reset link sent! Check your email.");
+      setTimeout(() => setShowForgotPassword(false), 3000); // Auto-close popup
+    } catch (error) {
+      console.error("Error sending reset link:", error);
+      setResetMessage("Something went wrong. Please try again.");
+    }
+  };
+  
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-green-700 rounded-tr-[100px] rounded-br-[100px] flex items-center justify-center">
@@ -96,11 +123,15 @@ const Login: React.FC = () => {
             <input
               type="password"
               placeholder="Enter your password"
-              className="w-full px-3 py-2 border border-gray-300 rounded mb-4 text-sm focus:outline-none focus:ring focus:ring-green-700"
+              className="w-full px-3 py-2 border border-gray-300 rounded mb-2 text-sm focus:outline-none focus:ring focus:ring-green-700"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+
+            <div className="text-right text-sm text-green-700 cursor-pointer mb-4" onClick={handleForgotPassword}>
+              Forgot Password?
+            </div>
 
             <button
               type="submit"
@@ -109,6 +140,33 @@ const Login: React.FC = () => {
               Login
             </button>
           </form>
+
+          {showForgotPassword && (
+            <div className="mt-4 bg-gray-100 p-4 rounded shadow-md">
+              <h3 className="text-sm font-medium mb-2">Reset Your Password</h3>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="w-full px-3 py-2 border border-gray-300 rounded mb-2 text-sm focus:outline-none focus:ring focus:ring-green-700"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                required
+              />
+              <button
+  onClick={handleResetPassword}
+  className="w-full bg-green-700 text-white py-2 rounded-full text-sm hover:bg-green-600 transition duration-300 ease-in-out"
+>
+  Send Reset Link
+</button>
+
+{resetMessage && (
+  <p className={`text-sm mt-2 ${resetMessage.includes("✅") ? "text-green-500" : "text-red-500"}`}>
+    {resetMessage}
+  </p>
+)}
+
+            </div>
+          )}
         </div>
       </div>
     </div>

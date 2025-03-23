@@ -19,11 +19,15 @@ export async function POST(req: Request) {
 
     // Create a transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // You can use other email services like SendGrid or AWS SES
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
-        user: process.env.EMAIL_USER, // Use your email address
-        pass: process.env.EMAIL_PASS, // Use your email password or app password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
+   
+    
       logger: true, // Enable logging
   debug: true,  // Output debug information
     });
