@@ -17,8 +17,8 @@ export interface Internship extends Document {
   isApproved: boolean; // Indicates if the internship is approve
   universityId: mongoose.Types.ObjectId; // Reference to the University model
   numberOfStudents: number;
-
-
+  assignedDepartment: mongoose.Types.ObjectId[];
+  rejectionComment:  String; // New field for rejection reason
 
 
 }
@@ -59,7 +59,18 @@ const internshipSchema = new Schema<Internship>({
     ],
     default: [], // Initialize as empty array
   },
+  assignedDepartment: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Department",
+      },
+    ],
+    default: [], // Initialize as empty array
+  },
   isApproved: { type: Boolean, default: false }, 
+  rejectionComment: { type: String, default: "" }, // New field for rejection reason
+
 });
 
 const InternshipModel = mongoose.models.Internship || mongoose.model<Internship>("Internship", internshipSchema);

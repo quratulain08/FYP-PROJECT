@@ -14,10 +14,10 @@ export async function GET() {
   }
 }
 
-// PUT: Approve or unapprove an internship by ID.
+// PUT: Approve or unapprove an internship and assign department by ID.
 export async function PUT(req: Request) {
   try {
-    const { id, isApproved } = await req.json(); // Extract ID and approval status from request body
+    const { id, isApproved, departmentId, rejectionComment } = await req.json();
 
     if (!id || typeof isApproved !== 'boolean') {
       return NextResponse.json(
@@ -28,10 +28,18 @@ export async function PUT(req: Request) {
 
     await connectToDatabase();
 
+    const updateFields: { isApproved: boolean; assignedDepartment?: string; rejectionComment?: string } = { isApproved };
+
+if (isApproved && departmentId) {
+  updateFields.assignedDepartment = departmentId;
+} else if (!isApproved && rejectionComment) {
+  updateFields.rejectionComment = rejectionComment;
+}
+
     const internship = await InternshipModel.findByIdAndUpdate(
       id,
-      { isApproved },
-      { new: true } // Return updated document
+      updateFields,
+      { new: true }
     );
 
     if (!internship) {
@@ -41,11 +49,14 @@ export async function PUT(req: Request) {
       );
     }
 
-    return NextResponse.json({ message: 'Internship approval status updated', internship });
+    return NextResponse.json({
+      message: isApproved ? 'Internship approval status and department updated' : 'Internship rejected with comment',
+      internship,
+    });
   } catch (error) {
-    console.error('Error updating internship approval status:', error);
+    console.error('Error updating internship:', error);
     return NextResponse.json(
-      { error: 'Failed to update internship approval status' },
+      { error: 'Failed to update internship' },
       { status: 500 }
     );
   }
@@ -54,7 +65,7 @@ export async function PUT(req: Request) {
 // DELETE: Remove an internship by ID.
 export async function DELETE(req: Request) {
   try {
-    const { id } = await req.json(); // Extract ID from request body
+    const { id } = await req.json();
 
     if (!id) {
       return NextResponse.json(

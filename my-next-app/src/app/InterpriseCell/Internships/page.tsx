@@ -31,10 +31,22 @@ interface Internship {
   assignedStudents: string
   isApproved: boolean
 }
+type Department = {
+  _id: string;
+  name: string;
+};
+
 
 const Internships: React.FC = () => {
   const [internships, setInternships] = useState<Internship[]>([])
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [showRejectPopup, setShowRejectPopup] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+
   const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
@@ -43,6 +55,7 @@ const Internships: React.FC = () => {
 
   useEffect(() => {
     fetchInternships()
+    fetchDepartments()
   }, [])
 
   useEffect(() => {
@@ -86,6 +99,20 @@ const Internships: React.FC = () => {
       setLoading(false)
     }
   }
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch('/api/department');
+      if (!response.ok) throw new Error('Failed to fetch department');
+
+      const data = await response.json();
+      setDepartments(data);
+    } catch (err) {
+      setError('Error fetching department.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this internship?")) {
@@ -191,6 +218,59 @@ const Internships: React.FC = () => {
       </InterpriseCellLayout>
     )
   }
+  const handleAssignDepartment = async (internshipId: string, departmentId: string) => {
+    const confirmAssign = confirm('Are you sure you want to assign this department?');
+    if (!confirmAssign) return;
+
+    try {
+      const response = await fetch(`/api/InternshipForInterpriseCell`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: internshipId, isApproved: true, departmentId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Failed to assign department:', data.error);
+        return;
+      }
+
+      setSuccessMessage('✅ Internship successfully assigned to department!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+      setShowPopup(false);
+    } catch (error) {
+      console.error('Error assigning department:', error);
+    }
+  };
+
+  const handleRejectInternship = async (internshipId: string) => {
+    if (!rejectionReason.trim()) {
+      alert('Please provide a reason for rejection.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/InternshipForInterpriseCell`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: internshipId, isApproved: false, rejectionComment: rejectionReason }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error('Failed to reject internship:', data.error);
+        return;
+      }
+
+      setSuccessMessage('❌ Internship rejected successfully!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+      setShowRejectPopup(false);
+    } catch (error) {
+      console.error('Error rejecting internship:', error);
+    }
+  };
 
   return (
     <InterpriseCellLayout>
@@ -355,31 +435,70 @@ const Internships: React.FC = () => {
                         {internship.isApproved ? "Approved" : "Pending Approval"}
                       </span>
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleApprove(internship._id, internship.isApproved)
-                        }}
-                        className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${
-                          internship.isApproved
-                            ? "bg-red-50 text-red-700 hover:bg-red-100"
-                            : "bg-green-50 text-green-700 hover:bg-green-100"
-                        } transition-colors duration-200`}
-                        style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                      >
-                        {internship.isApproved ? (
-                          <>
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Unapprove
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Approve
-                          </>
-                        )}
-                      </button>
+                      <button onClick={() => setShowPopup(true)} className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+        Open Assign Popup
+      </button>
 
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold mb-3">Select Department</h2>
+            {loading ? (
+              <p>Loading departments...</p>
+            ) : error ? (
+              <p className="text-red-500">{error}</p>
+            ) : (
+              <ul className="space-y-2 max-h-60 overflow-auto">
+                {departments.map((dept) => (
+                  <li key={dept._id} className="flex justify-between items-center p-2 border rounded">
+                    <span>{dept.name}</span>
+                    <button
+                      className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition"
+                      onClick={() => handleAssignDepartment(internship._id, dept._id)}
+                    >
+                      Assign
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button className="mt-4 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600" onClick={() => setShowPopup(false)}>
+              Cancel
+            </button>
+           
+          </div>
+        </div>
+      )}
+ <button
+              className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              onClick={() => setShowRejectPopup(true)}
+            >
+              Reject
+            </button>
+      {showRejectPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold mb-3">Provide Rejection Reason</h2>
+            <textarea
+              className="w-full p-2 border rounded mb-2"
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              placeholder="Enter reason for rejection..."
+            ></textarea>
+            <button
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              onClick={() => handleRejectInternship(internship._id)}
+            >
+              Confirm Reject
+            </button>
+            <button className="mt-2 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600" onClick={() => setShowRejectPopup(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
                       <button
                         onClick={(e) => {
                           e.stopPropagation()

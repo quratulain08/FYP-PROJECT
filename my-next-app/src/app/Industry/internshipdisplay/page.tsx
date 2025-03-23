@@ -19,6 +19,7 @@ interface Internship {
   compensationType?: "paid" | "unpaid"
   compensationAmount?: number
   numberOfStudents?: number
+  rejectionComment: string
 }
 
 const InternshipDisplay = () => {
@@ -251,18 +252,28 @@ const InternshipDisplay = () => {
                 onClick={() => handleCardClick(internship._id)}
                 className="bg-white border border-gray-200 hover:border-green-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
               >
-                <div className="p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <h2
-                      className="text-xl font-semibold text-gray-800 line-clamp-2"
-                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                    >
-                      {internship.title}
-                    </h2>
-                    <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                      {getCategoryLabel(internship.category)}
-                    </span>
-                  </div>
+              <div className="p-5">
+  <div className="flex justify-between items-start mb-3">
+    <h2
+      className="text-xl font-semibold text-gray-800 line-clamp-2"
+      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+    >
+      {internship.title}
+    </h2>
+    <div className="flex flex-col items-end">
+      <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+        {getCategoryLabel(internship.category)}
+      </span>
+      {internship.rejectionComment && (
+        <span
+          className="inline-block mt-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full cursor-pointer hover:bg-red-200"
+          onClick={() => alert(`Rejection Reason: ${internship.rejectionComment}`)}
+        >
+          Rejected
+        </span>
+      )}
+    </div>
+  </div>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center text-gray-600">
