@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Building2, Search, Plus, MapPin, Mail, Phone, User, Calendar, CheckCircle, X, ChevronDown } from "lucide-react"
-import SuperAdminLayout from "../superadminlayout"
+import SuperAdminLayout from "../SuperAdminLayout"
 
 // Static university data
 const universities = [

@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import SuperAdminLayout from "../superadminlayout"
+import SuperAdminLayout from "../SuperAdminLayout"
 import {
   Briefcase,
   BookOpen,
@@ -51,6 +51,7 @@ export default function HomePage() {
 
   return (
     <SuperAdminLayout>
+  
     <div className="min-h-screen bg-gray-50">
       {/* Header/Navbar */}
       {/* <header className="bg-white shadow-sm">
@@ -258,7 +259,7 @@ export default function HomePage() {
       </section>
 
       {/* Image Showcase */}
-      <section className="py-16 bg-gradient-to-r from-gray-100 to-gray-200">
+      {/* <section className="py-16 bg-gradient-to-r from-gray-100 to-gray-200">
         <div className="container mx-auto px-4 md:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <img
@@ -283,7 +284,7 @@ export default function HomePage() {
             />
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* User Roles with Image */}
       <section className="py-20 bg-white relative">
@@ -933,6 +934,7 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    
     </SuperAdminLayout>
   )
 }
