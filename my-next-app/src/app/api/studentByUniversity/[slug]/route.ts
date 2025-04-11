@@ -11,10 +11,12 @@ function getErrorMessage(error: unknown): string {
 }
 
 // GET: Fetch all students with optional department and batch filters.
-export async function GET(req: Request) {
+export async function GET(req: Request,
+    { params }: { params: { slug: string } }
+  ) {
+    const universityId = params.slug;
+  
   try {
-    const body = await req.json();
-    const universityId = body.universityId; // Correct variable name
 
     if (!universityId) {
       return NextResponse.json(

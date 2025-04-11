@@ -79,7 +79,9 @@ const TaskSubmission = () => {
   }
 
   const FetchStudentDetails = async () => {
-    const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
+          const email = localStorage.getItem("email");
+
+    //const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
   
     try {
       // Fetch student data by email

@@ -22,6 +22,8 @@ export interface IDepartment extends Document {
   CoordinatorCnic: string;
   CoordinatorEmail: string;
   CoordinatorPhone: string;
+  university: mongoose.Schema.Types.ObjectId; // University reference
+
 }
 
 const DepartmentSchema: Schema = new Schema({
@@ -44,6 +46,8 @@ const DepartmentSchema: Schema = new Schema({
   CoordinatorCnic: { type: String, required: true ,unique: true },
   CoordinatorEmail: { type: String, required: true , unique: true },
   CoordinatorPhone: { type: String, required: true },
+  university: { type: mongoose.Schema.Types.ObjectId, ref: "University", required: true }, // University reference
+
 }, {
   timestamps: true,
 });

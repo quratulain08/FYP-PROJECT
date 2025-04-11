@@ -39,7 +39,8 @@ const CoordinatorProfile: React.FC = () => {
 
   useEffect(() => {
     try {
-      const email = localStorage?.getItem("email") || "wajahat1@gmail.com"
+   //   const email = localStorage?.getItem("email") ;
+      const email= "wajahat1@gmail.com"
       if (email) {
         fetchProfile(email)
       } else {

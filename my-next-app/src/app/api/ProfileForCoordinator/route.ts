@@ -21,8 +21,8 @@ export async function GET(req: Request) {
 
     if (!department) {
       return NextResponse.json(
-        { error: "No department found with this CoordinatorEmail." },
-        { status: 404 }
+        { },
+        { status: 200 }
       );
     }
 

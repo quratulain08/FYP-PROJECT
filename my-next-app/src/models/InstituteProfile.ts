@@ -12,6 +12,8 @@ interface IProfile extends Document {
   officeLocation?: string;
   tenureStart?: Date; // Changed to Date for consistency
   tenureEnd?: Date;   // Changed to Date for consistency
+  university: mongoose.Schema.Types.ObjectId; // University reference
+
 }
 
 // Define the Profile schema
@@ -26,6 +28,8 @@ const ProfileSchema = new Schema<IProfile>({
   officeLocation: { type: String },
   tenureStart: { type: Date },
   tenureEnd: { type: Date },
+  university: { type: mongoose.Schema.Types.ObjectId, ref: "University", required: true }, // University reference
+
 });
 
 // Check if the model exists to avoid overwrite issues during development

@@ -78,9 +78,10 @@ const TaskDisplay = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
+    const email = localStorage.getItem("email");
 
         // Fetch student ID
-        const email = "ammary9290111@gmail.com" // Replace with actual logic to get the email
+       // const email = "ammary9290111@gmail.com" // Replace with actual logic to get the email
         const studentResponse = await fetch(`/api/StudentByemail/${email}`)
         if (!studentResponse.ok) throw new Error("Failed to fetch student details")
 

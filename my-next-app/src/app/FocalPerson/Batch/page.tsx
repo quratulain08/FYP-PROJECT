@@ -39,9 +39,9 @@ const BatchSummary: React.FC = () => {
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState<boolean>(false)
   const [showModal, setShowModal] = useState<boolean>(false)
+  const [departmentId, setDepartmentId] = useState(null);
 
   const router = useRouter()
-  const departmentId = "674179f1d751474776dc5bd5"
 
   const handleViewDetails = (batch: string) => {
     router.push(`/FocalPerson/students/${batch}`)
@@ -49,7 +49,42 @@ const BatchSummary: React.FC = () => {
 
   const fetchBatchData = async () => {
     try {
-      const res = await fetch("/api/students")
+      const email = localStorage.getItem("email");
+      if (!email) return;
+
+      const response = await fetch(`/api/departmentByfocalperson/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch department ID for ${email}`);
+      }
+
+      const dataa= await response.json();
+      // Assuming the response is an object with the universityId property
+      const departmentId = dataa.departmentId;
+      setDepartmentId(departmentId);
+
+
+      const response2 = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+     
+if (!response2.ok) {
+  throw new Error(`Failed to fetch university ID for ${email}`);
+}
+
+const data = await response2.json();
+const universityId = data.universityId; // Access the correct property
+      
+      const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }, // Missing comma here
+      });
+      
       if (!res.ok) throw new Error("Failed to fetch students")
 
       const students: Student[] = await res.json()

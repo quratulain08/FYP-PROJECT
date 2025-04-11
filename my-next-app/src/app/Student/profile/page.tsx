@@ -20,6 +20,8 @@ const VocalPerson: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+     //   const email = localStorage.getItem("email")
+
   const email ='wajahat@gmail.com'; 
 
   useEffect(() => {

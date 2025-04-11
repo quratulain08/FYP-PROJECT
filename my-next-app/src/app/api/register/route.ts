@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(req: Request) {
   try {
-    const { email, password, role = 'user' } = await req.json();  // Default to 'user' if no role is provided
+    const { email, password, role = 'user',university } = await req.json();  // Default to 'user' if no role is provided
     await connectToDatabase();
 
     // Check if the user already exists
@@ -20,6 +20,7 @@ export async function POST(req: Request) {
       email,
       password: hashedPassword,
       role,  // Add role field
+      university,
     });
 
     await newUser.save();

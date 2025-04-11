@@ -17,6 +17,7 @@ interface Student {
   registrationNumber: string
   section: string
   email: string
+  university:string
 }
 
 interface Department {
@@ -79,6 +80,7 @@ const StudentsPage: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [universityId, setUniversityId] = useState(''); // State to store universityId
 
   const params = useParams()
   const router = useRouter()
@@ -88,7 +90,27 @@ const StudentsPage: React.FC = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const res = await fetch("/api/students")
+             const email = localStorage.getItem("email")
+             const response = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            });
+            
+           
+      if (!response.ok) {
+        throw new Error(`Failed to fetch university ID for ${email}`);
+      }
+      
+      const dataa= await response.json();
+      // Assuming the response is an object with the universityId property
+      const universityId = dataa.universityId; // Access the correct property
+      setUniversityId(universityId); // Set the universityId in state
+
+            const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" }, // Missing comma here
+            });
+            
         if (!res.ok) throw new Error("Failed to fetch data")
         const data: Student[] = await res.json()
 
@@ -165,7 +187,7 @@ const StudentsPage: React.FC = () => {
     try {
       const batch = currentBatch
       const departmentName = department?.name || "Unknown Department"
-      await handleFileUpload(file, batch, departmentName)
+      await handleFileUpload(file, batch, departmentName,universityId )
     } catch (error) {
       console.error("Upload error:", error)
       alert("Failed to upload data.")
@@ -230,7 +252,7 @@ const StudentsPage: React.FC = () => {
     }
   }
 
-  const handleFileUpload = async (file: File, batch: string, department: string) => {
+  const handleFileUpload = async (file: File, batch: string, department: string, university: string ) => {
     try {
       const data = await file.arrayBuffer()
       const workbook = XLSX.read(data, { type: "array" })
@@ -241,6 +263,7 @@ const StudentsPage: React.FC = () => {
         ...student,
         batch,
         department,
+        university
       }))
 
       if (!file || studentsWithBatch.length === 0) {

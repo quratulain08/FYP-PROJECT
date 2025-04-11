@@ -29,7 +29,24 @@ const Internships: React.FC = () => {
 
   const fetchInternships = async () => {
     try {
-      const response = await fetch("/api/internships")
+           const CoordinatorEmail = localStorage.getItem("email") || "default@example.com"; 
+           // const CoordinatorEmail = "wajahat1@gmail.com"; // Replace with the actual email
+            const res = await fetch(`/api/departmentByemail/${CoordinatorEmail}`, {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            });
+
+
+            if (!res.ok) {
+              throw new Error(`Failed to fetch university ID for ${CoordinatorEmail}`);
+            }
+            
+            const dataa= await res.json();
+            // Assuming the response is an object with the universityId property
+            const departmentId = dataa.departmentId;
+            
+          
+      const response = await fetch(`/api/internshipByDepartment/${departmentId}`)
       if (!response.ok) throw new Error("Failed to fetch internships")
 
       const data = await response.json()

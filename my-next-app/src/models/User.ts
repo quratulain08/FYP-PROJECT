@@ -1,4 +1,3 @@
-// models/User.js
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
@@ -15,7 +14,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
+  university: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'University',
+  },
 });
 
 export default mongoose.models.User || mongoose.model('User', userSchema);

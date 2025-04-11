@@ -40,7 +40,9 @@ const InternshipDisplay = () => {
   }, [])
 
   const fetchInternships = async () => {
-    const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
+          const email = localStorage.getItem("email");
+
+    //const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
   
     try {
       setLoading(true)

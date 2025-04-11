@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Layout from "./../../../components/Layout"
 import { User, MapPin, Briefcase, GraduationCap, Save, ArrowLeft, Info } from "lucide-react"
@@ -20,6 +20,7 @@ export default function FacultyForm() {
   const params = useParams()
   const id = params.slug as string
   const departmentId = id
+  const [faculty, setFaculty] = useState<{ university?: string }>({});
 
   const [selectedProvince, setSelectedProvince] = useState<string>("")
   const [selectedCity, setSelectedCity] = useState<string>("")
@@ -44,11 +45,49 @@ export default function FacultyForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [message, setMessage] = useState<string>("")
   const [messageType, setMessageType] = useState<"success" | "error">("error")
+  const [error, setError] = useState("")
 
   const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedProvince(event.target.value)
     setSelectedCity("")
   }
+
+  useEffect(() => {
+    fetchUniversity()
+  }, [])
+
+
+  const fetchUniversity = async () => {
+    try {
+      const email = localStorage.getItem("email");
+      if (!email) {
+        throw new Error("Email not found in localStorage.");
+      }
+
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch university ID for ${email}`);
+      }
+
+      const data = await res.json();
+      const universityId = data.universityId;
+
+      // Set the universityId in the department state
+      setFaculty((prevState) => ({
+        ...prevState,
+        university: universityId || prevState.university, // Ensure existing value remains if universityId is undefined
+      }));
+    } catch (err) {
+      setError("Error fetching university information.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   // Get faculty initials (up to 2 characters)
   const getFacultyInitials = () => {
@@ -88,6 +127,7 @@ export default function FacultyForm() {
       leavingDate,
       email,
       isCoreComputingTeacher,
+      university: faculty.university,
       lastAcademicQualification: {
         degreeName,
         degreeType,
@@ -98,7 +138,6 @@ export default function FacultyForm() {
         degreeEndDate,
       },
     }
-
     try {
       const response = await fetch("/api/faculty", {
         method: "POST",

@@ -48,7 +48,27 @@ const BatchSummary: React.FC = () => {
 
   const fetchBatchData = async () => {
     try {
-      const res = await fetch("/api/students")
+
+      const email = localStorage.getItem("email")
+      const response = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+     
+if (!response.ok) {
+  throw new Error(`Failed to fetch university ID for ${email}`);
+}
+
+const data = await response.json();
+// Assuming the response is an object with the universityId property
+const universityId = data.universityId; // Access the correct property
+      
+      const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }, // Missing comma here
+      });
+      
       if (!res.ok) throw new Error("Failed to fetch students")
 
       const students: Student[] = await res.json()

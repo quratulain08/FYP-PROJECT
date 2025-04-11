@@ -68,7 +68,8 @@ const InternshipDisplay = () => {
     setLoading(true)
     try {
       // In a real app, you would get this from authentication context
-      const email = "aqurat@gmail.com"
+      const email = localStorage.getItem("email")
+    //  const email = "aqurat@gmail.com"
 
       // Fetch faculty data by email
       const facultyResponse = await fetch(`/api/facultyByEmail/${email}`)

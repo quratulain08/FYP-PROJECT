@@ -60,7 +60,7 @@ const Internships: React.FC = () => {
     message: string
   } | null>(null)
   const router = useRouter()
-  const departmentId = "674179f1d751474776dc5bd5"
+  const [departmentId, setDepartmentId] = useState(null);
 
   useEffect(() => {
     fetchInternships()
@@ -70,10 +70,27 @@ const Internships: React.FC = () => {
 
   const fetchInternships = async () => {
     try {
-      const response = await fetch("/api/internships")
-      if (!response.ok) throw new Error("Failed to fetch internships")
+      const email = localStorage.getItem("email");
+      if (!email) return;
 
-      const data = await response.json()
+      const response1 = await fetch(`/api/departmentByfocalperson/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response1.ok) {
+        throw new Error(`Failed to fetch department ID for ${email}`);
+      }
+
+      const dataa= await response1.json();
+      // Assuming the response is an object with the universityId property
+      const departmentId = dataa.departmentId;
+      setDepartmentId(departmentId);
+
+      const res = await fetch(`/api/internshipByDepartment/${departmentId}`) 
+      if (!res.ok) throw new Error("Failed to fetch internships")
+
+      const data = await res.json()
       setInternships(data)
     } catch (err) {
       setError("Error fetching internships.")
@@ -96,10 +113,27 @@ const Internships: React.FC = () => {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch("/api/students")
-      if (!response.ok) throw new Error("Failed to fetch students")
+      const email = localStorage.getItem("email");
+      const response2 = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+     
+if (!response2.ok) {
+  throw new Error(`Failed to fetch university ID for ${email}`);
+}
 
-      const data = await response.json()
+const dataa = await response2.json();
+const universityId = dataa.universityId; // Access the correct property
+      
+      const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }, // Missing comma here
+      });
+       if (!res.ok) throw new Error("Failed to fetch students")
+
+      const data = await res.json()
       setStudents(data)
     } catch (err) {
       setError("Error fetching students.")
@@ -237,13 +271,13 @@ const Internships: React.FC = () => {
     )
   }
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
-      </div>
-    )
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-screen">
+  //       <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <FocalPersonLayout>

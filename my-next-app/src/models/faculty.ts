@@ -26,6 +26,8 @@ interface Faculty extends Document {
   isCoreComputingTeacher: boolean;
   lastAcademicQualification: LastAcademicQualification;
   email: string; // Add email attribute
+  university: mongoose.Schema.Types.ObjectId; // University reference
+
 }
 
 const lastAcademicQualificationSchema = new Schema<LastAcademicQualification>({
@@ -58,6 +60,8 @@ const facultySchema = new Schema<Faculty>({
   isCoreComputingTeacher: { type: Boolean, required: true },
   lastAcademicQualification: { type: lastAcademicQualificationSchema, required: true },
   email: { type: String, required: true, unique: true }, // Email attribute added
+  university: { type: mongoose.Schema.Types.ObjectId, ref: "University", required: true }, // University reference
+
 });
 
 const FacultyModel: Model<Faculty> =

@@ -34,6 +34,8 @@ const StudentsPagee = () => {
     const [error, setError] = useState<string | null>(null); // Track errors
     useEffect(() => {
         const fetchAndNavigate = async () => {
+         //   const CoordinatorEmail = localStorage.getItem("email")
+
             const CoordinatorEmail = "wajahat1@gmail.com"; // Replace with the actual email
             try {
                 const response = await fetch(`/api/ProfileForCoordinator?CoordinatorEmail=${CoordinatorEmail}`);

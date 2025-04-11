@@ -38,9 +38,9 @@ export async function POST(req: Request) {
     const studentsToAdd = [];
 
     for (const studentData of studentsFromForm) {
-      const { name, department, batch, didInternship, registrationNumber, section, email } = studentData;
+      const { name, department, batch, didInternship, registrationNumber, section, email, university } = studentData;
 
-      if (!name || !department || !batch || didInternship === undefined || !registrationNumber || !section || !email) {
+      if (!name || !department || !batch || didInternship === undefined || !registrationNumber || !section || !email || !university) {
         console.log('Skipping invalid student data:', studentData);
         continue;
       }
@@ -53,6 +53,7 @@ export async function POST(req: Request) {
         registrationNumber,
         section,
         email,
+        university,
       });
 
       studentsToAdd.push(student);

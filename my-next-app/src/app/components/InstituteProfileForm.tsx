@@ -30,6 +30,8 @@ interface ProfileData {
   officeLocation?: string
   tenureStart?: string
   tenureEnd?: string
+  university:string
+
 }
 
 const InstituteProfile: React.FC = () => {
@@ -37,6 +39,8 @@ const InstituteProfile: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [profileData, setProfileData] = useState<Record<string, ProfileData>>({})
   const [editMode, setEditMode] = useState<Record<string, boolean>>({})
+  const [universityId, setUniversityId] = useState(null);
+
   const [newProfile, setNewProfile] = useState<ProfileData>({
     role: "",
     name: "",
@@ -48,6 +52,7 @@ const InstituteProfile: React.FC = () => {
     officeLocation: "",
     tenureStart: "",
     tenureEnd: "",
+    university:"",
   })
   const [addingRole, setAddingRole] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -55,7 +60,25 @@ const InstituteProfile: React.FC = () => {
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await fetch("/api/instituteProfile")
+
+
+      const email = localStorage.getItem("email")
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+     
+if (!res.ok) {
+  throw new Error(`Failed to fetch university ID for ${email}`);
+}
+
+const dataa = await res.json();
+// Assuming the response is an object with the universityId property
+const universityId = dataa.universityId; // Access the correct property
+setUniversityId(dataa.universityId); // Store universityId in state
+
+        const response = await fetch(`/api/instituteProfile/${universityId}`)
         const data = await response.json()
         const formattedData = data.reduce((acc: Record<string, ProfileData>, profile: ProfileData) => {
           acc[profile.role] = profile
@@ -113,6 +136,7 @@ const InstituteProfile: React.FC = () => {
           email,
           password,
           role: "EnterpriseCell",
+          university: universityId,
         }),
       })
 
@@ -261,6 +285,8 @@ const InstituteProfile: React.FC = () => {
         officeLocation: "",
         tenureStart: "",
         tenureEnd: "",
+        university:"",
+
       })
 
       setAddingRole(null)

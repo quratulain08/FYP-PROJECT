@@ -62,7 +62,7 @@ const VocalPerson: React.FC = () => {
     setError(null)
     setSuccess(null)
     try {
-      const response = await fetch("/api/department/674179f1d751474776dc5bd5")
+      const response = await fetch(`/api/departmentByfocalperson/${email}`)
       if (response.ok) {
         const data: Department = await response.json()
         setProfile(data)

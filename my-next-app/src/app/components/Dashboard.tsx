@@ -38,7 +38,28 @@ const StudentDashboard: React.FC = () => {
     const fetchStudents = async () => {
       try {
         setLoading(true)
-        const response = await fetch("/api/students")
+
+        const email = localStorage.getItem("email ")
+        const response = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        
+       
+  if (!response.ok) {
+    throw new Error(`Failed to fetch university ID for ${email}`);
+  }
+  
+  const dataa = await response.json();
+  // Assuming the response is an object with the universityId property
+  const universityId = dataa.universityId; // Access the correct property
+        
+        const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" }, // Missing comma here
+        });
+        
+        
         const data = await response.json()
         setStudents(data)
 

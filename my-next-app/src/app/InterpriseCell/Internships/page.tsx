@@ -87,7 +87,23 @@ const Internships: React.FC = () => {
 
   const fetchInternships = async () => {
     try {
-      const response = await fetch("/api/internships")
+
+      const email = localStorage.getItem("email")
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+       method: "GET",
+       headers: { "Content-Type": "application/json" },
+     });
+     
+    
+if (!res.ok) {
+ throw new Error(`Failed to fetch university ID for ${email}`);
+}
+
+const dataa= await res.json();
+// Assuming the response is an object with the universityId property
+const universityId = dataa.universityId;
+
+      const response = await fetch(`/api/internshipsByUniversity/${universityId}`)
       if (!response.ok) throw new Error("Failed to fetch internships")
 
       const data = await response.json()
@@ -100,10 +116,30 @@ const Internships: React.FC = () => {
     }
   }
 
-  const fetchDepartments = async () => {
+  const fetchDepartments = 
+  async () => {
     try {
-      const response = await fetch('/api/department');
-      if (!response.ok) throw new Error('Failed to fetch department');
+
+      const email = localStorage.getItem("email")
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+       method: "GET",
+       headers: { "Content-Type": "application/json" },
+     });
+     
+    
+if (!res.ok) {
+ throw new Error(`Failed to fetch university ID for ${email}`);
+}
+
+const dataa= await res.json();
+// Assuming the response is an object with the universityId property
+const universityId = dataa.universityId;
+
+const response = await fetch(`/api/departmentByUniversity/${universityId}`, {
+  method: "GET",
+  headers: { "Content-Type": "application/json" }, 
+});
+if (!response.ok) throw new Error("Failed to fetch departments")
 
       const data = await response.json();
       setDepartments(data);

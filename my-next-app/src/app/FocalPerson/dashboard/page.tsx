@@ -27,11 +27,28 @@ const Dashboard: React.FC = () => {
   const [internships, setInternships] = useState<Internship[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [universityId, setUniversityId] = useState(null);
 
   useEffect(() => {
     const fetchInternships = async () => {
       try {
-        const res = await fetch("/api/internships")
+        const email = localStorage.getItem("email");
+        if (!email) return;
+
+        const response = await fetch(`/api/departmentByfocalperson/${email}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch department ID for ${email}`);
+        }
+
+        const dataa= await response.json();
+        // Assuming the response is an object with the universityId property
+        const departmentId = dataa.departmentId;
+        
+        const res = await fetch(`/api/internshipByDepartment/${departmentId}`)
         if (!res.ok) throw new Error("Failed to fetch internships")
         const data: Internship[] = await res.json()
         setInternships(data)

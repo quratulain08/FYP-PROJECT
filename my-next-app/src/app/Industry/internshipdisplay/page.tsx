@@ -2,35 +2,241 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Briefcase, Calendar, MapPin, Building, Search, Filter, X, Plus, ChevronRight } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useParams, useRouter } from "next/navigation"
 import IndustryLayout from "../IndustryLayout"
+import { Briefcase, Calendar, MapPin, Building, Search, Filter, X, Plus, ChevronRight } from "lucide-react"
 
 interface Internship {
   _id: string
   title: string
-  hostInstitution: string
-  location: string
-  category: string
+  description: string
   startDate: string
   endDate: string
-  description: string
-  compensationType?: "paid" | "unpaid"
+  category: string
+  numberOfStudents: number
+  location: "onsite" | "oncampus"
+  compensationType: "paid" | "unpaid"
   compensationAmount?: number
-  numberOfStudents?: number
+  supervisorName: string
+  supervisorEmail: string
+  hostInstitution: string
   rejectionComment: string
+
 }
 
-const InternshipDisplay = () => {
-  const [internships, setInternships] = useState<Internship[]>([])
-  const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+interface University {
+  _id: string
+  name: string
+  address: string
+  contactEmail: string
+  location: string
+}
+
+interface InternshipForm {
+  hostInstitution: string
+  title: string
+  description: string
+  numberOfStudents: number
+  location: "onsite" | "oncampus"
+  compensationType: "paid" | "unpaid"
+  compensationAmount?: number
+  supervisorName: string
+  supervisorEmail: string
+  startDate: string
+  endDate: string
+  universityId: string
+  category: string
+}
+
+const internshipCategories = [
+  // Technology
+  { value: "frontend", label: "Frontend Development", group: "Technology" },
+  { value: "backend", label: "Backend Development", group: "Technology" },
+  { value: "fullstack", label: "Full Stack Development", group: "Technology" },
+  { value: "mobile", label: "Mobile Development", group: "Technology" },
+  { value: "devops", label: "DevOps", group: "Technology" },
+  { value: "data", label: "Data Science", group: "Technology" },
+  { value: "ai", label: "Artificial Intelligence", group: "Technology" },
+  { value: "cybersecurity", label: "Cybersecurity", group: "Technology" },
+  { value: "cloud", label: "Cloud Computing", group: "Technology" },
+  { value: "qa", label: "Quality Assurance", group: "Technology" },
+
+  // Business & Finance
+  { value: "accounting", label: "Accounting", group: "Business & Finance" },
+  { value: "finance", label: "Finance", group: "Business & Finance" },
+  { value: "marketing", label: "Marketing", group: "Business & Finance" },
+  { value: "sales", label: "Sales", group: "Business & Finance" },
+  { value: "hr", label: "Human Resources", group: "Business & Finance" },
+  { value: "consulting", label: "Business Consulting", group: "Business & Finance" },
+
+  // Engineering
+  { value: "mechanical", label: "Mechanical Engineering", group: "Engineering" },
+  { value: "electrical", label: "Electrical Engineering", group: "Engineering" },
+  { value: "civil", label: "Civil Engineering", group: "Engineering" },
+  { value: "chemical", label: "Chemical Engineering", group: "Engineering" },
+  { value: "aerospace", label: "Aerospace Engineering", group: "Engineering" },
+
+  // Healthcare
+  { value: "medical", label: "Medical", group: "Healthcare" },
+  { value: "nursing", label: "Nursing", group: "Healthcare" },
+  { value: "pharmacy", label: "Pharmacy", group: "Healthcare" },
+  { value: "biotech", label: "Biotechnology", group: "Healthcare" },
+
+  // Creative
+  { value: "design", label: "Graphic Design", group: "Creative" },
+  { value: "content", label: "Content Writing", group: "Creative" },
+  { value: "media", label: "Digital Media", group: "Creative" },
+  { value: "ui_ux", label: "UI/UX Design", group: "Creative" },
+
+  // Science & Research
+  { value: "research", label: "Research & Development", group: "Science & Research" },
+  { value: "physics", label: "Physics", group: "Science & Research" },
+  { value: "chemistry", label: "Chemistry", group: "Science & Research" },
+  { value: "biology", label: "Biology", group: "Science & Research" },
+
+  // Law & Public Policy
+  { value: "legal", label: "Legal", group: "Law & Public Policy" },
+  { value: "public_policy", label: "Public Policy", group: "Law & Public Policy" },
+  { value: "government", label: "Government", group: "Law & Public Policy" },
+
+  // Education
+  { value: "teaching", label: "Teaching", group: "Education" },
+  { value: "training", label: "Corporate Training", group: "Education" },
+  { value: "education_tech", label: "Education Technology", group: "Education" },
+
+  // Others
+  { value: "other", label: "Other", group: "Others" },
+]
+
+// Group categories by their group property
+const groupedCategories = internshipCategories.reduce(
+  (acc, category) => {
+    if (!acc[category.group]) {
+      acc[category.group] = []
+    }
+    acc[category.group].push(category)
+    return acc
+  },
+  {} as Record<string, typeof internshipCategories>,
+)
+
+const InternshipPage = () => {
+  const params = useParams()
+  const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCategory, setFilterCategory] = useState("")
-  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [internships, setInternships] = useState<Internship[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  const [showForm, setShowForm] = useState(false)
+  const [universityName, setUniversityName] = useState<string>("")
+  const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
+  const universityId = params?.slug as string
+  const [universities, setUniversities] = useState<University[]>([])
 
+  const [formData, setFormData] = useState<InternshipForm>({
+    hostInstitution: "",
+    title: "",
+    description: "",
+    numberOfStudents: 1,
+    location: "onsite",
+    compensationType: "paid",
+    compensationAmount: 0,
+    supervisorName: "",
+    supervisorEmail: "",
+    startDate: "",
+    endDate: "",
+    universityId: universityId,
+    category: "frontend",
+  })
+
+  const fetchUniversities = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/universities")
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+      const data = await res.json()
+      setUniversities(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch universities")
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+
+  useEffect(() => {
+
+    fetchUniversities();
+      fetchInternships()
+    
+  }, [universityId])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const res = await fetch("/api/internshipsForIndustories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          numberOfStudents: Number(formData.numberOfStudents),
+          compensationAmount: formData.compensationType === "paid" ? Number(formData.compensationAmount) : undefined,
+          universityId,
+        }),
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || "Failed to create internship")
+      }
+
+      const newInternship = await res.json()
+      setInternships((prev) => [newInternship, ...prev])
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        numberOfStudents: 1,
+        location: "onsite",
+        compensationType: "paid",
+        compensationAmount: 0,
+        supervisorName: "",
+        supervisorEmail: "",
+        startDate: "",
+        hostInstitution: "",
+        endDate: "",
+        universityId: universityId,
+        category: "frontend",
+      })
+
+      setShowForm(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create internship")
+      console.error("Error creating internship:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  
   useEffect(() => {
     fetchInternships()
   }, [])
@@ -142,37 +348,350 @@ const InternshipDisplay = () => {
   // Get unique categories
   const categories = [...new Set(internships.map((internship) => internship.category))]
 
-  if (loading)
-    return (
-      <IndustryLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-          </div>
-        </div>
-      </IndustryLayout>
-    )
-
-  if (error)
-    return (
-      <IndustryLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <p style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{error}</p>
-          </div>
-        </div>
-      </IndustryLayout>
-    )
-
   return (
-    <IndustryLayout>
-      <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
+      <IndustryLayout>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1
+              className="text-3xl font-bold text-green-600"
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              Internships
+            </h1>
+            {universityName && (
+              <p className="text-gray-600 mt-1" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                for <span className="font-medium">{universityName}</span>
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200"
+            style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add Internship</span>
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex justify-between items-center">
+            <span style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{error}</span>
+            <button onClick={() => setError(null)} className="text-red-700">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        {showForm && (
+          <div className="bg-white rounded-lg shadow-lg border border-gray-200 mb-8 overflow-hidden">
+            <div className="bg-green-600 px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold text-white" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                Add a New Internship
+              </h2>
+              <button onClick={() => setShowForm(false)} className="text-white hover:text-gray-200">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label
+                  htmlFor="title"
+                  className="block text-sm font-medium text-gray-700"
+                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                >
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="Internship Title"
+                  required
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700"
+                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                >
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Internship Description"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 min-h-[100px]"
+                  required
+                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+  <label
+    htmlFor="university"
+    className="block text-sm font-medium text-gray-700"
+    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif'" }}
+  >
+    Host Institution <span className="text-red-500">*</span>
+  </label>
+  
+  <select
+    id="hostInstitution"
+    name="hostInstitution"
+    value={formData.hostInstitution} // Ensuring it's part of form state
+    onChange={handleChange} // Handling changes properly
+    required
+    className="w-full border p-2 rounded bg-white text-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none"
+    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif'" }}
+  >
+    <option value="">Select a University</option>
+    {universities.length > 0 ? (
+      universities.map((university) => (
+        <option key={university._id} value={university.name}> {/* Storing name instead of ID */}
+          {university.name}
+        </option>
+      ))
+    ) : (
+      <option disabled>Loading universities...</option>
+    )}
+  </select>
+</div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="numberOfStudents"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    Number of Students <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="numberOfStudents"
+                    name="numberOfStudents"
+                    type="number"
+                    min="1"
+                    value={formData.numberOfStudents}
+                    onChange={handleChange}
+                    required
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="location"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    Location Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="location"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    <option value="onsite">On-site</option>
+                    <option value="oncampus">On-campus</option>
+                  </select>
+                </div>
+                
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    {Object.entries(groupedCategories).map(([group, categories]) => (
+                      <optgroup key={group} label={group}>
+                        {categories.map((category) => (
+                          <option key={category.value} value={category.value}>
+                            {category.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="compensationType"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    Compensation Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="compensationType"
+                    name="compensationType"
+                    value={formData.compensationType}
+                    onChange={handleChange}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    <option value="paid">Paid</option>
+                    <option value="unpaid">Unpaid</option>
+                  </select>
+                </div>
+
+                {formData.compensationType === "paid" && (
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="compensationAmount"
+                      className="block text-sm font-medium text-gray-700"
+                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                    >
+                      Compensation Amount
+                    </label>
+                    <input
+                      id="compensationAmount"
+                      name="compensationAmount"
+                      type="number"
+                      min="0"
+                      value={formData.compensationAmount}
+                      onChange={handleChange}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="startDate"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    Start Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    value={formData.startDate}
+                    onChange={handleChange}
+                    required
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="endDate"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    End Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="endDate"
+                    name="endDate"
+                    type="date"
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    required
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="supervisorName"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    Supervisor Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="supervisorName"
+                    name="supervisorName"
+                    value={formData.supervisorName}
+                    onChange={handleChange}
+                    placeholder="Supervisor Name"
+                    required
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="supervisorEmail"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  >
+                    Supervisor Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="supervisorEmail"
+                    name="supervisorEmail"
+                    type="email"
+                    value={formData.supervisorEmail}
+                    onChange={handleChange}
+                    placeholder="supervisor@example.com"
+                    required
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 mr-2 hover:bg-gray-50"
+                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed"
+                  disabled={loading}
+                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                >
+                  {loading ? "Adding..." : "Add Internship"}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <h1
             className="text-3xl font-bold text-green-600 mb-4 md:mb-0"
             style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
           >
-            All Internships
           </h1>
 
           <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4 w-full md:w-auto">
@@ -344,10 +863,11 @@ const InternshipDisplay = () => {
             ))}
           </div>
         )}
-      </div>
-    </IndustryLayout>
+     
+      </IndustryLayout>
+    </div>
   )
 }
 
-export default InternshipDisplay
+export default InternshipPage
 

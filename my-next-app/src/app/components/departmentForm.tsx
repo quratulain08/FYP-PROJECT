@@ -1,10 +1,47 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from "react"
 import DepartmentInfo from './DepartmentInfo';
 import Layout from "@/app/components/Layout";
 
 const DepartmentDashboard: React.FC = () => {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  useEffect(() => {
+    fetchUniversity()
+  }, [])
+  
+  const fetchUniversity = async () => {
+    try {
+      const email = localStorage.getItem("email");
+      if (!email) {
+        throw new Error("Email not found in localStorage.");
+      }
+
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch university ID for ${email}`);
+      }
+
+      const data = await res.json();
+      const universityId = data.universityId;
+
+      // Set the universityId in the department state
+      setDepartment((prevState) => ({
+        ...prevState,
+        university: universityId, // Set the universityId as the default value
+      }));
+    } catch (err) {
+      setError("Error fetching university information.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const [department, setDepartment] = useState({
     name: '',
     startDate: '',
@@ -20,6 +57,7 @@ const DepartmentDashboard: React.FC = () => {
     focalPersonCnic: '',
     focalPersonEmail: '',
     focalPersonPhone: '',
+    university:'',
   });
 
   const [statusMessage, setStatusMessage] = useState('');
@@ -78,6 +116,7 @@ const DepartmentDashboard: React.FC = () => {
         focalPersonCnic: '',
         focalPersonEmail: '',
         focalPersonPhone: '',
+        university:'',
       }); // Reset the form after successful submission
     } catch (error) {
       console.error(error);

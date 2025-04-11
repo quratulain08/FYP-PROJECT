@@ -34,6 +34,7 @@ const FacultyPage = () => {
     const [error, setError] = useState<string | null>(null); // Track errors
     useEffect(() => {
         const fetchAndNavigate = async () => {
+          //  const CoordinatorEmail = localStorage.getItem("email") || "default@example.com"; 
             const CoordinatorEmail = "wajahat1@gmail.com"; // Replace with the actual email
             try {
                 const response = await fetch(`/api/ProfileForCoordinator?CoordinatorEmail=${CoordinatorEmail}`);
@@ -52,6 +53,9 @@ const FacultyPage = () => {
                 }
             } catch (error) {
                 console.error("Error fetching department:", error);
+            }
+            finally {
+                setLoading(false);
             }
         };
 

@@ -20,7 +20,6 @@ export interface Internship extends Document {
   assignedDepartment: mongoose.Types.ObjectId[];
   rejectionComment:  String; // New field for rejection reason
 
-
 }
 
 const internshipSchema = new Schema<Internship>({

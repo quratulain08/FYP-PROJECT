@@ -35,6 +35,7 @@ const BatchSummary: React.FC = () => {
   const [showAddBatchModal, setShowAddBatchModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [universityId, setUniversityId] = useState(''); // State to store universityId
 
   const router = useRouter();
   const params = useParams();
@@ -46,8 +47,27 @@ const BatchSummary: React.FC = () => {
 
   const fetchBatchData = async () => {
     try {
-      const res = await fetch("/api/students");
-      if (!res.ok) throw new Error("Failed to fetch students");
+      const email = localStorage.getItem("email")
+      const response = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+       method: "GET",
+       headers: { "Content-Type": "application/json" },
+     });
+     
+    
+if (!response.ok) {
+ throw new Error(`Failed to fetch university ID for ${email}`);
+}
+
+const dataa= await response.json();
+// Assuming the response is an object with the universityId property
+const universityId = dataa.universityId; // Access the correct property
+setUniversityId(universityId); // Set the universityId in state
+
+     const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+       method: "GET",
+       headers: { "Content-Type": "application/json" }, // Missing comma here
+     });
+           if (!res.ok) throw new Error("Failed to fetch students");
 
       const students: Student[] = await res.json();
 

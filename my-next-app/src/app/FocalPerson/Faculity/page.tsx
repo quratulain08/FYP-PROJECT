@@ -92,9 +92,9 @@ const DepartmentDetail: React.FC = () => {
     type: "success" | "error"
     message: string
   } | null>(null)
+  const [departmentId, setDepartmentId] = useState(null);
 
   const router = useRouter()
-  const id = "674179f1d751474776dc5bd5"
 
   const checkResponseType = async (response: Response) => {
     const contentType = response.headers.get("content-type")
@@ -122,7 +122,23 @@ const DepartmentDetail: React.FC = () => {
 
     const fetchData = async () => {
       try {
-        if (!id) {
+        const email = localStorage.getItem("email");
+        if (!email) return;
+
+        const response = await fetch(`/api/departmentByfocalperson/${email}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch department ID for ${email}`);
+        }
+
+        const dataa= await response.json();
+        // Assuming the response is an object with the universityId property
+        const departmentId = dataa.departmentId;
+        setDepartmentId(departmentId);
+        if (!departmentId) {
           setError({ message: "Department ID is missing" })
           return
         }
@@ -130,8 +146,8 @@ const DepartmentDetail: React.FC = () => {
         setLoading(true)
 
         const [deptData, facultyData] = await Promise.all([
-          fetchWithErrorHandling(`/api/department/${id}`),
-          fetchWithErrorHandling(`/api/faculty/department/${id}`),
+          fetchWithErrorHandling(`/api/department/${departmentId}`),
+          fetchWithErrorHandling(`/api/faculty/department/${departmentId}`),
         ])
 
         if (mounted) {
@@ -159,11 +175,11 @@ const DepartmentDetail: React.FC = () => {
     return () => {
       mounted = false
     }
-  }, [id])
+  }, [departmentId])
 
   const handleAddFaculty = () => {
     if (department) {
-      router.push(`/admin/FacultyForm/${id}`)
+      router.push(`/admin/FacultyForm/${departmentId}`)
     } else {
       setNotification({
         type: "error",

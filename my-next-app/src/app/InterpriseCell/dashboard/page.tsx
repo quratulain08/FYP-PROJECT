@@ -32,9 +32,25 @@ const ApprovalDashboard: React.FC = () => {
   useEffect(() => {
     const fetchInternships = async () => {
       try {
-        const res = await fetch("/api/internships")
-        if (!res.ok) throw new Error("Failed to fetch internships")
-        const data: Internship[] = await res.json()
+        const email = localStorage.getItem("email")
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+       method: "GET",
+       headers: { "Content-Type": "application/json" },
+     });
+     
+    
+if (!res.ok) {
+ throw new Error(`Failed to fetch university ID for ${email}`);
+}
+
+const dataa= await res.json();
+// Assuming the response is an object with the universityId property
+const universityId = dataa.universityId;
+
+      const response = await fetch(`/api/internshipsByUniversity/${universityId}`)
+      if (!response.ok) throw new Error("Failed to fetch internships")
+
+        const data: Internship[] = await response.json()
         setInternships(data)
       } catch (err) {
         setError("Error fetching internships")
