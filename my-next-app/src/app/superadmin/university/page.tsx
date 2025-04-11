@@ -2,102 +2,33 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Building2, Search, Plus, MapPin, Mail, Phone, User, Calendar, CheckCircle, X, ChevronDown } from "lucide-react"
 import SuperAdminLayout from "../SuperAdminLayout"
 
+interface University {
+  _id: string
+  name: string
+  contactEmail: string
+  location: string
+}
 // Static university data
-const universities = [
-  {
-    id: 1,
-    name: "Air University",
-    location: "Islamabad, Pakistan",
-    established: "2002",
-    type: "Public",
-    website: "au.edu.pk",
-    email: "info@au.edu.pk",
-    phone: "+92-51-9262557",
-    programs: "Engineering, Computer Science, Business",
-    students: "5,000+",
-  },
-  {
-    id: 2,
-    name: "National University of Sciences & Technology",
-    location: "Islamabad, Pakistan",
-    established: "1991",
-    type: "Public",
-    website: "nust.edu.pk",
-    email: "info@nust.edu.pk",
-    phone: "+92-51-9085-1151",
-    programs: "Engineering, Medicine, Business, Social Sciences",
-    students: "15,000+",
-  },
-  {
-    id: 3,
-    name: "COMSATS University",
-    location: "Islamabad, Pakistan",
-    established: "1998",
-    type: "Public",
-    website: "comsats.edu.pk",
-    email: "info@comsats.edu.pk",
-    phone: "+92-51-9247000",
-    programs: "Computer Science, Engineering, Business, Arts",
-    students: "35,000+",
-  },
-  {
-    id: 4,
-    name: "Bahria University",
-    location: "Islamabad, Pakistan",
-    established: "2000",
-    type: "Public",
-    website: "bahria.edu.pk",
-    email: "info@bahria.edu.pk",
-    phone: "+92-51-9260002",
-    programs: "Engineering, Management, Social Sciences",
-    students: "9,000+",
-  },
-  {
-    id: 5,
-    name: "International Islamic University",
-    location: "Islamabad, Pakistan",
-    established: "1980",
-    type: "Public",
-    website: "iiu.edu.pk",
-    email: "info@iiu.edu.pk",
-    phone: "+92-51-9257988",
-    programs: "Islamic Studies, Engineering, Social Sciences",
-    students: "30,000+",
-  },
-  {
-    id: 6,
-    name: "Quaid-i-Azam University",
-    location: "Islamabad, Pakistan",
-    established: "1967",
-    type: "Public",
-    website: "qau.edu.pk",
-    email: "info@qau.edu.pk",
-    phone: "+92-51-9064000",
-    programs: "Natural Sciences, Social Sciences, Medical",
-    students: "13,000+",
-  },
-]
+
 
 export default function UniversitiesPage() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [universities, setUniversities] = useState<University[]>([])
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+   
   const [formData, setFormData] = useState({
-    name: "",
-    location: "",
-    established: "",
-    type: "",
-    website: "",
-    email: "",
-    phone: "",
-    programs: "",
-    contactPerson: "",
-    additionalInfo: "",
+    _id: '',
+  name: '',
+  contactEmail: '',
+  location: '',
   })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -111,6 +42,28 @@ export default function UniversitiesPage() {
     }))
   }
 
+  const fetchUniversities = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/universities")
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+      const data = await res.json()
+      setUniversities(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch universities")
+    } finally {
+      setLoading(false)
+    }
+  }
+  
+
+  useEffect(() => {
+    fetchUniversities();
+    
+  }, )
+
+
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -119,40 +72,37 @@ export default function UniversitiesPage() {
     setTypeDropdownOpen(false)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
-
-    // Simulate form submission
-    setTimeout(() => {
-      setSubmitting(false)
-      setSubmitted(true)
-
-      // Reset form after showing success message
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+  
+    try {
+      const response = await fetch("/api/universityToAddEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
+      if (!response.ok) throw new Error("Failed to send email");
+  
+      setSubmitting(false);
+      setSubmitted(true);
+  
       setTimeout(() => {
-        setSubmitted(false)
-        setIsDialogOpen(false)
-        setFormData({
-          name: "",
-          location: "",
-          established: "",
-          type: "",
-          website: "",
-          email: "",
-          phone: "",
-          programs: "",
-          contactPerson: "",
-          additionalInfo: "",
-        })
-      }, 2000)
-    }, 1500)
-  }
+        setSubmitted(false);
+        setIsDialogOpen(false);
+        setFormData({ _id: "", name: "", contactEmail: "", location: "" });
+      }, 2000);
+    } catch (error) {
+      console.error("Error:", error);
+      setSubmitting(false);
+    }
+  };
 
   const filteredUniversities = universities.filter(
     (university) =>
       university.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      university.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      university.type.toLowerCase().includes(searchTerm.toLowerCase()),
+      university.location.toLowerCase().includes(searchTerm.toLowerCase()) 
   )
 
   return (
@@ -228,7 +178,7 @@ export default function UniversitiesPage() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredUniversities.length > 0 ? (
                     filteredUniversities.map((university) => (
-                      <tr key={university.id} className="hover:bg-gray-50">
+                      <tr key={university._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {university.name}
                         </td>
@@ -238,19 +188,14 @@ export default function UniversitiesPage() {
                             {university.location}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{university.type}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{university.established}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{university.programs}</td>
+                        
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <div className="space-y-1">
                             <div className="flex items-center text-sm">
                               <Mail className="h-3 w-3 text-gray-400 mr-1" />
-                              {university.email}
+                              {university.contactEmail}
                             </div>
-                            <div className="flex items-center text-sm">
-                              <Phone className="h-3 w-3 text-gray-400 mr-1" />
-                              {university.phone}
-                            </div>
+                            
                           </div>
                         </td>
                         {/* <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -378,63 +323,7 @@ export default function UniversitiesPage() {
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <label htmlFor="established" className="block text-sm font-medium text-gray-700">
-                          Established Year
-                        </label>
-                        <input
-                          id="established"
-                          name="established"
-                          value={formData.established}
-                          onChange={handleChange}
-                          placeholder="e.g. 1990"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                          University Type <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <button
-                            type="button"
-                            onClick={() => setTypeDropdownOpen(!typeDropdownOpen)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-left flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                          >
-                            {formData.type || "Select type"}
-                            <ChevronDown className="h-4 w-4 text-gray-400" />
-                          </button>
-                          {typeDropdownOpen && (
-                            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 border border-gray-200">
-                              {["Public", "Private", "Semi-Government", "International"].map((type) => (
-                                <button
-                                  key={type}
-                                  type="button"
-                                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                  onClick={() => handleSelectChange("type", type)}
-                                >
-                                  {type}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label htmlFor="website" className="block text-sm font-medium text-gray-700">
-                          Website
-                        </label>
-                        <input
-                          id="website"
-                          name="website"
-                          value={formData.website}
-                          onChange={handleChange}
-                          placeholder="e.g. university.edu"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                        />
-                      </div>
+                      
 
                       <div className="space-y-2">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -442,9 +331,9 @@ export default function UniversitiesPage() {
                         </label>
                         <input
                           id="email"
-                          name="email"
+                          name="contactEmail"
                           type="email"
-                          value={formData.email}
+                          value={formData.contactEmail}
                           onChange={handleChange}
                           placeholder="contact@university.edu"
                           required
@@ -452,64 +341,8 @@ export default function UniversitiesPage() {
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-                          Phone Number
-                        </label>
-                        <input
-                          id="phone"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="e.g. +92-51-1234567"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                        />
-                      </div>
 
-                      <div className="space-y-2">
-                        <label htmlFor="contactPerson" className="block text-sm font-medium text-gray-700">
-                          Contact Person <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          id="contactPerson"
-                          name="contactPerson"
-                          value={formData.contactPerson}
-                          onChange={handleChange}
-                          placeholder="Name of primary contact"
-                          required
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="programs" className="block text-sm font-medium text-gray-700">
-                        Programs Offered
-                      </label>
-                      <input
-                        id="programs"
-                        name="programs"
-                        value={formData.programs}
-                        onChange={handleChange}
-                        placeholder="e.g. Engineering, Computer Science, Business"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700">
-                        Additional Information
-                      </label>
-                      <textarea
-                        id="additionalInfo"
-                        name="additionalInfo"
-                        value={formData.additionalInfo}
-                        onChange={handleChange}
-                        placeholder="Any additional details about the university..."
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                      />
-                    </div>
+                  
 
                     <div className="flex justify-end gap-4 pt-4">
                       <button
@@ -530,9 +363,10 @@ export default function UniversitiesPage() {
                             Registering...
                           </>
                         ) : (
-                          "Register University"
+                          "Request Register"
                         )}
                       </button>
+                    </div>
                     </div>
                   </form>
                 )}

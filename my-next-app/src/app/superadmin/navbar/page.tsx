@@ -79,7 +79,7 @@ const navbar = () => {
             </button>
 
             <button
-              onClick={() => handleNavigation("/Industry/internshipdisplay", "industry")}
+              onClick={() => handleNavigation("/Superadmin/Industry", "industry")}
               className={`flex items-center px-4 py-3 ${
                 activeButton === "industry"
                   ? "border-b-2 border-green-600 text-green-600"
