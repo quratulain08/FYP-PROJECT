@@ -64,8 +64,7 @@ const Internships: React.FC = () => {
 
   useEffect(() => {
     fetchInternships()
-    fetchFaculties()
-    fetchStudents()
+    
   }, [])
 
   const fetchInternships = async () => {
@@ -77,35 +76,43 @@ const Internships: React.FC = () => {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-
+    
       if (!response1.ok) {
         throw new Error(`Failed to fetch department ID for ${email}`);
       }
-
-      const dataa= await response1.json();
-      // Assuming the response is an object with the universityId property
+    
+      const dataa = await response1.json();
       const departmentId = dataa.departmentId;
+    
+      if (!departmentId) {
+        throw new Error("Department ID not found");
+      }
+    
       setDepartmentId(departmentId);
-
-      const res = await fetch(`/api/internshipByDepartment/${departmentId}`) 
-      if (!res.ok) throw new Error("Failed to fetch internships")
-
-      const data = await res.json()
-      setInternships(data)
+    
+      const res = await fetch(`/api/internshipByDepartment/${departmentId}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch internships");
+      }
+      const data = await res.json();
+      setInternships(data);
+      fetchFaculties(departmentId);
     } catch (err) {
-      setError("Error fetching internships.")
+      console.error(err);
+      setError("Error fetching internships.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
-  const fetchFaculties = async () => {
-    try {
-      const response = await fetch(`/api/faculty/department/${departmentId}`)
+  const fetchFaculties = async (deptId: string) => { 
+       try {
+      const response = await fetch(`/api/faculty/department/${deptId}`)
       if (!response.ok) throw new Error("Failed to fetch faculties")
 
       const data = await response.json()
       setFaculties(data)
+      fetchStudents()
     } catch (err) {
       setError("Error fetching faculties.")
     }
@@ -252,7 +259,7 @@ const universityId = dataa.universityId; // Access the correct property
   // Filter internships that are approved and have assigned students or faculty
   const filteredInternships = internships.filter(
     (internship) =>
-      (internship.assignedStudents?.length !== 0 || internship.assignedFaculty?.length !== 0) &&
+      (internship.assignedStudents?.length === 0 || internship.assignedFaculty?.length === 0) &&
       internship.isApproved === true,
   )
 

@@ -29,17 +29,18 @@ const DepartmentDashboard: React.FC = () => {
     CoordinatorCnic: "",
     CoordinatorEmail: "",
     CoordinatorPhone: "",
+    university:"",
   })
 
   const [statusMessage, setStatusMessage] = useState("")
   const [messageType, setMessageType] = useState<"success" | "error">("success")
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+const [universityId,setUniversityId]=useState("");
   const categories = ["Computing", "Engineering", "Management Sciences", "Mathematics & Natural Sciences"]
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setDepartment({ ...department, [name]: value })
+    setDepartment({ ...department, university: universityId, [name]: value })
   }
 
   // Get department initials (up to 2 characters)
@@ -68,6 +69,29 @@ const DepartmentDashboard: React.FC = () => {
     const focalPersonPassword = generateRandomPassword()
 
     try {
+      const email = localStorage.getItem("email");
+      if (!email) {
+        throw new Error("Email not found in localStorage.");
+      }
+
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch university ID for ${email}`);
+      }
+
+      const data = await res.json();
+      const universityId = data.universityId;
+      setUniversityId(universityId);
+      // Set the universityId in the department state
+      setDepartment((prevState) => ({
+        ...prevState,
+        university: universityId, // Set the universityId as the default value
+      }));
+
       // Create department first
       const response = await fetch("/api/department", {
         method: "POST",
@@ -96,6 +120,7 @@ const DepartmentDashboard: React.FC = () => {
           email: department.CoordinatorEmail,
           password: coordinatorPassword,
           role: "Coordinator",
+          university: universityId,
         }),
       })
 
@@ -114,6 +139,7 @@ const DepartmentDashboard: React.FC = () => {
           email: department.focalPersonEmail,
           password: focalPersonPassword,
           role: "FocalPerson",
+          university: universityId,
         }),
       })
 
@@ -177,6 +203,7 @@ const DepartmentDashboard: React.FC = () => {
         CoordinatorCnic: "",
         CoordinatorEmail: "",
         CoordinatorPhone: "",
+        university:String(universityId) || "",
       })
 
       // Redirect to departments list after a short delay

@@ -189,6 +189,19 @@ const InternshipPage = () => {
     setError(null)
 
     try {
+
+      const uniRes = await fetch(`/api/universityByName/${formData.hostInstitution}`);
+      if (!uniRes.ok) {
+        throw new Error("Failed to fetch university ID");
+      }
+      const university = await uniRes.json();
+  
+      if (!university?.id) {
+        throw new Error("University not found");
+      }
+  
+      const universityId = university.id;
+
       const res = await fetch("/api/internshipsForIndustories", {
         method: "POST",
         headers: {

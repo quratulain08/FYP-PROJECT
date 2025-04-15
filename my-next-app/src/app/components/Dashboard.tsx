@@ -39,7 +39,7 @@ const StudentDashboard: React.FC = () => {
       try {
         setLoading(true)
 
-        const email = localStorage.getItem("email ")
+        const email = localStorage.getItem("email")
         const response = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },

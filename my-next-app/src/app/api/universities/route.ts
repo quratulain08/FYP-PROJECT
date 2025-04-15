@@ -21,32 +21,34 @@ export async function POST(request: Request) {
   try {
     await connectToDatabase();
     const body = await request.json();
-    console.log('POST: Received university data:', body);
-    
-    const { name, address, contactEmail, location } = body;
-    
+    console.log("POST: Received university data:", body);
+
+    const { name, contactEmail, location } = body;
+
     if (!name || !contactEmail || !location) {
       return NextResponse.json(
-        { error: 'Name, contact email, and location are required' },
+        { error: "Name, contact email, and location are required" },
         { status: 400 }
       );
     }
 
     const university = new University({
       name,
-      address,
       contactEmail,
       location,
     });
 
     const savedUniversity = await university.save();
-    console.log('POST: Saved university to DB:', savedUniversity);
-    
-    return NextResponse.json(savedUniversity, { status: 201 });
-  } catch (error) {
-    console.error('Database error:', error);
+    console.log("POST: Saved university to DB:", savedUniversity);
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create university' },
+      { universityId: savedUniversity._id, ...savedUniversity._doc }, // Ensuring ObjectId is included
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Database error:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to create university" },
       { status: 500 }
     );
   }

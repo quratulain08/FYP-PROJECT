@@ -292,6 +292,8 @@ const StudentsPage: React.FC = () => {
 
       // Refresh the student list
       const res = await fetch("/api/students")
+
+
       if (res.ok) {
         const data: Student[] = await res.json()
         const filteredByDepartment = data.filter((student) => student.department === department)
@@ -533,9 +535,7 @@ const StudentsPage: React.FC = () => {
                           <button className="text-green-500 hover:text-green-700" title="Edit Student">
                             <Edit className="w-5 h-5" />
                           </button>
-                          <button className="text-indigo-500 hover:text-indigo-700" title="Send Email">
-                            <Mail className="w-5 h-5" />
-                          </button>
+                      
                           <button
                             onClick={() => deleteStudent(student._id)}
                             className="text-red-500 hover:text-red-700"

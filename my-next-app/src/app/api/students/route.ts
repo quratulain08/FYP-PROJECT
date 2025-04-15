@@ -64,7 +64,7 @@ export async function POST(req: Request) {
     await connectToDatabase();
     console.log("Connected to the database");
 
-    const { name, department, batch, didInternship, registrationNumber ,section } = studentData;
+    const { name, department, batch, didInternship, registrationNumber ,section ,university} = studentData;
     
     // Log each field
     console.log("Received student data fields:");
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error: 'Missing required fields',
-          missingFields: { name, department, batch, didInternship, registrationNumber,section},
+          missingFields: { name, department, batch, didInternship, registrationNumber,section,university},
         },
         { status: 400 }
       );

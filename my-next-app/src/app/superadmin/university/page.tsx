@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Building2, Search, Plus, MapPin, Mail, Phone, User, Calendar, CheckCircle, X, ChevronDown } from "lucide-react"
+import { Building2, Search, Plus, MapPin, Mail, Phone, User, Calendar, CheckCircle, X, ChevronDown,LogIn } from "lucide-react"
 import SuperAdminLayout from "../SuperAdminLayout"
 
 interface University {
@@ -107,25 +107,34 @@ export default function UniversitiesPage() {
 
   return (
     <SuperAdminLayout>
-      <div className="min-h-screen bg-gray-50 pb-12">
-        {/* Header Section */}
-        <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
-          <div className="container mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">Universities Directory</h1>
-                <p className="text-teal-100">Browse and manage university partnerships for internship programs</p>
-              </div>
+       <div className="min-h-screen bg-gray-50 pb-12">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
+        <div className="container mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">Universities Directory</h1>
+              <p className="text-teal-100">Browse and manage university partnerships for internship programs</p>
+            </div>
+            <div className="flex flex-col md:flex-row gap-2 mt-4 md:mt-0">
               <button
                 onClick={() => setIsDialogOpen(true)}
-                className="mt-4 md:mt-0 bg-white text-teal-700 hover:bg-gray-100 px-4 py-2 rounded-md shadow-lg flex items-center"
+                className="bg-white text-teal-700 hover:bg-gray-100 px-4 py-2 rounded-md shadow-lg flex items-center"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Register New University
               </button>
+              <button
+                onClick={() => router.push('/Login')}
+                className="bg-white text-teal-700 hover:bg-gray-100 px-4 py-2 rounded-md shadow-lg flex items-center"
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
         {/* Main Content */}
         <div className="container mx-auto px-4 md:px-8 -mt-6">

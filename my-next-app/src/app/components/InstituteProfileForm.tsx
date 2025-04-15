@@ -30,7 +30,7 @@ interface ProfileData {
   officeLocation?: string
   tenureStart?: string
   tenureEnd?: string
-  university:string
+  university?: string
 
 }
 
@@ -174,8 +174,8 @@ setUniversityId(dataa.universityId); // Store universityId in state
 
   const handleChange = (role: string, field: keyof ProfileData, value: string) => {
     setProfileData((prevData) => ({
-      ...prevData,
-      [role]: { ...prevData[role], [field]: value },
+      ...prevData,  
+         [role]: { ...prevData[role], [field]: value },
     }))
   }
 
@@ -251,8 +251,11 @@ setUniversityId(dataa.universityId); // Store universityId in state
     }
 
     setIsSubmitting(true)
-    const profileWithRole = { ...newProfile, role }
-
+    const profileWithRole: ProfileData = { 
+      ...newProfile, 
+      role, 
+      university: universityId ?? "" // Convert null to an empty string
+    };
     try {
       const response = await fetch("/api/instituteProfile", {
         method: "POST",
@@ -285,7 +288,7 @@ setUniversityId(dataa.universityId); // Store universityId in state
         officeLocation: "",
         tenureStart: "",
         tenureEnd: "",
-        university:"",
+        university: universityId || "",
 
       })
 

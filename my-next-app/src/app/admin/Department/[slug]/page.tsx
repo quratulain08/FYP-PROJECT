@@ -224,7 +224,7 @@ export default function DepartmentDetail() {
       return
     }
 
-    const editUrl = `/admin/FacultyForm/${encodeURIComponent(id)}?edit=true&facultyId=${encodeURIComponent(faculty._id)}&readOnlyName=${encodeURIComponent(faculty.name)}&readOnlyCnic=${encodeURIComponent(faculty.cnic)}`
+    const editUrl = `/admin/Edit-Faculty/${faculty._id}`
     router.push(editUrl)
   }
 
