@@ -32,18 +32,27 @@ interface Internship {
   isApproved: boolean
 }
 type Department = {
-  _id: string;
-  name: string;
-};
-
+  _id: string
+  name: string
+}
 
 const Internships: React.FC = () => {
+  // Add this style tag
+  const fadeInAnimation = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+  `
   const [internships, setInternships] = useState<Internship[]>([])
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [showRejectPopup, setShowRejectPopup] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [departments, setDepartments] = useState<Department[]>([])
+  const [showPopup, setShowPopup] = useState(false)
+  const [showRejectPopup, setShowRejectPopup] = useState(false)
+  const [rejectionReason, setRejectionReason] = useState("")
 
   const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
 
@@ -87,21 +96,19 @@ const Internships: React.FC = () => {
 
   const fetchInternships = async () => {
     try {
-
       const email = localStorage.getItem("email")
       const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
-       method: "GET",
-       headers: { "Content-Type": "application/json" },
-     });
-     
-    
-if (!res.ok) {
- throw new Error(`Failed to fetch university ID for ${email}`);
-}
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
 
-const dataa= await res.json();
-// Assuming the response is an object with the universityId property
-const universityId = dataa.universityId;
+      if (!res.ok) {
+        throw new Error(`Failed to fetch university ID for ${email}`)
+      }
+
+      const dataa = await res.json()
+      // Assuming the response is an object with the universityId property
+      const universityId = dataa.universityId
 
       const response = await fetch(`/api/internshipsByUniversity/${universityId}`)
       if (!response.ok) throw new Error("Failed to fetch internships")
@@ -116,39 +123,36 @@ const universityId = dataa.universityId;
     }
   }
 
-  const fetchDepartments = 
-  async () => {
+  const fetchDepartments = async () => {
     try {
-
       const email = localStorage.getItem("email")
       const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
-       method: "GET",
-       headers: { "Content-Type": "application/json" },
-     });
-     
-    
-if (!res.ok) {
- throw new Error(`Failed to fetch university ID for ${email}`);
-}
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
 
-const dataa= await res.json();
-// Assuming the response is an object with the universityId property
-const universityId = dataa.universityId;
+      if (!res.ok) {
+        throw new Error(`Failed to fetch university ID for ${email}`)
+      }
 
-const response = await fetch(`/api/departmentByUniversity/${universityId}`, {
-  method: "GET",
-  headers: { "Content-Type": "application/json" }, 
-});
-if (!response.ok) throw new Error("Failed to fetch departments")
+      const dataa = await res.json()
+      // Assuming the response is an object with the universityId property
+      const universityId = dataa.universityId
 
-      const data = await response.json();
-      setDepartments(data);
+      const response = await fetch(`/api/departmentByUniversity/${universityId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+      if (!response.ok) throw new Error("Failed to fetch departments")
+
+      const data = await response.json()
+      setDepartments(data)
     } catch (err) {
-      setError('Error fetching department.');
+      setError("Error fetching department.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this internship?")) {
@@ -255,61 +259,62 @@ if (!response.ok) throw new Error("Failed to fetch departments")
     )
   }
   const handleAssignDepartment = async (internshipId: string, departmentId: string) => {
-    const confirmAssign = confirm('Are you sure you want to assign this department?');
-    if (!confirmAssign) return;
+    const confirmAssign = confirm("Are you sure you want to assign this department?")
+    if (!confirmAssign) return
 
     try {
       const response = await fetch(`/api/InternshipForInterpriseCell`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: internshipId, isApproved: true, departmentId }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        console.error('Failed to assign department:', data.error);
-        return;
+        console.error("Failed to assign department:", data.error)
+        return
       }
 
-      setSuccessMessage('✅ Internship successfully assigned to department!');
-      setTimeout(() => setSuccessMessage(null), 3000);
-      setShowPopup(false);
+      setSuccessMessage("✅ Internship successfully assigned to department!")
+      setTimeout(() => setSuccessMessage(null), 3000)
+      setShowPopup(false)
     } catch (error) {
-      console.error('Error assigning department:', error);
+      console.error("Error assigning department:", error)
     }
-  };
+  }
 
   const handleRejectInternship = async (internshipId: string) => {
     if (!rejectionReason.trim()) {
-      alert('Please provide a reason for rejection.');
-      return;
+      alert("Please provide a reason for rejection.")
+      return
     }
 
     try {
       const response = await fetch(`/api/InternshipForInterpriseCell`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: internshipId, isApproved: false, rejectionComment: rejectionReason }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        console.error('Failed to reject internship:', data.error);
-        return;
+        console.error("Failed to reject internship:", data.error)
+        return
       }
 
-      setSuccessMessage('❌ Internship rejected successfully!');
-      setTimeout(() => setSuccessMessage(null), 3000);
-      setShowRejectPopup(false);
+      setSuccessMessage("❌ Internship rejected successfully!")
+      setTimeout(() => setSuccessMessage(null), 3000)
+      setShowRejectPopup(false)
     } catch (error) {
-      console.error('Error rejecting internship:', error);
+      console.error("Error rejecting internship:", error)
     }
-  };
+  }
 
   return (
     <InterpriseCellLayout>
+      <style>{fadeInAnimation}</style>
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <h1
@@ -471,70 +476,121 @@ if (!response.ok) throw new Error("Failed to fetch departments")
                         {internship.isApproved ? "Approved" : "Pending Approval"}
                       </span>
 
-                      <button onClick={() => setShowPopup(true)} className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-        Open Assign Popup
-      </button>
+                      <button
+                        onClick={() => setShowPopup(true)}
+                        className="bg-teal-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                      >
+                         Assign 
+                      </button>
 
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-96">
-            <h2 className="text-lg font-semibold mb-3">Select Department</h2>
-            {loading ? (
-              <p>Loading departments...</p>
-            ) : error ? (
-              <p className="text-red-500">{error}</p>
-            ) : (
-              <ul className="space-y-2 max-h-60 overflow-auto">
-                {departments.map((dept) => (
-                  <li key={dept._id} className="flex justify-between items-center p-2 border rounded">
-                    <span>{dept.name}</span>
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition"
-                      onClick={() => handleAssignDepartment(internship._id, dept._id)}
-                    >
-                      Assign
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <button className="mt-4 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600" onClick={() => setShowPopup(false)}>
-              Cancel
-            </button>
-           
-          </div>
-        </div>
-      )}
- <button
-              className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              onClick={() => setShowRejectPopup(true)}
-            >
-              Reject
-            </button>
-      {showRejectPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg w-96">
-            <h2 className="text-lg font-semibold mb-3">Provide Rejection Reason</h2>
-            <textarea
-              className="w-full p-2 border rounded mb-2"
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-              placeholder="Enter reason for rejection..."
-            ></textarea>
-            <button
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-              onClick={() => handleRejectInternship(internship._id)}
-            >
-              Confirm Reject
-            </button>
-            <button className="mt-2 bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600" onClick={() => setShowRejectPopup(false)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+                      {showPopup && (
+                        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
+                          <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
+                            <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-4">
+                              <h2 className="text-xl font-semibold text-white flex items-center">
+                                <Briefcase className="h-5 w-5 mr-2" />
+                                Assign Department
+                              </h2>
+                            </div>
+                            <div className="p-6">
+                              {loading ? (
+                                <div className="flex justify-center items-center py-8">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+                                </div>
+                              ) : error ? (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                                  <p className="text-red-600 flex items-center">
+                                    <AlertCircle className="h-4 w-4 mr-2" />
+                                    {error}
+                                  </p>
+                                </div>
+                              ) : (
+                                <>
+                                  <p className="text-gray-600 mb-4">
+                                    Select a department to assign this internship to:
+                                  </p>
+                                  <div className="max-h-60 overflow-auto border border-gray-200 rounded-lg mb-4">
+                                    {departments.length === 0 ? (
+                                      <div className="p-4 text-center text-gray-500">No departments available</div>
+                                    ) : (
+                                      <ul className="divide-y divide-gray-200">
+                                        {departments.map((dept) => (
+                                          <li key={dept._id} className="hover:bg-gray-50 transition-colors">
+                                            <button
+                                              className="w-full px-4 py-3 flex justify-between items-center text-left"
+                                              onClick={() => handleAssignDepartment(internship._id, dept._id)}
+                                            >
+                                              <span className="font-medium text-gray-700">{dept.name}</span>
+                                              <span className="text-teal-600 hover:text-teal-700">
+                                                <CheckCircle className="h-5 w-5" />
+                                              </span>
+                                            </button>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
+                                </>
+                              )}
+                              <div className="flex justify-end space-x-3 mt-2">
+                                <button
+                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                                  onClick={() => setShowPopup(false)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        onClick={() => setShowRejectPopup(true)}
+                      >
+                        Reject
+                      </button>
+                      {showRejectPopup && (
+                        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
+                          <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
+                            <div className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
+                              <h2 className="text-xl font-semibold text-white flex items-center">
+                                <XCircle className="h-5 w-5 mr-2" />
+                                Reject Internship
+                              </h2>
+                            </div>
+                            <div className="p-6">
+                              <p className="text-gray-600 mb-4">
+                                Please provide a reason for rejecting this internship:
+                              </p>
+                              <textarea
+                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4 h-32 resize-none"
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                                placeholder="Enter detailed reason for rejection..."
+                              ></textarea>
+                              <div className="flex justify-end space-x-3">
+                                <button
+                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                                  onClick={() => setShowRejectPopup(false)}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+                                  onClick={() => handleRejectInternship(internship._id)}
+                                  disabled={!rejectionReason.trim()}
+                                >
+                                  <XCircle className="h-4 w-4 mr-2" />
+                                  Confirm Rejection
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
-      {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
+                      {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
@@ -657,4 +713,3 @@ if (!response.ok) throw new Error("Failed to fetch departments")
 }
 
 export default Internships
-

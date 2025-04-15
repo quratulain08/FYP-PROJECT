@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import IndustryLayout from "../IndustryLayout"
-import { Briefcase, Calendar, MapPin, Building, Search, Filter, X, Plus, ChevronRight } from "lucide-react"
+import { Briefcase, Calendar, MapPin, Building, Search, Filter, X, Plus, ChevronRight, XCircle } from "lucide-react"
 
 interface Internship {
   _id: string
@@ -22,7 +22,6 @@ interface Internship {
   supervisorEmail: string
   hostInstitution: string
   rejectionComment: string
-
 }
 
 interface University {
@@ -135,6 +134,19 @@ const InternshipPage = () => {
   const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
   const universityId = params?.slug as string
   const [universities, setUniversities] = useState<University[]>([])
+  const [showRejectionModal, setShowRejectionModal] = useState(false)
+  const [activeRejection, setActiveRejection] = useState<Internship | null>(null)
+
+  // Add this style tag for animations
+  const fadeInAnimation = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+  `
 
   const [formData, setFormData] = useState<InternshipForm>({
     hostInstitution: "",
@@ -166,13 +178,10 @@ const InternshipPage = () => {
       setLoading(false)
     }
   }
-  
 
   useEffect(() => {
-
-    fetchUniversities();
-      fetchInternships()
-    
+    fetchUniversities()
+    fetchInternships()
   }, [universityId])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -189,18 +198,17 @@ const InternshipPage = () => {
     setError(null)
 
     try {
-
-      const uniRes = await fetch(`/api/universityByName/${formData.hostInstitution}`);
+      const uniRes = await fetch(`/api/universityByName/${formData.hostInstitution}`)
       if (!uniRes.ok) {
-        throw new Error("Failed to fetch university ID");
+        throw new Error("Failed to fetch university ID")
       }
-      const university = await uniRes.json();
-  
+      const university = await uniRes.json()
+
       if (!university?.id) {
-        throw new Error("University not found");
+        throw new Error("University not found")
       }
-  
-      const universityId = university.id;
+
+      const universityId = university.id
 
       const res = await fetch("/api/internshipsForIndustories", {
         method: "POST",
@@ -249,7 +257,6 @@ const InternshipPage = () => {
     }
   }
 
-  
   useEffect(() => {
     fetchInternships()
   }, [])
@@ -363,6 +370,7 @@ const InternshipPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <style>{fadeInAnimation}</style>
       <IndustryLayout>
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -451,36 +459,38 @@ const InternshipPage = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-  <label
-    htmlFor="university"
-    className="block text-sm font-medium text-gray-700"
-    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif'" }}
-  >
-    Host Institution <span className="text-red-500">*</span>
-  </label>
-  
-  <select
-    id="hostInstitution"
-    name="hostInstitution"
-    value={formData.hostInstitution} // Ensuring it's part of form state
-    onChange={handleChange} // Handling changes properly
-    required
-    className="w-full border p-2 rounded bg-white text-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none"
-    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif'" }}
-  >
-    <option value="">Select a University</option>
-    {universities.length > 0 ? (
-      universities.map((university) => (
-        <option key={university._id} value={university.name}> {/* Storing name instead of ID */}
-          {university.name}
-        </option>
-      ))
-    ) : (
-      <option disabled>Loading universities...</option>
-    )}
-  </select>
-</div>
+                <div className="space-y-2">
+                  <label
+                    htmlFor="university"
+                    className="block text-sm font-medium text-gray-700"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif'" }}
+                  >
+                    Host Institution <span className="text-red-500">*</span>
+                  </label>
+
+                  <select
+                    id="hostInstitution"
+                    name="hostInstitution"
+                    value={formData.hostInstitution} // Ensuring it's part of form state
+                    onChange={handleChange} // Handling changes properly
+                    required
+                    className="w-full border p-2 rounded bg-white text-gray-700 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                    style={{ fontFamily: "'Segoe UI', system-ui, sans-serif'" }}
+                  >
+                    <option value="">Select a University</option>
+                    {universities.length > 0 ? (
+                      universities.map((university) => (
+                        <option key={university._id} value={university.name}>
+                          {" "}
+                          {/* Storing name instead of ID */}
+                          {university.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>Loading universities...</option>
+                    )}
+                  </select>
+                </div>
 
                 <div className="space-y-2">
                   <label
@@ -523,7 +533,6 @@ const InternshipPage = () => {
                     <option value="oncampus">On-campus</option>
                   </select>
                 </div>
-                
 
                 <div className="space-y-2">
                   <label
@@ -704,8 +713,7 @@ const InternshipPage = () => {
           <h1
             className="text-3xl font-bold text-green-600 mb-4 md:mb-0"
             style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-          >
-          </h1>
+          ></h1>
 
           <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4 w-full md:w-auto">
             <div className="relative">
@@ -750,17 +758,6 @@ const InternshipPage = () => {
           </div>
         </div>
 
-        {/* <div className="flex justify-end mb-6">
-          <button
-            onClick={() => router.push("/Industry/createinternship")}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200"
-            style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-          >
-            <Plus className="h-4 w-4" />
-            <span>Create Internship</span>
-          </button>
-        </div> */}
-
         {filteredInternships.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
             <Briefcase className="mx-auto h-12 w-12 text-gray-400" />
@@ -784,28 +781,32 @@ const InternshipPage = () => {
                 onClick={() => handleCardClick(internship._id)}
                 className="bg-white border border-gray-200 hover:border-green-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
               >
-              <div className="p-5">
-  <div className="flex justify-between items-start mb-3">
-    <h2
-      className="text-xl font-semibold text-gray-800 line-clamp-2"
-      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-    >
-      {internship.title}
-    </h2>
-    <div className="flex flex-col items-end">
-      <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-        {getCategoryLabel(internship.category)}
-      </span>
-      {internship.rejectionComment && (
-        <span
-          className="inline-block mt-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full cursor-pointer hover:bg-red-200"
-          onClick={() => alert(`Rejection Reason: ${internship.rejectionComment}`)}
-        >
-          Rejected
-        </span>
-      )}
-    </div>
-  </div>
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-3">
+                    <h2
+                      className="text-xl font-semibold text-gray-800 line-clamp-2"
+                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                    >
+                      {internship.title}
+                    </h2>
+                    <div className="flex flex-col items-end">
+                      <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                        {getCategoryLabel(internship.category)}
+                      </span>
+                      {internship.rejectionComment && (
+                        <span
+                          className="inline-block mt-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full cursor-pointer hover:bg-red-200"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setActiveRejection(internship)
+                            setShowRejectionModal(true)
+                          }}
+                        >
+                          Rejected
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center text-gray-600">
@@ -876,11 +877,55 @@ const InternshipPage = () => {
             ))}
           </div>
         )}
-     
+
+        {/* Rejection Comment Modal */}
+        {showRejectionModal && activeRejection && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
+              <div className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-white flex items-center">
+                    <XCircle className="h-5 w-5 mr-2" />
+                    Rejection Details
+                  </h2>
+                  <button
+                    onClick={() => setShowRejectionModal(false)}
+                    className="text-white hover:text-gray-200 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="mb-4">
+                  <h3 className="font-medium text-gray-900 mb-1">Internship Title</h3>
+                  <p className="text-gray-700">{activeRejection.title}</p>
+                </div>
+                <div className="mb-4">
+                  <h3 className="font-medium text-gray-900 mb-1">Host Institution</h3>
+                  <p className="text-gray-700">{activeRejection.hostInstitution}</p>
+                </div>
+                <div className="mb-6">
+                  <h3 className="font-medium text-red-600 mb-1">Rejection Reason</h3>
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-gray-800">
+                    {activeRejection.rejectionComment}
+                  </div>
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setShowRejectionModal(false)}
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </IndustryLayout>
     </div>
   )
 }
 
 export default InternshipPage
-
