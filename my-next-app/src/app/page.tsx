@@ -18,7 +18,7 @@ const Page: React.FC = () => {
       setIsAuthenticated(true); // User is authenticated
       
     } else {
-      router.push('/Login'); // Redirect to login if token is missing
+      router.push('/superadmin/home'); // Redirect to login if token is missing
     }
   }, [router]);
 

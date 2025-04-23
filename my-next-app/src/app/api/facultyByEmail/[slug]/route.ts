@@ -19,7 +19,7 @@ export async function GET(
       const faculty = await FacultyModel.findOne({ email });
   
       if (!faculty) {
-        return NextResponse.json({ error: 'Student not found' }, { status: 404 });
+        return NextResponse.json({ error: 'faculty not found' }, { status: 404 });
       }
   
       return NextResponse.json(faculty);

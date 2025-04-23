@@ -57,7 +57,14 @@ const Login: React.FC = () => {
           case "student":
             router.push("/Student/navbar");
             break;
+          case "industry":
+            router.push("/Industry/navbar");
+            break;
+            case "EnterpriseCell":
+              router.push("/interpriseCell/navbar");
+              break;
           default:
+            
             router.push("/dashboard");
         }
       } else {

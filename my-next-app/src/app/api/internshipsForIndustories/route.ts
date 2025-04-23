@@ -115,6 +115,7 @@ export async function POST(req: Request) {
         description,
         universityId,
         numberOfStudents,
+        AssigningIndustry,
       } = body;
   
       // Validate required fields and gather missing fields
@@ -132,7 +133,8 @@ export async function POST(req: Request) {
       if (!description) missingFields.push('description');
       if (!universityId) missingFields.push('universityId');
       if (!numberOfStudents) missingFields.push('numberOfStudents');
-  
+      if (!AssigningIndustry) missingFields.push('AssigningIndustry');
+
       // Return error if there are missing fields
       if (missingFields.length > 0) {
         return NextResponse.json(
@@ -160,6 +162,7 @@ export async function POST(req: Request) {
         numberOfStudents,
         assignedFaculty: [], // Default to an empty array
         assignedStudents: [], // Default to an empty array
+        AssigningIndustry ,
       });
   
       await newInternship.save();

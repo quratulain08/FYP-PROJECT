@@ -22,6 +22,7 @@ interface Internship {
   supervisorEmail: string
   hostInstitution: string
   rejectionComment: string
+  AssigningIndustry: string
 }
 
 interface University {
@@ -46,6 +47,8 @@ interface InternshipForm {
   endDate: string
   universityId: string
   category: string
+  AssigningIndustry: string
+
 }
 
 const internshipCategories = [
@@ -136,6 +139,7 @@ const InternshipPage = () => {
   const [universities, setUniversities] = useState<University[]>([])
   const [showRejectionModal, setShowRejectionModal] = useState(false)
   const [activeRejection, setActiveRejection] = useState<Internship | null>(null)
+  const [ObjectID, setObjectID] = useState<string>("")
 
   // Add this style tag for animations
   const fadeInAnimation = `
@@ -162,6 +166,8 @@ const InternshipPage = () => {
     endDate: "",
     universityId: universityId,
     category: "frontend",
+    AssigningIndustry: "",
+
   })
 
   const fetchUniversities = async () => {
@@ -179,10 +185,35 @@ const InternshipPage = () => {
     }
   }
 
+  const getUserObjectId = async (): Promise<string | null> => {
+    try {
+      const email = localStorage.getItem("email");
+      if (!email) throw new Error("Email not found in localStorage");
+  
+     
+    const res = await fetch(`/api/industryByEmail/${email}`);
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to fetch user ID");
+    }
+
+    const data = await res.json();
+    setObjectID(data._id);
+    fetchInternships(data._id);
+
+  
+      return data.userId;
+    } catch (error) {
+      console.error("Error getting user ID:", error);
+      return null;
+    }
+  };
+  
+  
   useEffect(() => {
+    getUserObjectId()
     fetchUniversities()
-    fetchInternships()
-  }, [universityId])
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -203,12 +234,24 @@ const InternshipPage = () => {
         throw new Error("Failed to fetch university ID")
       }
       const university = await uniRes.json()
+      const universityId = university.id;
 
       if (!university?.id) {
         throw new Error("University not found")
       }
 
-      const universityId = university.id
+      const email= localStorage.getItem('email');
+
+      const emailRes = await fetch(`/api/industryByEmail/${email}`)
+      if (!emailRes.ok) {
+        throw new Error("Failed to fetch university ID")
+      }
+      const AssignedIndustry = await emailRes.json()
+
+      if (!AssignedIndustry?._id) {
+        throw new Error("AssignedIndustry not found")
+      }
+
 
       const res = await fetch("/api/internshipsForIndustories", {
         method: "POST",
@@ -220,6 +263,8 @@ const InternshipPage = () => {
           numberOfStudents: Number(formData.numberOfStudents),
           compensationAmount: formData.compensationType === "paid" ? Number(formData.compensationAmount) : undefined,
           universityId,
+          AssigningIndustry: AssignedIndustry._id,
+
         }),
       })
 
@@ -246,6 +291,7 @@ const InternshipPage = () => {
         endDate: "",
         universityId: universityId,
         category: "frontend",
+        AssigningIndustry: "",
       })
 
       setShowForm(false)
@@ -257,23 +303,25 @@ const InternshipPage = () => {
     }
   }
 
-  useEffect(() => {
-    fetchInternships()
-  }, [])
 
   useEffect(() => {
     filterInternships()
   }, [searchTerm, filterCategory, internships])
 
-  const fetchInternships = async () => {
+  const fetchInternships = async (id: string) => {
     try {
       setLoading(true)
       const response = await fetch("/api/internships")
       if (!response.ok) throw new Error("Failed to fetch internships")
-
+  
       const data = await response.json()
-      setInternships(data)
-      setFilteredInternships(data)
+  
+      const filtered = data.filter(
+        (internship: any) => String(internship.AssigningIndustry) === String(id)
+      )
+      
+      setInternships(filtered)
+      setFilteredInternships(filtered)
     } catch (err) {
       setError("Error fetching internships.")
       console.error(err)
@@ -321,7 +369,6 @@ const InternshipPage = () => {
 
         if (response.ok) {
           alert(result.message)
-          fetchInternships()
         } else {
           alert(`Error: ${result.error}`)
         }

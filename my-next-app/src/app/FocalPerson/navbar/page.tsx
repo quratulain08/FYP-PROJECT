@@ -158,6 +158,19 @@ const FocalPersonNavbar = ({ children }: { children: React.ReactNode }) => {
               <span>All Internships</span>
               <ChevronDown className="h-4 w-4 ml-1" />
             </button>
+            <button
+              onClick={() => router.push("/FocalPerson/approvedInternships")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/FocalPerson/allInternships")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <ClipboardList className="h-5 w-5 mr-2" />
+              <span>Approved Internships</span>
+              <ChevronDown className="h-4 w-4 ml-1" />
+            </button>
           </div>
         </div>
       </nav>

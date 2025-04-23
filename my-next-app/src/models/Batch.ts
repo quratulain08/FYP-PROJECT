@@ -12,7 +12,7 @@ const BatchSchema: Schema = new Schema(
     batchName: {
       type: String,
       required: true,
-      unique: true, // Ensure no duplicate batch names
+      unique: false, // Ensure no duplicate batch names
       trim: true,
     },
     departmentId: [

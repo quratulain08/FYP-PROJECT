@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       from: process.env.EMAIL_USER, // Sender address
       to: Email, // FIXED: Correctly assign the recipient
       subject: 'Registration Successful',
-      text: `Hello,\n\nYour account has been successfully registered as follows:\n\nAdmin:\nEmail: ${Email}\nPassword: ${Password}\n\nPlease login to the platform to get started.\n\nBest regards,\nInternship Log`,
+      text: `Hello,\n\nYour account has been successfully registered as follows:\n\nIndustry:\nEmail: ${Email}\nPassword: ${Password}\n\nPlease login to the platform to get started.\n\nBest regards,\nInternship Log`,
     };
 
     // Send email

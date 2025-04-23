@@ -85,21 +85,18 @@ const [universityId,setUniversityId]=useState("");
 
       const data = await res.json();
       const universityId = data.universityId;
-      setUniversityId(universityId);
-      // Set the universityId in the department state
-      setDepartment((prevState) => ({
-        ...prevState,
-        university: universityId, // Set the universityId as the default value
-      }));
+      const departmentPayload = {
+        ...department,
+        university: universityId, // Use directly here
+      };
 
-      // Create department first
       const response = await fetch("/api/department", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(department),
-      })
+        body: JSON.stringify(departmentPayload),
+      });
 
       if (!response.ok) {
         throw new Error("Error creating department")
@@ -208,7 +205,7 @@ const [universityId,setUniversityId]=useState("");
 
       // Redirect to departments list after a short delay
       setTimeout(() => {
-        router.push("/admin/Departments")
+        router.push("/admin/Department")
       }, 2000)
     } catch (error) {
       console.error(error)

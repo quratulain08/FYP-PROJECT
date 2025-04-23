@@ -15,8 +15,8 @@ const navbar = () => {
     // Set initial active button based on current path
     if (pathname?.startsWith("/superAdminPortal/makeAdmin")) {
       setActiveButton("MakeAdmin")
-    } else if (pathname?.startsWith("/superAdminPortal/university")) {
-      setActiveButton("universities")
+    } else if (pathname?.startsWith("/superAdminPortal/Industry")) {
+      setActiveButton("Industry")
     } else if (
       pathname?.startsWith("/superAdminPortal/internshipdisplay") ||
       pathname?.startsWith("/superAdminPortal/internships") ||
@@ -63,19 +63,19 @@ const navbar = () => {
               }`}
             >
               <Home className="h-5 w-5 mr-2" />
-              <span>Home</span>
+              <span>MakeAdmin</span>
             </button>
 
             <button
-              onClick={() => handleNavigation("/superadmin/university", "universities")}
+              onClick={() => handleNavigation("/superAdminPortal/makeIndustry", "Industry")}
               className={`flex items-center px-4 py-3 ${
-                activeButton === "universities"
+                activeButton === "Industry"
                   ? "border-b-2 border-green-600 text-green-600"
                   : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
               }`}
             >
               <Building2 className="h-5 w-5 mr-2" />
-              <span>Universities</span>
+              <span>MakeIndustry</span>
             </button>
 
             <button

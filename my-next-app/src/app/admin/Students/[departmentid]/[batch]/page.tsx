@@ -88,55 +88,56 @@ const StudentsPage: React.FC = () => {
   const currentBatch = params.batch as string
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-             const email = localStorage.getItem("email")
-             const response = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
-              method: "GET",
-              headers: { "Content-Type": "application/json" },
-            });
-            
-           
-      if (!response.ok) {
-        throw new Error(`Failed to fetch university ID for ${email}`);
-      }
-      
-      const dataa= await response.json();
-      // Assuming the response is an object with the universityId property
-      const universityId = dataa.universityId; // Access the correct property
-      setUniversityId(universityId); // Set the universityId in state
-
-            const res = await fetch(`/api/studentByUniversity/${universityId}`, {
-              method: "GET",
-              headers: { "Content-Type": "application/json" }, // Missing comma here
-            });
-            
-        if (!res.ok) throw new Error("Failed to fetch data")
-        const data: Student[] = await res.json()
-
-        const ress = await fetch(`/api/department/${departmentId}`)
-        if (!ress.ok) throw new Error("Failed to fetch department data")
-        const departmentData: Department = await ress.json()
-        setDepartment(departmentData)
-
-        const filteredByDepartment = data.filter((student) => student.department === departmentData.name)
-        setStudents(filteredByDepartment)
-        setFilteredStudents(filteredByDepartment)
-
-        const uniqueSections = Array.from(new Set(filteredByDepartment.map((student) => student.section)))
-        // Extract unique batches for filter options
-        const uniqueBatches = Array.from(new Set(filteredByDepartment.map((student) => student.batch)))
-        setBatches(uniqueBatches)
-        setSections(uniqueSections) // Set sections for filter
-      } catch (err) {
-        setError(`Error fetching data ${departmentId}`)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchStudents()
+       fetchStudents()
   }, [departmentId])
 
+
+  const fetchStudents = async () => {
+    try {
+           const email = localStorage.getItem("email")
+           const response = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+          
+         
+    if (!response.ok) {
+      throw new Error(`Failed to fetch university ID for ${email}`);
+    }
+    
+    const dataa= await response.json();
+    // Assuming the response is an object with the universityId property
+    const universityId = dataa.universityId; // Access the correct property
+    setUniversityId(universityId); // Set the universityId in state
+
+          const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }, // Missing comma here
+          });
+          
+      if (!res.ok) throw new Error("Failed to fetch data")
+      const data: Student[] = await res.json()
+
+      const ress = await fetch(`/api/department/${departmentId}`)
+      if (!ress.ok) throw new Error("Failed to fetch department data")
+      const departmentData: Department = await ress.json()
+      setDepartment(departmentData)
+
+      const filteredByDepartment = data.filter((student) => student.department === departmentData.name)
+      setStudents(filteredByDepartment)
+      setFilteredStudents(filteredByDepartment)
+
+      const uniqueSections = Array.from(new Set(filteredByDepartment.map((student) => student.section)))
+      // Extract unique batches for filter options
+      const uniqueBatches = Array.from(new Set(filteredByDepartment.map((student) => student.batch)))
+      setBatches(uniqueBatches)
+      setSections(uniqueSections) // Set sections for filter
+    } catch (err) {
+      setError(`Error fetching data ${departmentId}`)
+    } finally {
+      setLoading(false)
+    }
+  }
   useEffect(() => {
     let filtered = students
 
@@ -291,15 +292,9 @@ const StudentsPage: React.FC = () => {
       setShowModal(false)
 
       // Refresh the student list
-      const res = await fetch("/api/students")
+      fetchStudents();
 
-
-      if (res.ok) {
-        const data: Student[] = await res.json()
-        const filteredByDepartment = data.filter((student) => student.department === department)
-        setStudents(filteredByDepartment)
-        setFilteredStudents(filteredByDepartment)
-      }
+    
     } catch (error) {
       console.error("Upload error:", error)
       alert("Failed to upload data.")

@@ -19,7 +19,7 @@ export interface Internship extends Document {
   numberOfStudents: number;
   assignedDepartment: mongoose.Types.ObjectId[];
   rejectionComment:  String; // New field for rejection reason
-
+  AssigningIndustry: mongoose.Types.ObjectId[];
 }
 
 const internshipSchema = new Schema<Internship>({
@@ -69,7 +69,15 @@ const internshipSchema = new Schema<Internship>({
   },
   isApproved: { type: Boolean, default: false }, 
   rejectionComment: { type: String, default: "" }, // New field for rejection reason
-
+  AssigningIndustry: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Industry",
+      },
+    ],
+    default: [], 
+  },
 });
 
 const InternshipModel = mongoose.models.Internship || mongoose.model<Internship>("Internship", internshipSchema);

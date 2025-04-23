@@ -61,8 +61,7 @@ export default function UniversitiesPage() {
   useEffect(() => {
     fetchUniversities();
     
-  }, )
-
+  },[])
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({

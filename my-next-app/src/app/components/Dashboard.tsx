@@ -14,10 +14,11 @@ import {
   Tooltip,
   Legend,
   ArcElement,
+  Filler,
 } from "chart.js"
 import { FaGraduationCap, FaBriefcase, FaChartLine, FaChartPie, FaFilter } from "react-icons/fa"
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, BarElement, Title, Tooltip, Legend, ArcElement)
+ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, BarElement, Title, Tooltip, Legend, ArcElement,Filler)
 
 interface StudentData {
   name: string
@@ -60,7 +61,7 @@ const StudentDashboard: React.FC = () => {
         });
         
         
-        const data = await response.json()
+        const data = await res.json()
         setStudents(data)
 
         // Extract unique departments and batches

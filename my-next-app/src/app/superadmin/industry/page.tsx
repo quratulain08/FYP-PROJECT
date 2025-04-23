@@ -102,9 +102,12 @@ export default function IndustryPage() {
     setSubmitting(true)
   
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
+      const response = await fetch("/api/industryToAddEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
       // Add new industry to the list (in a real app, this would come from the API)
       const newIndustry = {
         id: (industries.length + 1).toString(),

@@ -85,6 +85,8 @@ const Navbar: React.FC = () => {
               <span>Internships</span>
             </button>
 
+            
+
     
           </div>
         </div>
