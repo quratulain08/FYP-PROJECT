@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from 'lucide-react'; // or use react-icons if you prefer
+
+
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -11,6 +14,8 @@ const Login: React.FC = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false); // 👈 Password visibility
+
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,9 +65,9 @@ const Login: React.FC = () => {
           case "industry":
             router.push("/Industry/navbar");
             break;
-            case "EnterpriseCell":
-              router.push("/interpriseCell/navbar");
-              break;
+          case "enterpriseCell":
+            router.push("/interpriseCell/navbar");
+            break;
           default:
             
             router.push("/dashboard");
@@ -127,14 +132,22 @@ const Login: React.FC = () => {
             />
 
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full px-3 py-2 border border-gray-300 rounded mb-2 text-sm focus:outline-none focus:ring focus:ring-green-700"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="relative mb-2">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring focus:ring-green-700 pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <div
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute top-1/2 right-3 transform -translate-y-1/2 cursor-pointer text-gray-500"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </div>
+            </div>
 
             <div className="text-right text-sm text-green-700 cursor-pointer mb-4" onClick={handleForgotPassword}>
               Forgot Password?
@@ -160,18 +173,17 @@ const Login: React.FC = () => {
                 required
               />
               <button
-  onClick={handleResetPassword}
-  className="w-full bg-green-700 text-white py-2 rounded-full text-sm hover:bg-green-600 transition duration-300 ease-in-out"
->
-  Send Reset Link
-</button>
+                onClick={handleResetPassword}
+                className="w-full bg-green-700 text-white py-2 rounded-full text-sm hover:bg-green-600 transition duration-300 ease-in-out"
+              >
+                Send Reset Link
+              </button>
 
-{resetMessage && (
-  <p className={`text-sm mt-2 ${resetMessage.includes("✅") ? "text-green-500" : "text-red-500"}`}>
-    {resetMessage}
-  </p>
-)}
-
+              {resetMessage && (
+                <p className={`text-sm mt-2 ${resetMessage.includes("✅") ? "text-green-500" : "text-red-500"}`}>
+                  {resetMessage}
+                </p>
+              )}
             </div>
           )}
         </div>

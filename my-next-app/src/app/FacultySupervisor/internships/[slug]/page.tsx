@@ -33,6 +33,8 @@ interface Internship {
   description: string;
   assignedFaculty: string;
   assignedStudents: string;
+  isComplete: boolean;
+
 }
 
 interface Student {
@@ -50,7 +52,7 @@ const InternshipDetails: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string | undefined;
-  const [internship, setInternships] = useState<Internship[]>([]);
+  const [internship, setInternship] = useState<Internship | null>(null); // Change the type to handle a single internship
   const [student, setStudents] = useState<Student[]>([]);
   const [involvement, setInvolvement] = useState<InternshipInvolvement[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
@@ -69,6 +71,20 @@ const InternshipDetails: React.FC = () => {
     weightage: 0,
     assignedStudents: [],
   });
+
+
+  const fetchInternshipData = async () => {
+    try {
+      const response = await fetch(`/api/internships/${slug}`);
+      if (!response.ok) throw new Error("Failed to fetch internship");
+  
+      const data: Internship = await response.json(); // Assuming single internship
+      console.log(data); // Check the output here
+      setInternship(data);
+    } catch (error) {
+      console.error("Error fetching internship:", error);
+    }
+  };
 
   // Fetch tasks from API for faculty
   const fetchTasks = async () => {
@@ -89,7 +105,7 @@ const InternshipDetails: React.FC = () => {
       if (!response.ok) throw new Error("Failed to fetch internship");
 
       const data = await response.json();
-      setInternships(data);
+      setInternship(data);
 
       // Ensure that assignedStudents is an array of strings (student IDs)
       const assignedStudents: string[] = data.assignedStudents;
@@ -226,9 +242,11 @@ const InternshipDetails: React.FC = () => {
   };
 
   useEffect(() => {
-    if (activeTab === "classwork" && slug) {
+    if (slug) {
+      fetchInternshipData();
       fetchTasks();
       FetchAssignedStudent();
+      
     }
   }, [activeTab, slug]);
 
@@ -378,12 +396,24 @@ const InternshipDetails: React.FC = () => {
            </div>
        
            {/* Submit Button */}
-           <button
-             type="submit"
-             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-           >
-             Assign Task
-           </button>
+           {internship?.isComplete && (
+      <p className="text-red-600 font-medium mb-2">
+        ⚠️ Can't assign task after internship is completed.
+      </p>
+    )}
+    <button
+      type="submit"
+      className={`text-white px-4 py-2 rounded-lg transition duration-300 ${
+        internship?.isComplete
+          ? 'bg-gray-400 cursor-not-allowed'
+          : 'bg-green-600 hover:bg-green-700'
+      }`}
+      disabled={internship?.isComplete}
+    >
+      Assign Task
+    </button>
+   
+
          </form>
        </div>
        

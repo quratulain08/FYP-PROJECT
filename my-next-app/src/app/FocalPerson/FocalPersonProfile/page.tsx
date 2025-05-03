@@ -33,49 +33,60 @@ const VocalPerson: React.FC = () => {
   const [formData, setFormData] = useState<Partial<Department>>({})
 
   useEffect(() => {
-    try {
-      const email = localStorage?.getItem("email")
-      if (email) {
-        fetchProfile(email)
-      } else {
-        setError("Email not found in localStorage.")
-        setLoading(false)
+    const fetchProfile = async () => {
+      try {
+        const email = localStorage?.getItem("email");
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+  
+        const response = await fetch(`/api/departmentByfocalperson/${email}`);
+        if (response.ok) {
+          const data: Department = await response.json();
+          setProfile(data);
+        } else {
+          const errorData = await response.json();
+          setError(errorData.error || "Failed to fetch profile.");
+        }
+      } catch (err) {
+        setError("Network error: Unable to fetch profile.");
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      setError("LocalStorage access is not available.")
-      setLoading(false)
-    }
-  }, [])
+    };
+  
+    fetchProfile();
+  }, []);
 
-  useEffect(() => {
-    if (profile) {
-      setFormData({
-        focalPersonName: profile.focalPersonName,
-        focalPersonPhone: profile.focalPersonPhone,
-        name: profile.name,
-      })
-    }
-  }, [profile])
+  // useEffect(() => {
+  //   if (profile) {
+  //     setFormData({
+  //       focalPersonName: profile.focalPersonName,
+  //       focalPersonPhone: profile.focalPersonPhone,
+  //       name: profile.name,
+  //     })
+  //   }
+  // }, [profile])
 
-  const fetchProfile = async (email: string) => {
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
-    try {
-      const response = await fetch(`/api/departmentByfocalperson/${email}`)
-      if (response.ok) {
-        const data: Department = await response.json()
-        setProfile(data)
-      } else {
-        const errorData = await response.json()
-        setError(errorData.error || "Failed to fetch profile.")
-      }
-    } catch {
-      setError("Network error: Unable to fetch profile.")
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const fetchProfile = async (email: string) => {
+  //   setLoading(true)
+  //   setError(null)
+  //   setSuccess(null)
+  //   try {
+  //     const response = await fetch(`/api/departmentByfocalperson/${email}`)
+  //     if (response.ok) {
+  //       const data: Department = await response.json()
+  //       setProfile(data)
+  //     } else {
+  //       const errorData = await response.json()
+  //       setError(errorData.error || "Failed to fetch profile.")
+  //     }
+  //   } catch {
+  //     setError("Network error: Unable to fetch profile.")
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const handleChange = (field: keyof Department, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))

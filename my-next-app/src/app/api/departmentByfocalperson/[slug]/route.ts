@@ -22,7 +22,7 @@ export async function GET(req: Request, { params }: { params: { slug: string } }
       return NextResponse.json([], { status: 200 }); // Return empty array if no match
     }
 
-    return NextResponse.json({ departmentId: department._id });
+    return NextResponse.json(department); // Return full department data
 
   } catch (error) {
     console.error('Error fetching department:', error);

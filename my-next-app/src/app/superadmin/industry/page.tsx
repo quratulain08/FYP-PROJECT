@@ -73,10 +73,7 @@ export default function IndustryPage() {
     description: ''
   })
   
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: ''
-  })
+
   
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -89,13 +86,6 @@ export default function IndustryPage() {
     }))
   }
 
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setLoginData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -142,29 +132,7 @@ export default function IndustryPage() {
     }
   }
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
-  
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // In a real app, this would validate credentials and redirect
-      alert("Login functionality would be implemented here")
-      
-      setSubmitting(false)
-      setIsLoginDialogOpen(false)
-      setLoginData({
-        email: '',
-        password: ''
-      })
-    } catch (error) {
-      console.error("Error:", error)
-      setSubmitting(false)
-    }
-  }
-
+ 
   const filteredIndustries = industries.filter(
     (industry) =>
       industry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -192,12 +160,12 @@ export default function IndustryPage() {
                   Register Your Company
                 </button>
                 <button
-                  onClick={() => setIsLoginDialogOpen(true)}
-                  className="bg-white text-teal-700 hover:bg-gray-100 px-4 py-2 rounded-md shadow-lg flex items-center"
-                >
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Login
-                </button>
+                onClick={() => router.push('/Login')}
+                className="bg-white text-teal-700 hover:bg-gray-100 px-4 py-2 rounded-md shadow-lg flex items-center"
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </button>
               </div>
             </div>
           </div>
@@ -504,88 +472,7 @@ export default function IndustryPage() {
           </div>
         )}
 
-        {/* Login Dialog */}
-        {isLoginDialogOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-[400px]">
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-semibold text-teal-700">Industry Partner Login</h2>
-                  <button onClick={() => setIsLoginDialogOpen(false)} className="text-gray-500 hover:text-gray-700">
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email Address
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={loginData.email}
-                      onChange={handleLoginChange}
-                      placeholder="contact@company.com"
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={loginData.password}
-                      onChange={handleLoginChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
-                    />
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <input
-                        id="remember-me"
-                        name="remember-me"
-                        type="checkbox"
-                        className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                        Remember me
-                      </label>
-                    </div>
-                    <div className="text-sm">
-                      <a href="#" className="text-teal-600 hover:text-teal-500">
-                        Forgot password?
-                      </a>
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 flex items-center justify-center"
-                    disabled={submitting}
-                  >
-                    {submitting ? (
-                      <>
-                        <span className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Login"
-                    )}
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
+       
       </div>
     </SuperAdminLayout>
   )

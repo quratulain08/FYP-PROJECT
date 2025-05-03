@@ -20,6 +20,8 @@ export interface Internship extends Document {
   assignedDepartment: mongoose.Types.ObjectId[];
   rejectionComment:  String; // New field for rejection reason
   AssigningIndustry: mongoose.Types.ObjectId[];
+  isComplete: boolean; 
+
 }
 
 const internshipSchema = new Schema<Internship>({
@@ -67,6 +69,7 @@ const internshipSchema = new Schema<Internship>({
     ],
     default: [], // Initialize as empty array
   },
+  isComplete: { type: Boolean, default: false }, 
   isApproved: { type: Boolean, default: false }, 
   rejectionComment: { type: String, default: "" }, // New field for rejection reason
   AssigningIndustry: {

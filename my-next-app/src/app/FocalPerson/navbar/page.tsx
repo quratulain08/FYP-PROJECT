@@ -89,7 +89,7 @@ const FocalPersonNavbar = ({ children }: { children: React.ReactNode }) => {
               <User className="h-5 w-5 mr-2" />
               <span>Your Profile</span>
             </button>
-
+{/* 
             <button
               onClick={() => router.push("/FocalPerson/Internship")}
               className={`flex items-center px-4 py-3 ${
@@ -129,7 +129,7 @@ const FocalPersonNavbar = ({ children }: { children: React.ReactNode }) => {
               <Users className="h-5 w-5 mr-2" />
               <span>Students Directory</span>
               <ChevronDown className="h-4 w-4 ml-1" />
-            </button>
+            </button> */}
 
             {/* <button
               onClick={() => router.push("/FocalPerson/Internships")}

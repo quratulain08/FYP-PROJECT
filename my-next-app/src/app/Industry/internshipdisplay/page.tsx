@@ -23,6 +23,7 @@ interface Internship {
   hostInstitution: string
   rejectionComment: string
   AssigningIndustry: string
+  isComplete: boolean
 }
 
 interface University {
@@ -140,6 +141,9 @@ const InternshipPage = () => {
   const [showRejectionModal, setShowRejectionModal] = useState(false)
   const [activeRejection, setActiveRejection] = useState<Internship | null>(null)
   const [ObjectID, setObjectID] = useState<string>("")
+  const [completedInternships, setCompletedInternships] = useState<Internship[]>([]);
+const [incompleteInternships, setIncompleteInternships] = useState<Internship[]>([]);
+
 
   // Add this style tag for animations
   const fadeInAnimation = `
@@ -319,8 +323,12 @@ const InternshipPage = () => {
       const filtered = data.filter(
         (internship: any) => String(internship.AssigningIndustry) === String(id)
       )
-      
-      setInternships(filtered)
+      const completed = filtered.filter((i: any) => i.isComplete);
+const incomplete = filtered.filter((i: any) => !i.isComplete);
+
+      setInternships(filtered);
+      setCompletedInternships(completed);
+setIncompleteInternships(incomplete);
       setFilteredInternships(filtered)
     } catch (err) {
       setError("Error fetching internships.")
@@ -415,6 +423,25 @@ const InternshipPage = () => {
   // Get unique categories
   const categories = [...new Set(internships.map((internship) => internship.category))]
 
+
+  const handleMarkAsComplete = async (internshipId:string) => {
+    const confirmed = window.confirm("Are you sure you want to mark this internship as complete?");
+    if (!confirmed) return;
+  
+    try {
+      const res = await fetch(`/api/MarkasComplete/${internshipId}`, {
+        method: 'PUT',
+      });
+  
+      if (!res.ok) throw new Error('Failed to mark internship as complete.');
+  
+      alert('Internship marked as complete!');
+      location.reload();
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  };
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <style>{fadeInAnimation}</style>
@@ -820,9 +847,16 @@ const InternshipPage = () => {
                 : "No internships are currently available"}
             </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredInternships.map((internship) => (
+        ) : ( 
+          
+          <>
+    {incompleteInternships.length > 0 && (
+      <>
+        <h2 className="text-xl font-bold mt-8 mb-4 text-gray-800" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+          Incomplete Internships
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {incompleteInternships.map((internship) => (
               <div
                 key={internship._id}
                 onClick={() => handleCardClick(internship._id)}
@@ -854,6 +888,8 @@ const InternshipPage = () => {
                       )}
                     </div>
                   </div>
+
+  
 
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center text-gray-600">
@@ -889,6 +925,15 @@ const InternshipPage = () => {
                     {internship.description}
                   </p>
                 </div>
+                <button
+  onClick={(e) => {
+    e.stopPropagation();
+    handleMarkAsComplete(internship._id);
+  }}
+  className="mt-2 w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded"
+>
+  Mark as Complete
+</button>
 
                 <div className="bg-green-50 p-3 flex justify-between items-center">
                   <div
@@ -921,10 +966,126 @@ const InternshipPage = () => {
                   </button>
                 </div>
               </div>
-            ))}
-          </div>
+             ))}
+             </div>
+           </>
         )}
+     
 
+         {completedInternships.length > 0 && (
+      <>
+        <h2 className="text-xl font-bold mt-12 mb-4 text-gray-800" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+          Completed Internships
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {completedInternships.map((internship) => (
+                  <div
+                    key={internship._id}
+                    onClick={() => handleCardClick(internship._id)}
+                    className="bg-white border border-gray-200 hover:border-green-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
+                  >
+                    <div className="p-5">
+                      <div className="flex justify-between items-start mb-3">
+                        <h2
+                          className="text-xl font-semibold text-gray-800 line-clamp-2"
+                          style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                        >
+                          {internship.title}
+                        </h2>
+                        <div className="flex flex-col items-end">
+                          <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                            {getCategoryLabel(internship.category)}
+                          </span>
+                          {internship.rejectionComment && (
+                            <span
+                              className="inline-block mt-1 px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full cursor-pointer hover:bg-red-200"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setActiveRejection(internship)
+                                setShowRejectionModal(true)
+                              }}
+                            >
+                              Rejected
+                            </span>
+                          )}
+                        </div>
+                      </div>
+    
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-gray-600">
+                          <Building className="h-4 w-4 mr-2 text-green-600" />
+                          <span style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                            {internship.hostInstitution}
+                          </span>
+                        </div>
+    
+                        <div className="flex items-center text-gray-600">
+                          <MapPin className="h-4 w-4 mr-2 text-green-600" />
+                          <span style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                            {internship.location === "onsite"
+                              ? "On-site"
+                              : internship.location === "oncampus"
+                                ? "On-campus"
+                                : internship.location}
+                          </span>
+                        </div>
+    
+                        <div className="flex items-center text-gray-600">
+                          <Calendar className="h-4 w-4 mr-2 text-green-600" />
+                          <span style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                            {formatDate(internship.startDate)} - {formatDate(internship.endDate)}
+                          </span>
+                        </div>
+                      </div>
+    
+                      <p
+                        className="text-gray-600 line-clamp-3 mb-4"
+                        style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                      >
+                        {internship.description}
+                      </p>
+                    </div>
+    
+                    <div className="bg-green-50 p-3 flex justify-between items-center">
+                      <div
+                        className="flex items-center text-green-600 font-medium"
+                        style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                      >
+                        Assign Task
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </div>
+    
+                      <button
+                        onClick={(e) => handleDelete(internship._id, e)}
+                        className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50"
+                        aria-label="Delete internship"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+               
+                 ))}
+        </div>
+      </>
+    )}
+  </>
+)}
+
+        
         {/* Rejection Comment Modal */}
         {showRejectionModal && activeRejection && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">

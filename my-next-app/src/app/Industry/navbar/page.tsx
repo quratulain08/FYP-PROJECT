@@ -64,19 +64,6 @@ const IndustryNavbar = () => {
           <div className="flex overflow-x-auto hide-scrollbar">
 
             <button
-              onClick={() => router.push("/Industry/university")}
-              className={`flex items-center px-4 py-3 ${
-                isActive("/Industry/university")
-                  ? "border-b-2 border-green-600 text-green-600"
-                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
-              }`}
-              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-            >
-              <Building2 className="h-5 w-5 mr-2" />
-              <span>Universities</span>
-            </button>
-
-            <button
               onClick={() => router.push("/Industry/internshipdisplay")}
               className={`flex items-center px-4 py-3 ${
                 isActive("/Industry/internshipdisplay") ||
