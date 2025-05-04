@@ -40,6 +40,7 @@ const InstituteProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<Record<string, ProfileData>>({})
   const [editMode, setEditMode] = useState<Record<string, boolean>>({})
   const [universityId, setUniversityId] = useState(null);
+  const [exists, setExists] = useState<boolean | null>(null);
 
   const [newProfile, setNewProfile] = useState<ProfileData>({
     role: "",
@@ -74,9 +75,8 @@ if (!res.ok) {
 }
 
 const dataa = await res.json();
-// Assuming the response is an object with the universityId property
-const universityId = dataa.universityId; // Access the correct property
-setUniversityId(dataa.universityId); // Store universityId in state
+const universityId = dataa.universityId; 
+setUniversityId(dataa.universityId); 
 
         const response = await fetch(`/api/instituteProfile/${universityId}`)
         const data = await response.json()
@@ -85,6 +85,15 @@ setUniversityId(dataa.universityId); // Store universityId in state
           return acc
         }, {})
         setProfileData(formattedData)
+
+        const resp = await fetch(`/api/userExists?universityId=${universityId}&role=EnterpriseCell`
+        , {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const dataaa = await resp.json();
+        setExists(dataaa.exists);
       } catch (error) {
         console.error("Failed to fetch profiles:", error)
         setStatusMessage({ type: "error", message: "Failed to fetch profiles. Please try again." })
@@ -99,6 +108,7 @@ setUniversityId(dataa.universityId); // Store universityId in state
     if (statusMessage) {
       const timer = setTimeout(() => {
         setStatusMessage(null)
+
       }, 5000)
       return () => clearTimeout(timer)
     }
@@ -426,6 +436,7 @@ setUniversityId(dataa.universityId); // Store universityId in state
     )
   }
 
+
   const renderDisplay = (role: string, title: string) => {
     const profile = profileData[role]
 
@@ -720,6 +731,11 @@ setUniversityId(dataa.universityId); // Store universityId in state
                 <h2 className="text-xl font-bold">Register Enterprise Cell</h2>
               </div>
               <div className="p-6">
+              {exists === true && (
+          <div className="bg-red-100 text-red-700 p-2 rounded mb-4">
+            🚫 An Enterprise Cell already exists for this university.
+          </div>
+        )}
                 <form onSubmit={handleSubmitRegister} className="space-y-4">
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -752,8 +768,8 @@ setUniversityId(dataa.universityId); // Store universityId in state
 
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition flex items-center justify-center gap-2 disabled:bg-green-400"
+                    disabled={isSubmitting || exists === true}
+                    className="w-full bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:text-gray-700 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? "Registering..." : "Register"}
                     {!isSubmitting && <UserPlus size={18} />}
