@@ -20,11 +20,11 @@ const StudentLayout: React.FC<StudentLayoutProps> = ({ children }) => {
     if (token) {
         setIsAuthenticated(true); // User is authenticated
 
-         // if (role === 'Student') {
-        //   setIsStudent(true); // User has admin role
-        // } else {
-        //   router.push('/Unauthorized'); // Redirect if user is not an admin
-        // }
+         if (role === 'Student') {
+          setIsStudent(true); // User has admin role
+        } else {
+          router.push('/Unauthorized'); // Redirect if user is not an admin
+        }
     } else {
         router.push('/Login'); // Redirect to login if token is missing
     }

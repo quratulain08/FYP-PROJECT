@@ -19,7 +19,7 @@ const IndustryLayout: React.FC<IndustryLayoutProps> = ({ children }) => {
 
     if (token) {
         setIsAuthenticated(true); // User is authenticated
-          if (role === 'Industry') {
+          if (role === 'industry') {
           setIsIndustry(true); // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin

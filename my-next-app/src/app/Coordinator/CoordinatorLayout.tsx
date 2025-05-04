@@ -20,11 +20,11 @@ const CoordinatorLayout: React.FC<CoordinatorLayoutProps> = ({ children }) => {
         setIsAuthenticated(true); // User is authenticated
 
 
-        // if (role === 'Coordinator') {
-        //   setIsCoordinator(true); // User has admin role
-        // } else {
-        //   router.push('/Unauthorized'); // Redirect if user is not an admin
-        // }
+        if (role === 'Coordinator') {
+          setIsCoordinator(true); // User has admin role
+        } else {
+          router.push('/Unauthorized'); // Redirect if user is not an admin
+        }
     } else {
         router.push('/Login'); // Redirect to login if token is missing
     }

@@ -5,6 +5,8 @@ import MakeAInternship from "../makeAInternship/page"; // Adjust the import path
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import InterpriseCellLayout from "../InterpriseCellLayout"
+import GradeReports from "../gradeReport/page"; // Adjust path as necessary
+
 import {
   Trash2,
   CheckCircle,
@@ -39,6 +41,7 @@ type Department = {
 const Internships: React.FC = () => {
   // Add this style tag
   const [isPopupVisible, setPopupVisible] = useState(false);
+  const [visibleInternshipId, setVisibleInternshipId] = useState<string | null>(null);
 
   const fadeInAnimation = `
     @keyframes fadeIn {
@@ -55,9 +58,7 @@ const Internships: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false)
   const [showRejectPopup, setShowRejectPopup] = useState(false)
   const [rejectionReason, setRejectionReason] = useState("")
-
   const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
-
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
@@ -513,6 +514,7 @@ const Internships: React.FC = () => {
                       </div>
                     </div>
 
+
                     <div className="flex items-center space-x-2">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
@@ -597,6 +599,8 @@ const Internships: React.FC = () => {
                       >
                         Reject
                       </button>
+
+                      
                       {showRejectPopup && (
                         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
                           <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
@@ -650,6 +654,31 @@ const Internships: React.FC = () => {
                         <Trash2 className="h-4 w-4 mr-1" />
                         Delete
                       </button>
+
+                    <button
+className="
+     bg-gradient-to-r from-green-500 to-teal-400 
+     text-white font-medium 
+     px-5 py-2 rounded-lg 
+     shadow-md hover:shadow-lg 
+     transition-all duration-200 
+     hover:from-green-600 hover:to-teal-500 
+     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300
+   "                onClick={() =>
+                  setVisibleInternshipId(visibleInternshipId === internship._id ? null : internship._id)
+                }
+              >
+                {visibleInternshipId === internship._id ? "Hide Grade Reports" : "View Grade Reports"}
+              </button>
+            
+
+            {visibleInternshipId === internship._id && (
+              <div className="mt-4">
+                <GradeReports internshipId={internship._id} />
+              </div>
+            )}
+
+                      
                     </div>
                   </div>
 

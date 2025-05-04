@@ -19,11 +19,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             const role = localStorage.getItem('role'); // Retrieve role from local storage
 
 
-        // if (role === 'admin') {
-        //   setIsAdmin(true); // User has admin role
-        // } else {
-        //   router.push('/Unauthorized'); // Redirect if user is not an admin
-        // }
+        if (role === 'admin') {
+          setIsAdmin(true); // User has admin role
+        } else {
+          router.push('/Unauthorized'); // Redirect if user is not an admin
+        }
     } else {
         router.push('/Login'); // Redirect to login if token is missing
     }
