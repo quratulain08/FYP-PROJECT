@@ -51,22 +51,22 @@ const Login: React.FC = () => {
             router.push("/admin/dashboard");
             break;
           case "coordinator":
-            router.push("/Coordinator/Internships");
+            router.push("/Coordinator/Dashboard");
             break;
           case "focalperson":
             router.push("/FocalPerson/dashboard");
             break;
           case "faculty":
-            router.push("/FacultySupervisor/navbar");
+            router.push("/FacultySupervisor/internshipdisplay");
             break;
           case "student":
-            router.push("/Student/navbar");
+            router.push("/Student/internshipdisplay");
             break;
           case "industry":
-            router.push("/Industry/navbar");
+            router.push("/Industry/internshipdisplay");
             break;
-          case "enterpriseCell":
-            router.push("/interpriseCell/navbar");
+          case "enterprisecell":
+            router.push("/InterpriseCell/dashboard");
             break;
           default:
             

@@ -9,12 +9,25 @@ import { LogOut, User, BookOpen, Home, FileText, Users } from "lucide-react"
 const FacultyLayout = ({ children }: { children: React.ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null)
   const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const pathname = usePathname()
+  const [isIFaculty, setIsFaculty] = useState<boolean>(false); // State to track admin role
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("email")
-    setEmail(storedEmail)
-  }, [])
+    const token = localStorage.getItem('token'); // Retrieve token from local storage
+    const role = localStorage.getItem('role'); // Retrieve role from local storage
+
+    if (token) {
+        setIsAuthenticated(true); // User is authenticated
+          if (role === 'Faculty') {
+          setIsFaculty(true); // User has admin role
+        } else {
+          router.push('/Unauthorized'); // Redirect if user is not an admin
+        }
+    } else {
+        router.push('/Login'); // Redirect to login if token is missing
+    }
+}, [router]);
 
   const handleLogout = () => {
     localStorage.clear()

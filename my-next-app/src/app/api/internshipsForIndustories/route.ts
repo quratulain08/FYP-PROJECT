@@ -127,7 +127,6 @@ export async function POST(req: Request) {
       if (!supervisorName) missingFields.push('supervisorName');
       if (!supervisorEmail) missingFields.push('supervisorEmail');
       if (!compensationType) missingFields.push('compensationType');
-      if (!compensationAmount) missingFields.push('compensationAmount');
       if (!startDate) missingFields.push('startDate');
       if (!endDate) missingFields.push('endDate');
       if (!description) missingFields.push('description');

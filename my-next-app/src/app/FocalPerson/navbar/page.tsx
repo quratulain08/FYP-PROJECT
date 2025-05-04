@@ -161,7 +161,7 @@ const FocalPersonNavbar = ({ children }: { children: React.ReactNode }) => {
             <button
               onClick={() => router.push("/FocalPerson/approvedInternships")}
               className={`flex items-center px-4 py-3 ${
-                isActive("/FocalPerson/allInternships")
+                isActive("/FocalPerson/approvedInternships")
                   ? "border-b-2 border-green-600 text-green-600"
                   : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
               }`}

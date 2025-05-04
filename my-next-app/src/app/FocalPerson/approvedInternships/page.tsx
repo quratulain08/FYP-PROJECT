@@ -82,7 +82,7 @@ const Internships: React.FC = () => {
       }
     
       const dataa = await response1.json();
-      const departmentId = dataa.departmentId;
+      const departmentId = dataa._id;
     
       if (!departmentId) {
         throw new Error("Department ID not found");

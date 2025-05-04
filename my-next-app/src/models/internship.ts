@@ -28,7 +28,7 @@ const internshipSchema = new Schema<Internship>({
   numberOfStudents :{ type: Number, required: true },
   supervisorName :{ type: String, required: true },
   supervisorEmail :{ type: String, required: true },
-  compensationAmount :{ type: Number, required: true },
+  compensationAmount :{ type: Number },
   compensationType :{ type: String, required: true },
   title: { type: String, required: true },
   hostInstitution: { type: String, required: true },

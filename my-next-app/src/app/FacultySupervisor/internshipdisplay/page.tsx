@@ -17,6 +17,7 @@ interface Internship {
   compensationType?: "paid" | "unpaid"
   compensationAmount?: number
   numberOfStudents?: number
+  isComplete: boolean
 }
 
 interface FacultyData {
@@ -55,6 +56,8 @@ const InternshipDisplay = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCategory, setFilterCategory] = useState("")
   const router = useRouter()
+  const [completedInternships, setCompletedInternships] = useState<Internship[]>([]);
+  const [incompleteInternships, setIncompleteInternships] = useState<Internship[]>([]);
 
   useEffect(() => {
     fetchInternships()
@@ -90,7 +93,14 @@ const InternshipDisplay = () => {
       if (!response.ok) throw new Error("Failed to fetch internships")
 
       const data = await response.json()
+      const filtered = data.filter(
+        (internship: any) => String(internship.assignedFaculty) === String(facultyId)
+      )
+      const completed = filtered.filter((i: any) => i.isComplete);
+      const incomplete = filtered.filter((i: any) => !i.isComplete);
       setInternships(data)
+      setCompletedInternships(completed);
+setIncompleteInternships(incomplete);
       setFilteredInternships(data)
     } catch (err) {
       console.error(err)
@@ -252,9 +262,16 @@ const InternshipDisplay = () => {
                 : "You haven't been assigned to any internships yet"}
             </p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredInternships.map((internship) => (
+      ) : ( 
+          
+        <>
+  {incompleteInternships.length > 0 && (
+    <>
+      <h2 className="text-xl font-bold mt-8 mb-4 text-gray-800" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+        In Progress Internships
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {incompleteInternships.map((internship) => (
               <div
                 key={internship._id}
                 onClick={() => handleCardClick(internship._id)}
@@ -319,9 +336,90 @@ const InternshipDisplay = () => {
                 </div>
               </div>
             ))}
+            </div>
+          </>
+       )}
+    
+    {completedInternships.length > 0 && (
+      <>
+        <h2 className="text-xl font-bold mt-12 mb-4 text-gray-800" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+          Completed Internships
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {completedInternships.map((internship) => (
+            <div
+            key={internship._id}
+            onClick={() => handleCardClick(internship._id)}
+            className="bg-white border border-gray-200 hover:border-green-300 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden cursor-pointer"
+          >
+            <div className="p-5">
+              <div className="flex justify-between items-start mb-3">
+                <h2
+                  className="text-xl font-semibold text-gray-800 line-clamp-2"
+                  style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+                >
+                  {internship.title}
+                </h2>
+                <span className="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                  {getCategoryLabel(internship.category)}
+                </span>
+              </div>
+
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center text-gray-600">
+                  <Building className="h-4 w-4 mr-2 text-green-600" />
+                  <span style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                    {internship.hostInstitution}
+                  </span>
+                </div>
+
+                <div className="flex items-center text-gray-600">
+                  <MapPin className="h-4 w-4 mr-2 text-green-600" />
+                  <span style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                    {internship.location === "onsite"
+                      ? "On-site"
+                      : internship.location === "oncampus"
+                        ? "On-campus"
+                        : internship.location}
+                  </span>
+                </div>
+
+                <div className="flex items-center text-gray-600">
+                  <Calendar className="h-4 w-4 mr-2 text-green-600" />
+                  <span style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+                    {formatDate(internship.startDate)} - {formatDate(internship.endDate)}
+                  </span>
+                </div>
+              </div>
+
+              <p
+                className="text-gray-600 line-clamp-3 mb-4"
+                style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+              >
+                {internship.description}
+              </p>
+            </div>
+
+            <div className="bg-green-50 p-3 flex justify-between items-center">
+              <div
+                className="flex items-center text-green-600 font-medium"
+                style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+              >
+                Manage Internship
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </div>
+            </div>
           </div>
-        )}
-      </div>
+          
+               
+          ))}
+     </div>
+      </>
+    )}
+   </>
+   )}
+           </div>
+
     </FacultyLayout>
   )
 }

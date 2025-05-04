@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import MakeAInternship from "../makeAInternship/page"; // Adjust the import path based on your file structure
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import InterpriseCellLayout from "../InterpriseCellLayout"
@@ -38,6 +38,8 @@ type Department = {
 
 const Internships: React.FC = () => {
   // Add this style tag
+  const [isPopupVisible, setPopupVisible] = useState(false);
+
   const fadeInAnimation = `
     @keyframes fadeIn {
       from { opacity: 0; transform: scale(0.95); }
@@ -279,6 +281,7 @@ const Internships: React.FC = () => {
       setSuccessMessage("✅ Internship successfully assigned to department!")
       setTimeout(() => setSuccessMessage(null), 3000)
       setShowPopup(false)
+      fetchInternships()
     } catch (error) {
       console.error("Error assigning department:", error)
     }
@@ -311,6 +314,18 @@ const Internships: React.FC = () => {
       console.error("Error rejecting internship:", error)
     }
   }
+  // Function to handle showing the popup
+  const handleShowPopup = () => {
+    setPopupVisible(true);
+  };
+
+  // Function to handle hiding the popup
+  const handleClosePopup = () => {
+    setPopupVisible(false);
+    fetchInternships()
+
+  };
+
 
   return (
     <InterpriseCellLayout>
@@ -398,6 +413,7 @@ const Internships: React.FC = () => {
               </div>
             </div>
           </div>
+     
 
           <div className="bg-white rounded-lg shadow-md p-5 border-l-4 border-red-500">
             <div className="flex items-center">
@@ -420,6 +436,37 @@ const Internships: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="flex justify-between items-center mb-8">
+      {/* This is your button on the right */}
+      <button
+        onClick={handleShowPopup}
+        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200"
+        >
+        Add Internship
+      </button>
+
+      {/* Popup (MakeAInternship) */}
+      {isPopupVisible && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full">
+            <MakeAInternship
+              universityId="someUniversityId"
+              onSuccess={(newInternship) => {
+                console.log("Internship created successfully:", newInternship);
+                handleClosePopup(); // Close the popup after success
+              }}
+            />
+            <button
+              onClick={handleClosePopup}
+              className="absolute top-2 right-2 text-gray-500"
+            >
+              X
+            </button>
+          </div>
+        </div>
+      )}
         </div>
 
         {filteredInternships.length === 0 ? (

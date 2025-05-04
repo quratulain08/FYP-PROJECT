@@ -34,7 +34,6 @@ interface Internship {
   assignedFaculty: string;
   assignedStudents: string;
   isComplete: boolean;
-
 }
 
 interface Student {
