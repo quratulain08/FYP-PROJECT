@@ -30,7 +30,6 @@ const Internships: React.FC = () => {
   const fetchInternships = async () => {
     try {
            const CoordinatorEmail = localStorage.getItem("email") || "default@example.com"; 
-           // const CoordinatorEmail = "wajahat1@gmail.com"; // Replace with the actual email
             const res = await fetch(`/api/departmentByemail/${CoordinatorEmail}`, {
               method: "GET",
               headers: { "Content-Type": "application/json" },

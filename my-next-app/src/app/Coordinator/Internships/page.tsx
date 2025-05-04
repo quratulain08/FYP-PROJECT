@@ -1,4 +1,3 @@
-import DepartmentDashboard from '../../components/departmentForm';
 import Internships from '@/app/components/ViewInternships';
 import CoordinatorLayout from './../CoordinatorLayout';
 

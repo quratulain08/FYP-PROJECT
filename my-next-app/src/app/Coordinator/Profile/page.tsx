@@ -39,8 +39,8 @@ const CoordinatorProfile: React.FC = () => {
 
   useEffect(() => {
     try {
-   //   const email = localStorage?.getItem("email") ;
-      const email= "wajahat1@gmail.com"
+      const email = localStorage?.getItem("email") ;
+   
       if (email) {
         fetchProfile(email)
       } else {
@@ -53,14 +53,6 @@ const CoordinatorProfile: React.FC = () => {
     }
   }, [])
 
-  useEffect(() => {
-    if (profile) {
-      setFormData({
-        CoordinatorName: profile.CoordinatorName,
-        CoordinatorPhone: profile.CoordinatorPhone,
-      })
-    }
-  }, [profile])
 
   const fetchProfile = async (email: string) => {
     setLoading(true)

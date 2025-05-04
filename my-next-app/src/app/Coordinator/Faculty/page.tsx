@@ -34,8 +34,7 @@ const FacultyPage = () => {
     const [error, setError] = useState<string | null>(null); // Track errors
     useEffect(() => {
         const fetchAndNavigate = async () => {
-          //  const CoordinatorEmail = localStorage.getItem("email") || "default@example.com"; 
-            const CoordinatorEmail = "wajahat1@gmail.com"; // Replace with the actual email
+            const CoordinatorEmail = localStorage.getItem("email") || "default@example.com"; 
             try {
                 const response = await fetch(`/api/ProfileForCoordinator?CoordinatorEmail=${CoordinatorEmail}`);
                 if (response.ok) {

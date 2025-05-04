@@ -428,14 +428,7 @@ export default function DepartmentDetail() {
           message="Are you sure you want to delete this faculty member? This action cannot be undone."
         />
 
-        {/* Breadcrumb */}
-        <div className="flex items-center text-sm text-gray-500 mb-4">
-          <span className="hover:text-gray-700 cursor-pointer" onClick={() => router.push("/Coordinator/Departments")}>
-            Departments
-          </span>
-          <ChevronRight className="mx-2 h-4 w-4" />
-          <span className="font-medium text-green-600">{department.name}</span>
-        </div>
+       
 
         {/* Department Header */}
         <div className="flex justify-between items-center mb-6">

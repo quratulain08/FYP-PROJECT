@@ -77,6 +77,19 @@ const navbar = ({ children }: { children: React.ReactNode }) => {
               <Home className="h-5 w-5 mr-2" />
               <span>Dashboard</span>
             </button>
+            
+            <button
+              onClick={() => router.push("/Coordinator/Profile")}
+              className={`flex items-center px-4 py-3 ${
+                isActive("/Coordinator/Profile")
+                  ? "border-b-2 border-green-600 text-green-600"
+                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+              }`}
+              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+            >
+              <Settings className="h-5 w-5 mr-2" />
+              <span>Profile</span>
+            </button>
 
             <button
               onClick={() => router.push("/Coordinator/Internships")}
@@ -117,18 +130,7 @@ const navbar = ({ children }: { children: React.ReactNode }) => {
               <span>Students Directory</span>
             </button>
 
-            <button
-              onClick={() => router.push("/Coordinator/Profile")}
-              className={`flex items-center px-4 py-3 ${
-                isActive("/Coordinator/Profile")
-                  ? "border-b-2 border-green-600 text-green-600"
-                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
-              }`}
-              style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-            >
-              <Settings className="h-5 w-5 mr-2" />
-              <span>Profile</span>
-            </button>
+           
           </div>
         </div>
       </nav>

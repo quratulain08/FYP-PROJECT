@@ -5,8 +5,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import * as XLSX from "xlsx"
-import { Edit, Mail, Trash2, Upload, ChevronRight, CheckCircle, XCircle, Users } from "lucide-react"
- import CoordinatorLayout from "../../../CoordinatorLayout";
+import { Edit, Mail, Trash2, Upload, ChevronRight, Users, CheckCircle, XCircle } from "lucide-react"
+import Layout from "@/app/Coordinator/CoordinatorLayout"
 
 interface Student {
   _id: string
@@ -17,6 +17,7 @@ interface Student {
   registrationNumber: string
   section: string
   email: string
+  university:string
 }
 
 interface Department {
@@ -79,6 +80,7 @@ const StudentsPage: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [universityId, setUniversityId] = useState(''); // State to store universityId
 
   const params = useParams()
   const router = useRouter()
@@ -86,35 +88,55 @@ const StudentsPage: React.FC = () => {
   const currentBatch = params.batch as string
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const res = await fetch("/api/students")
-        if (!res.ok) throw new Error("Failed to fetch data")
-        const data: Student[] = await res.json()
-
-        const ress = await fetch(`/api/department/${departmentId}`)
-        if (!ress.ok) throw new Error("Failed to fetch department data")
-        const departmentData: Department = await ress.json()
-        setDepartment(departmentData)
-
-        const filteredByDepartment = data.filter((student) => student.department === departmentData.name)
-        setStudents(filteredByDepartment)
-        setFilteredStudents(filteredByDepartment)
-
-        const uniqueSections = Array.from(new Set(filteredByDepartment.map((student) => student.section)))
-        // Extract unique batches for filter options
-        const uniqueBatches = Array.from(new Set(filteredByDepartment.map((student) => student.batch)))
-        setBatches(uniqueBatches)
-        setSections(uniqueSections) // Set sections for filter
-      } catch (err) {
-        setError(`Error fetching data ${departmentId}`)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchStudents()
+       fetchStudents()
   }, [departmentId])
 
+
+  const fetchStudents = async () => {
+    try {
+           const email = localStorage.getItem("email")
+           
+           const resp = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+             method: "GET",
+             headers: { "Content-Type": "application/json" },
+           });
+     
+           if (!resp.ok) {
+             throw new Error(`Failed to fetch university ID for ${email}`);
+           }
+     
+           const dataa = await resp.json();
+           const universityId = dataa.universityId;
+    setUniversityId(universityId); // Set the universityId in state
+
+          const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }, // Missing comma here
+          });
+          
+      if (!res.ok) throw new Error("Failed to fetch data")
+      const data: Student[] = await res.json()
+
+      const ress = await fetch(`/api/department/${departmentId}`)
+      if (!ress.ok) throw new Error("Failed to fetch department data")
+      const departmentData: Department = await ress.json()
+      setDepartment(departmentData)
+
+      const filteredByDepartment = data.filter((student) => student.department === departmentData.name)
+      setStudents(filteredByDepartment)
+      setFilteredStudents(filteredByDepartment)
+
+      const uniqueSections = Array.from(new Set(filteredByDepartment.map((student) => student.section)))
+      // Extract unique batches for filter options
+      const uniqueBatches = Array.from(new Set(filteredByDepartment.map((student) => student.batch)))
+      setBatches(uniqueBatches)
+      setSections(uniqueSections) // Set sections for filter
+    } catch (err) {
+      setError(`Error fetching data ${departmentId}`)
+    } finally {
+      setLoading(false)
+    }
+  }
   useEffect(() => {
     let filtered = students
 
@@ -165,7 +187,7 @@ const StudentsPage: React.FC = () => {
     try {
       const batch = currentBatch
       const departmentName = department?.name || "Unknown Department"
-      await handleFileUpload(file, batch, departmentName)
+      await handleFileUpload(file, batch, departmentName,universityId )
     } catch (error) {
       console.error("Upload error:", error)
       alert("Failed to upload data.")
@@ -230,7 +252,7 @@ const StudentsPage: React.FC = () => {
     }
   }
 
-  const handleFileUpload = async (file: File, batch: string, department: string) => {
+  const handleFileUpload = async (file: File, batch: string, department: string, university: string ) => {
     try {
       const data = await file.arrayBuffer()
       const workbook = XLSX.read(data, { type: "array" })
@@ -241,6 +263,7 @@ const StudentsPage: React.FC = () => {
         ...student,
         batch,
         department,
+        university
       }))
 
       if (!file || studentsWithBatch.length === 0) {
@@ -268,13 +291,9 @@ const StudentsPage: React.FC = () => {
       setShowModal(false)
 
       // Refresh the student list
-      const res = await fetch("/api/students")
-      if (res.ok) {
-        const data: Student[] = await res.json()
-        const filteredByDepartment = data.filter((student) => student.department === department)
-        setStudents(filteredByDepartment)
-        setFilteredStudents(filteredByDepartment)
-      }
+      fetchStudents();
+
+    
     } catch (error) {
       console.error("Upload error:", error)
       alert("Failed to upload data.")
@@ -301,33 +320,26 @@ const StudentsPage: React.FC = () => {
   if (error)
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
+        <div className="text-red-500">{error}</div>
       </div>
     )
 
   const studentsInCurrentBatch = filteredStudents.filter((student) => student.batch === currentBatch)
 
+  // Calculate summary statistics
+  const totalStudents = studentsInCurrentBatch.length
   const completedInternships = studentsInCurrentBatch.filter((student) => student.didInternship).length
-  const pendingInternships = studentsInCurrentBatch.length - completedInternships
+  const pendingInternships = totalStudents - completedInternships
+  const uniqueSectionsCount = new Set(studentsInCurrentBatch.map((student) => student.section)).size
 
   return (
-    <CoordinatorLayout>
+    <Layout>
       <div className="max-w-7xl mx-auto p-6">
-        {/* Breadcrumb */}
-        <div className="flex items-center text-sm text-gray-500 mb-4">
-          <span
-            className="hover:text-gray-700 cursor-pointer"
-            onClick={() => router.push(`/Coordinator/Batch/${departmentId}`)}
-          >
-            Batches
-          </span>
-          <ChevronRight className="mx-2 h-4 w-4" />
-          <span className="font-medium text-green-600">{currentBatch}</span>
-        </div>
+    
 
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-semibold text-gray-800">
             {department?.name} - {currentBatch} Students
           </h1>
 
@@ -341,7 +353,7 @@ const StudentsPage: React.FC = () => {
             </button>
             <button
               onClick={sendMailToAll}
-              className="flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+              className="flex items-center px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600 transition-colors"
             >
               <Mail className="w-4 h-4 mr-2" />
               Send Mail to All
@@ -349,16 +361,16 @@ const StudentsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+              <div className="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
                 <Users className="h-6 w-6" />
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Students</p>
-                <p className="text-2xl font-semibold text-gray-900">{studentsInCurrentBatch.length}</p>
+                <p className="text-2xl font-semibold text-gray-900">{totalStudents}</p>
               </div>
             </div>
           </div>
@@ -383,6 +395,18 @@ const StudentsPage: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">Pending Internships</p>
                 <p className="text-2xl font-semibold text-gray-900">{pendingInternships}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center">
+              <div className="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                <Users className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Sections</p>
+                <p className="text-2xl font-semibold text-gray-900">{uniqueSectionsCount}</p>
               </div>
             </div>
           </div>
@@ -415,8 +439,8 @@ const StudentsPage: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
+              <thead>
+                <tr className="bg-gray-50">
                   <th
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -495,9 +519,7 @@ const StudentsPage: React.FC = () => {
                           <button className="text-green-500 hover:text-green-700" title="Edit Student">
                             <Edit className="w-5 h-5" />
                           </button>
-                          <button className="text-indigo-500 hover:text-indigo-700" title="Send Email">
-                            <Mail className="w-5 h-5" />
-                          </button>
+                      
                           <button
                             onClick={() => deleteStudent(student._id)}
                             className="text-red-500 hover:text-red-700"
@@ -551,7 +573,7 @@ const StudentsPage: React.FC = () => {
           </div>
         </div>
       )}
-    </CoordinatorLayout>
+    </Layout>
   )
 }
 
