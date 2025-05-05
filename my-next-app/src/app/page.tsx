@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'; // Use Next.js router for redirects
 import Login from './Login/page'; // Login component
 import Dashboard from '@/app/components/Dashboard'; // Dashboard component
 import Navbar from './admin/navbar/page';
+import Home from './superadmin/home/page';
 
 const Page: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -29,8 +30,8 @@ const Page: React.FC = () => {
   // Render the page content only if authenticated
   return (
     <>
-    <Navbar/>
-    <Dashboard />
+<Home />
+
     </>
   );
 };
