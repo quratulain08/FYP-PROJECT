@@ -1,16 +1,10 @@
 "use client"
-
-import type React from "react"
-
-import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Users, BookOpen, Award, GraduationCap, Building2, LogIn, X } from "lucide-react"
+import { Users, BookOpen, Award, GraduationCap, Building2, LogIn, UserCircle } from "lucide-react"
 import SuperAdminLayout from "../SuperAdminLayout"
 
 export default function FacultyPage() {
   const router = useRouter()
-
-  
 
   return (
     <SuperAdminLayout>
@@ -24,13 +18,13 @@ export default function FacultyPage() {
                 <p className="text-teal-100">Distinguished faculty members and academic resources</p>
               </div>
               <div className="mt-4 md:mt-0">
-              <button
-                onClick={() => router.push('/Login')}
-                className="bg-white text-teal-700 hover:bg-gray-100 px-4 py-2 rounded-md shadow-lg flex items-center"
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
-              </button>
+                <button
+                  onClick={() => router.push("/Login")}
+                  className="bg-white text-teal-700 hover:bg-gray-100 px-4 py-2 rounded-md shadow-lg flex items-center"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Login
+                </button>
               </div>
             </div>
           </div>
@@ -97,64 +91,52 @@ export default function FacultyPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                <div className="h-48 bg-gray-200">
-                  <img
-                    src="/placeholder.svg?height=200&width=400"
-                    alt="Dr. Ahmed Khan"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="h-48 bg-teal-50 flex items-center justify-center">
+                  <UserCircle className="h-32 w-32 text-teal-600" />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-medium text-gray-800 text-lg">Dr. Ahmed Khan</h3>
-                  <p className="text-sm text-teal-600 mb-2">Professor, Computer Science</p>
+                  <h3 className="font-medium text-gray-800 text-lg">Dr. Ashfaq Hussain Farooqi</h3>
+                  <p className="text-sm text-teal-600 mb-2">Assistant Professor, Computer Science</p>
                   <p className="text-sm text-gray-600 mb-3">
-                    PhD from MIT with over 20 years of experience in AI and Machine Learning research.
+                    Specializing in data science and artificial intelligence with extensive research experience.
                   </p>
                   <div className="flex items-center text-sm text-gray-500">
                     <BookOpen className="h-4 w-4 mr-1" />
-                    120+ Publications
+                    75+ Publications
                   </div>
                 </div>
               </div>
 
               <div className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                <div className="h-48 bg-gray-200">
-                  <img
-                    src="/placeholder.svg?height=200&width=400"
-                    alt="Dr. Fatima Zaidi"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="h-48 bg-teal-50 flex items-center justify-center">
+                  <UserCircle className="h-32 w-32 text-teal-600" />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-medium text-gray-800 text-lg">Dr. Fatima Zaidi</h3>
-                  <p className="text-sm text-teal-600 mb-2">Associate Professor, Electrical Engineering</p>
+                  <h3 className="font-medium text-gray-800 text-lg">Dr. Mehdi Hassan</h3>
+                  <p className="text-sm text-teal-600 mb-2">Professor, Computer Engineering</p>
                   <p className="text-sm text-gray-600 mb-3">
-                    PhD from Stanford University, specializing in renewable energy systems and smart grids.
+                    PhD with expertise in machine learning and computer vision systems.
                   </p>
                   <div className="flex items-center text-sm text-gray-500">
                     <BookOpen className="h-4 w-4 mr-1" />
-                    85+ Publications
+                    90+ Publications
                   </div>
                 </div>
               </div>
 
               <div className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                <div className="h-48 bg-gray-200">
-                  <img
-                    src="/placeholder.svg?height=200&width=400"
-                    alt="Dr. Usman Ali"
-                    className="w-full h-full object-cover"
-                  />
+                <div className="h-48 bg-teal-50 flex items-center justify-center">
+                  <UserCircle className="h-32 w-32 text-teal-600" />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-medium text-gray-800 text-lg">Dr. Usman Ali</h3>
-                  <p className="text-sm text-teal-600 mb-2">Professor, Business Administration</p>
+                  <h3 className="font-medium text-gray-800 text-lg">Dr. Junaid Nazar</h3>
+                  <p className="text-sm text-teal-600 mb-2">Associate Professor, Information Technology</p>
                   <p className="text-sm text-gray-600 mb-3">
-                    PhD from Harvard Business School with expertise in entrepreneurship and innovation management.
+                    PhD with research focus on cybersecurity and network systems.
                   </p>
                   <div className="flex items-center text-sm text-gray-500">
                     <BookOpen className="h-4 w-4 mr-1" />
-                    95+ Publications
+                    65+ Publications
                   </div>
                 </div>
               </div>
@@ -256,8 +238,6 @@ export default function FacultyPage() {
             </div>
           </div>
         </div>
-
-        
       </div>
     </SuperAdminLayout>
   )
