@@ -170,7 +170,7 @@ const CoordinatorProfile: React.FC = () => {
         )}
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-300 to-indigo-600 px-6 py-12 text-center">
+          <div className="bg-gradient-to-r from-green-300 to-green-600 px-6 py-12 text-center">
             <div className="mx-auto h-32 w-32 rounded-full bg-white flex items-center justify-center mb-4 border-4 border-white shadow-lg">
               <span className="text-4xl font-bold text-Blue-600">
                 {profile?.CoordinatorName ? getInitials(profile.CoordinatorName) : "CO"}
@@ -251,7 +251,7 @@ const CoordinatorProfile: React.FC = () => {
                 <div className="mt-8 flex justify-end">
                   <button
                     onClick={() => setEditMode(true)}
-                    className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+                    className="flex items-center bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Profile

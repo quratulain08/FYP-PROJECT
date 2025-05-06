@@ -531,7 +531,7 @@ export default function DepartmentDetail() {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="flex items-start">
-                  <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                  <div className="p-2 rounded-full text-green-600 mr-3">
                     <Users className="h-5 w-5" />
                   </div>
                   <div>
@@ -543,7 +543,7 @@ export default function DepartmentDetail() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                  <div className="p-2 rounded-full text-green-600 mr-3">
                     <CreditCard className="h-5 w-5" />
                   </div>
                   <div>
@@ -553,7 +553,7 @@ export default function DepartmentDetail() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                  <div className="p-2 rounded-full  text-green-600 mr-3">
                     <AtSign className="h-5 w-5" />
                   </div>
                   <div>
@@ -564,7 +564,7 @@ export default function DepartmentDetail() {
 
                 {department.focalPersonPhone && (
                   <div className="flex items-start">
-                    <div className="p-2 rounded-full bg-blue-100 text-blue-600 mr-3">
+                    <div className="p-2 rounded-full  text-green-600 mr-3">
                       <Phone className="h-5 w-5" />
                     </div>
                     <div>
@@ -582,7 +582,7 @@ export default function DepartmentDetail() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+              <div className="p-3 rounded-full bg-green-100 text-red-600 mr-4">
                 <Users className="h-6 w-6" />
               </div>
               <div>
@@ -608,7 +608,7 @@ export default function DepartmentDetail() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
-              <div className="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+              <div className="p-3 rounded-full bg-green-100 text-grey-600 mr-4">
                 <Users className="h-6 w-6" />
               </div>
               <div>
