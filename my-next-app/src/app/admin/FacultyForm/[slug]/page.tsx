@@ -4,7 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import Layout from "./../../../components/Layout"
-import { User, MapPin, Briefcase, GraduationCap, Save, ArrowLeft, Info } from "lucide-react"
+import { User, MapPin, Briefcase, GraduationCap, Save, ArrowLeft, Info, AlertCircle } from "lucide-react"
 
 const provinces = [
   { name: "Punjab", cities: ["Lahore", "Faisalabad", "Rawalpindi", "Multan"] },
@@ -20,16 +20,18 @@ export default function FacultyForm() {
   const params = useParams()
   const id = params.slug as string
   const departmentId = id
-  const [faculty, setFaculty] = useState<{ university?: string }>({});
+  const [faculty, setFaculty] = useState<{ university?: string }>({})
 
   const [selectedProvince, setSelectedProvince] = useState<string>("")
   const [selectedCity, setSelectedCity] = useState<string>("")
   const [honorific, setHonorific] = useState<string>("Mr")
   const [name, setName] = useState<string>("")
   const [cnic, setCnic] = useState<string>("")
+  const [cnicError, setCnicError] = useState<string>("")
   const [gender, setGender] = useState<string>("Male")
   const [address, setAddress] = useState<string>("")
   const [email, setEmail] = useState<string>("")
+  const [emailError, setEmailError] = useState<string>("")
   const [contractType, setContractType] = useState<string>("Permanent")
   const [academicRank, setAcademicRank] = useState<string>("Professor")
   const [joiningDate, setJoiningDate] = useState<string>("")
@@ -46,48 +48,139 @@ export default function FacultyForm() {
   const [message, setMessage] = useState<string>("")
   const [messageType, setMessageType] = useState<"success" | "error">("error")
   const [error, setError] = useState("")
+  const [isCheckingCnic, setIsCheckingCnic] = useState(false)
+
+  // Email validation function
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  // CNIC validation function
+  const validateCnic = (cnic: string) => {
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/
+    return cnicRegex.test(cnic)
+  }
+
+  // Format CNIC as user types
+  const formatCnic = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, "")
+
+    // Don't add hyphens if we don't have enough digits
+    if (digits.length <= 5) return digits
+
+    // Add first hyphen
+    let formatted = `${digits.substring(0, 5)}-`
+
+    // Add second hyphen if we have enough digits
+    if (digits.length <= 12) {
+      formatted += digits.substring(5)
+    } else {
+      formatted += `${digits.substring(5, 12)}-${digits.substring(12, 13)}`
+    }
+
+    return formatted
+  }
+
+  // Check if CNIC already exists
+  const checkCnicExists = async (cnicValue: string) => {
+    if (!validateCnic(cnicValue)) return false
+
+    setIsCheckingCnic(true)
+    try {
+      const response = await fetch(`/api/check-cnic?cnic=${cnicValue}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to check CNIC")
+      }
+
+      const data = await response.json()
+      return data.exists
+    } catch (error) {
+      console.error("Error checking CNIC:", error)
+      return false
+    } finally {
+      setIsCheckingCnic(false)
+    }
+  }
 
   const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedProvince(event.target.value)
     setSelectedCity("")
   }
 
+  const handleCnicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedCnic = formatCnic(e.target.value)
+    setCnic(formattedCnic)
+
+    // Validate CNIC format
+    if (formattedCnic.length > 0 && !validateCnic(formattedCnic)) {
+      setCnicError("CNIC must be in format: 12345-1234567-1")
+    } else {
+      setCnicError("")
+
+      // Check for duplicate CNIC if format is valid
+      if (validateCnic(formattedCnic)) {
+        const exists = await checkCnicExists(formattedCnic)
+        if (exists) {
+          setCnicError("This CNIC already exists in the system")
+        }
+      }
+    }
+  }
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const emailValue = e.target.value
+    setEmail(emailValue)
+
+    // Validate email format
+    if (emailValue.length > 0 && !validateEmail(emailValue)) {
+      setEmailError("Please enter a valid email address")
+    } else {
+      setEmailError("")
+    }
+  }
+
   useEffect(() => {
     fetchUniversity()
   }, [])
 
-
   const fetchUniversity = async () => {
     try {
-      const email = localStorage.getItem("email");
+      const email = localStorage.getItem("email")
       if (!email) {
-        throw new Error("Email not found in localStorage.");
+        throw new Error("Email not found in localStorage.")
       }
 
       const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-      });
+      })
 
       if (!res.ok) {
-        throw new Error(`Failed to fetch university ID for ${email}`);
+        throw new Error(`Failed to fetch university ID for ${email}`)
       }
 
-      const data = await res.json();
-      const universityId = data.universityId;
+      const data = await res.json()
+      const universityId = data.universityId
 
       // Set the universityId in the department state
       setFaculty((prevState) => ({
         ...prevState,
         university: universityId || prevState.university, // Ensure existing value remains if universityId is undefined
-      }));
+      }))
     } catch (err) {
-      setError("Error fetching university information.");
+      setError("Error fetching university information.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-
+  }
 
   // Get faculty initials (up to 2 characters)
   const getFacultyInitials = () => {
@@ -100,8 +193,35 @@ export default function FacultyForm() {
     return name.substring(0, 2).toUpperCase()
   }
 
+  // Validate form before submission
+  const validateForm = () => {
+    let isValid = true
+
+    // Validate CNIC
+    if (!validateCnic(cnic)) {
+      setCnicError("CNIC must be in format: 12345-1234567-1")
+      isValid = false
+    }
+
+    // Validate email
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address")
+      isValid = false
+    }
+
+    return isValid
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
+
+    // Validate form before submission
+    if (!validateForm()) {
+      setMessage("Please fix the errors in the form before submitting.")
+      setMessageType("error")
+      return
+    }
+
     setLoading(true)
     setMessage("")
 
@@ -186,19 +306,6 @@ export default function FacultyForm() {
 
         {/* Faculty Preview */}
         <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200 mb-8">
-          {/* <div className="flex flex-col items-center mb-6 pb-6 border-b border-gray-100">
-            <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center mb-4">
-              <span className="text-white font-bold text-xl">{getFacultyInitials()}</span>
-            </div>
-            <h2 className="text-lg font-bold text-gray-800 text-center mb-2">
-              {honorific} {name || "Faculty Name"}
-            </h2>
-            <p className="text-sm text-gray-500 text-center mb-2">{academicRank || "Academic Rank"}</p>
-            <div className="flex items-center justify-center text-sm text-gray-500">
-              <span className="px-2 py-1 bg-gray-100 rounded-full text-xs">{contractType || "Contract Type"}</span>
-            </div>
-          </div> */}
-
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Instructions Box */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -210,6 +317,7 @@ export default function FacultyForm() {
                 <li>1. Name & CNIC cannot be changed once added.</li>
                 <li>2. For Computing Faculty Types and Requirements/Criteria please visit the website.</li>
                 <li>3. Core Computing Teacher (Check Box) must be checked for computing faculty.</li>
+                <li>4. CNIC must be in format: 12345-1234567-1</li>
               </ul>
             </div>
 
@@ -264,24 +372,36 @@ export default function FacultyForm() {
                   <label className="block text-sm font-medium text-gray-700">CNIC</label>
                   <input
                     type="text"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    className={`w-full p-3 border ${cnicError ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
                     value={cnic}
-                    onChange={(e) => setCnic(e.target.value)}
-                    placeholder="Enter CNIC number"
+                    onChange={handleCnicChange}
+                    placeholder="Format: 12345-1234567-1"
                     required
                   />
+                  {cnicError && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {cnicError}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Email</label>
                   <input
                     type="email"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    className={`w-full p-3 border ${emailError ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                     placeholder="Enter email address"
                     required
                   />
+                  {emailError && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {emailError}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -533,7 +653,7 @@ export default function FacultyForm() {
               <button
                 type="submit"
                 className="inline-flex items-center bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                disabled={loading}
+                disabled={loading || isCheckingCnic || !!cnicError || !!emailError}
               >
                 {loading ? (
                   <>
@@ -554,4 +674,3 @@ export default function FacultyForm() {
     </Layout>
   )
 }
-

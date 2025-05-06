@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Layout from "@/app/components/Layout"
-import { Building, User, Save, Info } from "lucide-react"
+import { Building, User, Save, Info, AlertCircle } from "lucide-react"
 
 const DepartmentDashboard: React.FC = () => {
   const router = useRouter()
@@ -29,18 +29,126 @@ const DepartmentDashboard: React.FC = () => {
     CoordinatorCnic: "",
     CoordinatorEmail: "",
     CoordinatorPhone: "",
-    university:"",
+    university: "",
+  })
+
+  // Validation states
+  const [errors, setErrors] = useState({
+    cnic: "",
+    email: "",
+    focalPersonCnic: "",
+    focalPersonEmail: "",
+    CoordinatorCnic: "",
+    CoordinatorEmail: "",
   })
 
   const [statusMessage, setStatusMessage] = useState("")
   const [messageType, setMessageType] = useState<"success" | "error">("success")
   const [isSubmitting, setIsSubmitting] = useState(false)
-const [universityId,setUniversityId]=useState("");
+  const [universityId, setUniversityId] = useState("")
+  const [isCheckingCnic, setIsCheckingCnic] = useState(false)
+
   const categories = ["Computing", "Engineering", "Management Sciences", "Mathematics & Natural Sciences"]
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Email validation function
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  // CNIC validation function
+  const validateCnic = (cnic: string) => {
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/
+    return cnicRegex.test(cnic)
+  }
+
+  // Format CNIC as user types
+  const formatCnic = (value: string) => {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, "")
+
+    // Don't add hyphens if we don't have enough digits
+    if (digits.length <= 5) return digits
+
+    // Add first hyphen
+    let formatted = `${digits.substring(0, 5)}-`
+
+    // Add second hyphen if we have enough digits
+    if (digits.length <= 12) {
+      formatted += digits.substring(5)
+    } else {
+      formatted += `${digits.substring(5, 12)}-${digits.substring(12, 13)}`
+    }
+
+    return formatted
+  }
+
+  // Check if CNIC already exists
+  const checkCnicExists = async (cnic: string, field: string) => {
+    if (!validateCnic(cnic)) return false
+
+    setIsCheckingCnic(true)
+    try {
+      const response = await fetch(`/api/check-cnic?cnic=${cnic}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to check CNIC")
+      }
+
+      const data = await response.json()
+      return data.exists
+    } catch (error) {
+      console.error("Error checking CNIC:", error)
+      return false
+    } finally {
+      setIsCheckingCnic(false)
+    }
+  }
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setDepartment({ ...department, university: universityId, [name]: value })
+
+    // Special handling for CNIC fields
+    if (name === "cnic" || name === "focalPersonCnic" || name === "CoordinatorCnic") {
+      const formattedCnic = formatCnic(value)
+
+      setDepartment({ ...department, university: universityId, [name]: formattedCnic })
+
+      // Validate CNIC format
+      if (formattedCnic.length > 0 && !validateCnic(formattedCnic)) {
+        setErrors((prev) => ({ ...prev, [name]: "CNIC must be in format: 12345-1234567-1" }))
+      } else {
+        setErrors((prev) => ({ ...prev, [name]: "" }))
+
+        // Check for duplicate CNIC if format is valid
+        if (validateCnic(formattedCnic)) {
+          const exists = await checkCnicExists(formattedCnic, name)
+          if (exists) {
+            setErrors((prev) => ({ ...prev, [name]: "This CNIC already exists in the system" }))
+          }
+        }
+      }
+    }
+    // Special handling for email fields
+    else if (name === "email" || name === "focalPersonEmail" || name === "CoordinatorEmail") {
+      setDepartment({ ...department, university: universityId, [name]: value })
+
+      // Validate email format
+      if (value.length > 0 && !validateEmail(value)) {
+        setErrors((prev) => ({ ...prev, [name]: "Please enter a valid email address" }))
+      } else {
+        setErrors((prev) => ({ ...prev, [name]: "" }))
+      }
+    }
+    // Default handling for other fields
+    else {
+      setDepartment({ ...department, university: universityId, [name]: value })
+    }
   }
 
   // Get department initials (up to 2 characters)
@@ -54,8 +162,58 @@ const [universityId,setUniversityId]=useState("");
     return department.name.substring(0, 2).toUpperCase()
   }
 
+  // Validate all fields before submission
+  const validateForm = () => {
+    let isValid = true
+    const newErrors = { ...errors }
+
+    // Validate HOD fields
+    if (!validateCnic(department.cnic)) {
+      newErrors.cnic = "CNIC must be in format: 12345-1234567-1"
+      isValid = false
+    }
+
+    if (!validateEmail(department.email)) {
+      newErrors.email = "Please enter a valid email address"
+      isValid = false
+    }
+
+    // Validate Focal Person fields
+    if (!validateCnic(department.focalPersonCnic)) {
+      newErrors.focalPersonCnic = "CNIC must be in format: 12345-1234567-1"
+      isValid = false
+    }
+
+    if (!validateEmail(department.focalPersonEmail)) {
+      newErrors.focalPersonEmail = "Please enter a valid email address"
+      isValid = false
+    }
+
+    // Validate Coordinator fields
+    if (!validateCnic(department.CoordinatorCnic)) {
+      newErrors.CoordinatorCnic = "CNIC must be in format: 12345-1234567-1"
+      isValid = false
+    }
+
+    if (!validateEmail(department.CoordinatorEmail)) {
+      newErrors.CoordinatorEmail = "Please enter a valid email address"
+      isValid = false
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate form before submission
+    if (!validateForm()) {
+      setStatusMessage("Please fix the errors in the form before submitting.")
+      setMessageType("error")
+      return
+    }
+
     setIsSubmitting(true)
     setStatusMessage("")
 
@@ -69,26 +227,26 @@ const [universityId,setUniversityId]=useState("");
     const focalPersonPassword = generateRandomPassword()
 
     try {
-      const email = localStorage.getItem("email");
+      const email = localStorage.getItem("email")
       if (!email) {
-        throw new Error("Email not found in localStorage.");
+        throw new Error("Email not found in localStorage.")
       }
 
       const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-      });
+      })
 
       if (!res.ok) {
-        throw new Error(`Failed to fetch university ID for ${email}`);
+        throw new Error(`Failed to fetch university ID for ${email}`)
       }
 
-      const data = await res.json();
-      const universityId = data.universityId;
+      const data = await res.json()
+      const universityId = data.universityId
       const departmentPayload = {
         ...department,
         university: universityId, // Use directly here
-      };
+      }
 
       const response = await fetch("/api/department", {
         method: "POST",
@@ -96,7 +254,7 @@ const [universityId,setUniversityId]=useState("");
           "Content-Type": "application/json",
         },
         body: JSON.stringify(departmentPayload),
-      });
+      })
 
       if (!response.ok) {
         throw new Error("Error creating department")
@@ -200,7 +358,7 @@ const [universityId,setUniversityId]=useState("");
         CoordinatorCnic: "",
         CoordinatorEmail: "",
         CoordinatorPhone: "",
-        university:String(universityId) || "",
+        university: String(universityId) || "",
       })
 
       // Redirect to departments list after a short delay
@@ -228,19 +386,6 @@ const [universityId,setUniversityId]=useState("");
 
         {/* Department Preview */}
         <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200 mb-8">
-          {/* <div className="flex flex-col items-center mb-6 pb-6 border-b border-gray-100">
-            <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center mb-4">
-              <span className="text-white font-bold text-xl">{getDepartmentInitials()}</span>
-            </div>
-            <h2 className="text-lg font-bold text-gray-800 text-center mb-2">{department.name || "Department Name"}</h2>
-            <p className="text-sm text-gray-500 text-center mb-2">{department.category || "Department Category"}</p>
-            <div className="flex items-center justify-center text-sm text-gray-500">
-              <span className="px-2 py-1 bg-gray-100 rounded-full text-xs">
-                {department.honorific} {department.hodName || "HOD Name"}
-              </span>
-            </div>
-          </div> */}
-
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Basic Information */}
             <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -336,10 +481,16 @@ const [universityId,setUniversityId]=useState("");
                     name="cnic"
                     value={department.cnic}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                    placeholder="Enter CNIC number"
+                    className={`w-full p-3 border ${errors.cnic ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
+                    placeholder="Format: 12345-1234567-1"
                     required
                   />
+                  {errors.cnic && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {errors.cnic}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -349,10 +500,16 @@ const [universityId,setUniversityId]=useState("");
                     name="email"
                     value={department.email}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    className={`w-full p-3 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
                     placeholder="Enter email address"
                     required
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {errors.email}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -424,10 +581,16 @@ const [universityId,setUniversityId]=useState("");
                     name="focalPersonCnic"
                     value={department.focalPersonCnic}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                    placeholder="Enter CNIC number"
+                    className={`w-full p-3 border ${errors.focalPersonCnic ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
+                    placeholder="Format: 12345-1234567-1"
                     required
                   />
+                  {errors.focalPersonCnic && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {errors.focalPersonCnic}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -437,10 +600,16 @@ const [universityId,setUniversityId]=useState("");
                     name="focalPersonEmail"
                     value={department.focalPersonEmail}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    className={`w-full p-3 border ${errors.focalPersonEmail ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
                     placeholder="Enter email address"
                     required
                   />
+                  {errors.focalPersonEmail && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {errors.focalPersonEmail}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -500,10 +669,16 @@ const [universityId,setUniversityId]=useState("");
                     name="CoordinatorCnic"
                     value={department.CoordinatorCnic}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                    placeholder="Enter CNIC number"
+                    className={`w-full p-3 border ${errors.CoordinatorCnic ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
+                    placeholder="Format: 12345-1234567-1"
                     required
                   />
+                  {errors.CoordinatorCnic && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {errors.CoordinatorCnic}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -513,10 +688,16 @@ const [universityId,setUniversityId]=useState("");
                     name="CoordinatorEmail"
                     value={department.CoordinatorEmail}
                     onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    className={`w-full p-3 border ${errors.CoordinatorEmail ? "border-red-500" : "border-gray-300"} rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors`}
                     placeholder="Enter email address"
                     required
                   />
+                  {errors.CoordinatorEmail && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      {errors.CoordinatorEmail}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -559,7 +740,7 @@ const [universityId,setUniversityId]=useState("");
               <button
                 type="submit"
                 className="inline-flex items-center bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isCheckingCnic || Object.values(errors).some((error) => error !== "")}
               >
                 {isSubmitting ? (
                   <>
@@ -582,4 +763,3 @@ const [universityId,setUniversityId]=useState("");
 }
 
 export default DepartmentDashboard
-
