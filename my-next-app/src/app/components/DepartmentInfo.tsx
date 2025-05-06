@@ -37,8 +37,6 @@ const DepartmentCard = ({
   onEdit: (e: React.MouseEvent) => void
   onDelete: (e: React.MouseEvent) => void
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
-
   // Get department initials (up to 2 characters)
   const getInitials = () => {
     const words = department.name.split(" ")
@@ -50,10 +48,8 @@ const DepartmentCard = ({
 
   return (
     <div
-      className={`bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg ${isHovered ? "border-green-400" : ""} cursor-pointer`}
+      className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer"
       onClick={onCardClick}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Action Buttons */}
       <div className="flex justify-end p-3">
@@ -69,65 +65,61 @@ const DepartmentCard = ({
 
       {/* Circle with Department Initials */}
       <div className="flex flex-col items-center justify-center p-6 pt-0">
-        <div
-          className={`w-24 h-24 rounded-full bg-green-400 flex items-center justify-center mb-4 transition-all duration-300 ${isHovered ? "transform scale-110" : ""}`}
-        >
+        <div className="w-24 h-24 rounded-full bg-green-400 flex items-center justify-center mb-4">
           <span className="text-white font-bold text-2xl">{getInitials()}</span>
         </div>
         <h2 className="text-xl font-bold text-gray-800 text-center mb-2">{department.name}</h2>
-        <p className="text-sm text-gray-500 text-center">
+        <p className="text-sm text-gray-500 text-center mb-4">
           {department.honorific} {department.hodName}
         </p>
       </div>
 
-      {/* Department Details - Visible on Hover */}
-      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isHovered ? "max-h-96" : "max-h-0"}`}>
-        <div className="p-6 pt-0 border-t border-gray-100">
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center gap-3">
-              <Tag className="text-green-500 w-4 h-4" />
-              <div>
-                <p className="text-xs text-gray-500">Category</p>
-                <p className="text-sm font-medium text-gray-800">{department.category}</p>
-              </div>
+      {/* Department Details - Always Visible */}
+      <div className="p-6 pt-0 border-t border-gray-100">
+        <div className="grid grid-cols-1 gap-3">
+          <div className="flex items-center gap-3">
+            <Tag className="text-green-500 w-4 h-4" />
+            <div>
+              <p className="text-xs text-gray-500">Category</p>
+              <p className="text-sm font-medium text-gray-800">{department.category}</p>
             </div>
-
-            <div className="flex items-center gap-3">
-              <Calendar className="text-green-500 w-4 h-4" />
-              <div>
-                <p className="text-xs text-gray-500">Start Date</p>
-                <p className="text-sm font-medium text-gray-800">{department.startDate}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Mail className="text-green-500 w-4 h-4" />
-              <div>
-                <p className="text-xs text-gray-500">Email</p>
-                <p className="text-sm font-medium text-gray-800">{department.email}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Phone className="text-green-500 w-4 h-4" />
-              <div>
-                <p className="text-xs text-gray-500">Phone</p>
-                <p className="text-sm font-medium text-gray-800">{department.phone}</p>
-              </div>
-            </div>
-
-            {department.focalPersonName && (
-              <div className="flex items-center gap-3">
-                <User className="text-green-500 w-4 h-4" />
-                <div>
-                  <p className="text-xs text-gray-500">Focal Person</p>
-                  <p className="text-sm font-medium text-gray-800">
-                    {department.focalPersonHonorific} {department.focalPersonName}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
+
+          <div className="flex items-center gap-3">
+            <Calendar className="text-green-500 w-4 h-4" />
+            <div>
+              <p className="text-xs text-gray-500">Start Date</p>
+              <p className="text-sm font-medium text-gray-800">{department.startDate}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Mail className="text-green-500 w-4 h-4" />
+            <div>
+              <p className="text-xs text-gray-500">Email</p>
+              <p className="text-sm font-medium text-gray-800">{department.email}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Phone className="text-green-500 w-4 h-4" />
+            <div>
+              <p className="text-xs text-gray-500">Phone</p>
+              <p className="text-sm font-medium text-gray-800">{department.phone}</p>
+            </div>
+          </div>
+
+          {department.focalPersonName && (
+            <div className="flex items-center gap-3">
+              <User className="text-green-500 w-4 h-4" />
+              <div>
+                <p className="text-xs text-gray-500">Focal Person</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {department.focalPersonHonorific} {department.focalPersonName}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -147,24 +139,23 @@ const DepartmentInfo: React.FC = () => {
   const fetchDepartments = async () => {
     try {
       const email = localStorage.getItem("email")
-             const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
-              method: "GET",
-              headers: { "Content-Type": "application/json" },
-            });
-            
-           
+      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
       if (!res.ok) {
-        throw new Error(`Failed to fetch university ID for ${email}`);
+        throw new Error(`Failed to fetch university ID for ${email}`)
       }
-      
-      const dataa= await res.json();
+
+      const dataa = await res.json()
       // Assuming the response is an object with the universityId property
-      const universityId = dataa.universityId;
+      const universityId = dataa.universityId
 
       const response = await fetch(`/api/departmentByUniversity/${universityId}`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" }, 
-      });
+        headers: { "Content-Type": "application/json" },
+      })
       if (!response.ok) throw new Error("Failed to fetch departments")
 
       const data = await response.json()
@@ -283,4 +274,3 @@ const DepartmentInfo: React.FC = () => {
 }
 
 export default DepartmentInfo
-

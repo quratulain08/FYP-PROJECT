@@ -1,5 +1,5 @@
-// pages/faculty.js
-import DepartmentDashboard from '../../components/departmentForm';
+// // pages/faculty.js
+// import DepartmentDashboard from '../../components/departmentForm';
 import DepartmentInfo from '../../components/DepartmentInfo';
 import Layout from '../../components/Layout';
 
