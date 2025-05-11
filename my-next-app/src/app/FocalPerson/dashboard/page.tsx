@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
 
         const dataa= await response.json();
         // Assuming the response is an object with the universityId property
-        const departmentId = dataa.departmentId;
+        const departmentId = dataa._id;
         
         const res = await fetch(`/api/internshipByDepartment/${departmentId}`)
         if (!res.ok) throw new Error("Failed to fetch internships")

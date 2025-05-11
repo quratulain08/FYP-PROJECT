@@ -134,7 +134,7 @@ if (!response2.ok) {
 const dataa = await response2.json();
 const universityId = dataa.universityId; // Access the correct property
       
-      const res = await fetch(`/api/studentByUniversity/${universityId}`, {
+      const res = await fetch(`/api/studentNoInternship/${universityId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }, // Missing comma here
       });
