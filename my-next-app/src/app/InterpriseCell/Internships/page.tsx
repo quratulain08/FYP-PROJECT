@@ -1,11 +1,11 @@
 "use client"
 
 import type React from "react"
-import MakeAInternship from "../makeAInternship/page"; // Adjust the import path based on your file structure
+import MakeAInternship from "../makeAInternship/page" // Adjust the import path based on your file structure
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import InterpriseCellLayout from "../InterpriseCellLayout"
-import GradeReports from "../gradeReport/page"; // Adjust path as necessary
+import GradeReports from "../gradeReport/page" // Adjust path as necessary
 
 import {
   Trash2,
@@ -18,6 +18,8 @@ import {
   AlertCircle,
   Search,
   Filter,
+  FileText,
+  X,
 } from "lucide-react"
 
 interface Internship {
@@ -32,6 +34,7 @@ interface Internship {
   assignedFaculty: string
   assignedStudents: string
   isApproved: boolean
+  rejectionComment?: string
 }
 type Department = {
   _id: string
@@ -40,8 +43,11 @@ type Department = {
 
 const Internships: React.FC = () => {
   // Add this style tag
-  const [isPopupVisible, setPopupVisible] = useState(false);
-  const [visibleInternshipId, setVisibleInternshipId] = useState<string | null>(null);
+  const [isPopupVisible, setPopupVisible] = useState(false)
+  const [visibleInternshipId, setVisibleInternshipId] = useState<string | null>(null)
+  const [showGradeReportModal, setShowGradeReportModal] = useState(false)
+  const [selectedInternshipId, setSelectedInternshipId] = useState<string | null>(null)
+  const [selectedInternship, setSelectedInternship] = useState<Internship | null>(null)
 
   const fadeInAnimation = `
     @keyframes fadeIn {
@@ -317,16 +323,20 @@ const Internships: React.FC = () => {
   }
   // Function to handle showing the popup
   const handleShowPopup = () => {
-    setPopupVisible(true);
-  };
+    setPopupVisible(true)
+  }
 
   // Function to handle hiding the popup
   const handleClosePopup = () => {
-    setPopupVisible(false);
+    setPopupVisible(false)
     fetchInternships()
+  }
 
-  };
-
+  // Function to open grade report modal
+  const openGradeReportModal = (internshipId: string) => {
+    setSelectedInternshipId(internshipId)
+    setShowGradeReportModal(true)
+  }
 
   return (
     <InterpriseCellLayout>
@@ -414,7 +424,6 @@ const Internships: React.FC = () => {
               </div>
             </div>
           </div>
-     
 
           <div className="bg-white rounded-lg shadow-md p-5 border-l-4 border-red-500">
             <div className="flex items-center">
@@ -440,34 +449,36 @@ const Internships: React.FC = () => {
         </div>
 
         <div className="flex justify-between items-center mb-8">
-      {/* This is your button on the right */}
-      <button
-        onClick={handleShowPopup}
-        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200"
-        >
-        Add Internship
-      </button>
+          {/* This is your button on the right */}
+          <button
+            onClick={handleShowPopup}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md transition-colors duration-200"
+          >
+            Add Internship
+          </button>
 
-      {/* Popup (MakeAInternship) */}
-      {isPopupVisible && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full">
-            <MakeAInternship
-              universityId="someUniversityId"
-              onSuccess={(newInternship) => {
-                console.log("Internship created successfully:", newInternship);
-                handleClosePopup(); // Close the popup after success
-              }}
-            />
-            <button
-              onClick={handleClosePopup}
-              className="absolute top-2 right-2 text-gray-500"
-            >
-              X
-            </button>
-          </div>
-        </div>
-      )}
+          {/* Popup (MakeAInternship) */}
+          {isPopupVisible && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto">
+              <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-5xl mx-4 my-8">
+                <div className="max-h-[80vh] overflow-y-auto">
+                  <MakeAInternship
+                    universityId="someUniversityId"
+                    onSuccess={(newInternship) => {
+                      console.log("Internship created successfully:", newInternship)
+                      handleClosePopup() // Close the popup after success
+                    }}
+                  />
+                </div>
+                <button
+                  onClick={handleClosePopup}
+                  className="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-full p-2 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {filteredInternships.length === 0 ? (
@@ -514,7 +525,6 @@ const Internships: React.FC = () => {
                       </div>
                     </div>
 
-
                     <div className="flex items-center space-x-2">
                       <span
                         className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
@@ -524,161 +534,6 @@ const Internships: React.FC = () => {
                       >
                         {internship.isApproved ? "Approved" : "Pending Approval"}
                       </span>
-
-                      <button
-                        onClick={() => setShowPopup(true)}
-                        className="bg-teal-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                      >
-                         Assign 
-                      </button>
-
-                      {showPopup && (
-                        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
-                          <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
-                            <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-4">
-                              <h2 className="text-xl font-semibold text-white flex items-center">
-                                <Briefcase className="h-5 w-5 mr-2" />
-                                Assign Department
-                              </h2>
-                            </div>
-                            <div className="p-6">
-                              {loading ? (
-                                <div className="flex justify-center items-center py-8">
-                                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
-                                </div>
-                              ) : error ? (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                                  <p className="text-red-600 flex items-center">
-                                    <AlertCircle className="h-4 w-4 mr-2" />
-                                    {error}
-                                  </p>
-                                </div>
-                              ) : (
-                                <>
-                                  <p className="text-gray-600 mb-4">
-                                    Select a department to assign this internship to:
-                                  </p>
-                                  <div className="max-h-60 overflow-auto border border-gray-200 rounded-lg mb-4">
-                                    {departments.length === 0 ? (
-                                      <div className="p-4 text-center text-gray-500">No departments available</div>
-                                    ) : (
-                                      <ul className="divide-y divide-gray-200">
-                                        {departments.map((dept) => (
-                                          <li key={dept._id} className="hover:bg-gray-50 transition-colors">
-                                            <button
-                                              className="w-full px-4 py-3 flex justify-between items-center text-left"
-                                              onClick={() => handleAssignDepartment(internship._id, dept._id)}
-                                            >
-                                              <span className="font-medium text-gray-700">{dept.name}</span>
-                                              <span className="text-teal-600 hover:text-teal-700">
-                                                <CheckCircle className="h-5 w-5" />
-                                              </span>
-                                            </button>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    )}
-                                  </div>
-                                </>
-                              )}
-                              <div className="flex justify-end space-x-3 mt-2">
-                                <button
-                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                                  onClick={() => setShowPopup(false)}
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      <button
-                        className="mt-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        onClick={() => setShowRejectPopup(true)}
-                      >
-                        Reject
-                      </button>
-
-                      
-                      {showRejectPopup && (
-                        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
-                          <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
-                            <div className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
-                              <h2 className="text-xl font-semibold text-white flex items-center">
-                                <XCircle className="h-5 w-5 mr-2" />
-                                Reject Internship
-                              </h2>
-                            </div>
-                            <div className="p-6">
-                              <p className="text-gray-600 mb-4">
-                                Please provide a reason for rejecting this internship:
-                              </p>
-                              <textarea
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4 h-32 resize-none"
-                                value={rejectionReason}
-                                onChange={(e) => setRejectionReason(e.target.value)}
-                                placeholder="Enter detailed reason for rejection..."
-                              ></textarea>
-                              <div className="flex justify-end space-x-3">
-                                <button
-                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
-                                  onClick={() => setShowRejectPopup(false)}
-                                >
-                                  Cancel
-                                </button>
-                                <button
-                                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
-                                  onClick={() => handleRejectInternship(internship._id)}
-                                  disabled={!rejectionReason.trim()}
-                                >
-                                  <XCircle className="h-4 w-4 mr-2" />
-                                  Confirm Rejection
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDelete(internship._id)
-                        }}
-                        className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                        title="Delete"
-                        style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </button>
-
-                    <button
-className="
-     bg-gradient-to-r from-green-500 to-teal-400 
-     text-white font-medium 
-     px-5 py-2 rounded-lg 
-     shadow-md hover:shadow-lg 
-     transition-all duration-200 
-     hover:from-green-600 hover:to-teal-500 
-     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-300
-   "                onClick={() =>
-                  setVisibleInternshipId(visibleInternshipId === internship._id ? null : internship._id)
-                }
-              >
-                {visibleInternshipId === internship._id ? "Hide Grade Reports" : "View Grade Reports"}
-              </button>
-            
-
-            {visibleInternshipId === internship._id && (
-              <div className="mt-4">
-                <GradeReports internshipId={internship._id} />
-              </div>
-            )}
-
-                      
                     </div>
                   </div>
 
@@ -761,7 +616,7 @@ className="
                 </div>
 
                 <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-wrap justify-between items-center">
                     <div className="flex items-center space-x-4">
                       <span
                         className="text-sm text-gray-500"
@@ -770,17 +625,198 @@ className="
                         ID: {internship._id.substring(0, 8)}...
                       </span>
                     </div>
-                    <button
-                      onClick={() => router.push(`/InterpriseCell/internships/${internship._id}`)}
-                      className="text-green-600 hover:text-green-700 text-sm font-medium"
-                      style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-                    >
-                      View Details
-                    </button>
+
+                    {/* Action buttons in a single row */}
+                    <div className="flex items-center space-x-3 mt-2 md:mt-0">
+                      <button
+                        onClick={() => {
+                          setShowPopup(true)
+                          setSelectedInternship(internship)
+                        }}
+                        className="inline-flex items-center px-3 py-1.5 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Assign
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowRejectPopup(true)
+                          setSelectedInternship(internship)
+                        }}
+                        className="inline-flex items-center px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                      >
+                        <XCircle className="h-4 w-4 mr-1" />
+                        Reject
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDelete(internship._id)
+                        }}
+                        className="inline-flex items-center px-3 py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </button>
+
+                      <button
+                        className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded hover:from-green-600 hover:to-teal-600 transition-colors"
+                        onClick={() => openGradeReportModal(internship._id)}
+                      >
+                        <FileText className="h-4 w-4 mr-1" />
+                        View Grade Reports
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Department Assignment Popup */}
+        {showPopup && selectedInternship && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
+              <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-4">
+                <h2 className="text-xl font-semibold text-white flex items-center">
+                  <Briefcase className="h-5 w-5 mr-2" />
+                  Assign Department
+                </h2>
+              </div>
+              <div className="p-6">
+                {loading ? (
+                  <div className="flex justify-center items-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
+                  </div>
+                ) : error ? (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <p className="text-red-600 flex items-center">
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      {error}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-gray-600 mb-4">Select a department to assign this internship to:</p>
+                    <div className="max-h-60 overflow-auto border border-gray-200 rounded-lg mb-4">
+                      {departments.length === 0 ? (
+                        <div className="p-4 text-center text-gray-500">No departments available</div>
+                      ) : (
+                        <ul className="divide-y divide-gray-200">
+                          {departments.map((dept) => (
+                            <li key={dept._id} className="hover:bg-gray-50 transition-colors">
+                              <button
+                                className="w-full px-4 py-3 flex justify-between items-center text-left"
+                                onClick={() => handleAssignDepartment(selectedInternship._id, dept._id)}
+                              >
+                                <span className="font-medium text-gray-700">{dept.name}</span>
+                                <span className="text-teal-600 hover:text-teal-700">
+                                  <CheckCircle className="h-5 w-5" />
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </>
+                )}
+                <div className="flex justify-end space-x-3 mt-2">
+                  <button
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                    onClick={() => {
+                      setShowPopup(false)
+                      setSelectedInternship(null)
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Rejection Popup */}
+        {showRejectPopup && selectedInternship && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl w-96 overflow-hidden animate-fadeIn">
+              <div className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4">
+                <h2 className="text-xl font-semibold text-white flex items-center">
+                  <XCircle className="h-5 w-5 mr-2" />
+                  Reject Internship
+                </h2>
+              </div>
+              <div className="p-6">
+                <p className="text-gray-600 mb-4">Please provide a reason for rejecting this internship:</p>
+                <textarea
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 mb-4 h-32 resize-none"
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="Enter detailed reason for rejection..."
+                ></textarea>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                    onClick={() => {
+                      setShowRejectPopup(false)
+                      setSelectedInternship(null)
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+                    onClick={() => handleRejectInternship(selectedInternship._id)}
+                    disabled={!rejectionReason.trim()}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Confirm Rejection
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Grade Reports Modal */}
+        {showGradeReportModal && selectedInternshipId && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 backdrop-blur-sm">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-fadeIn">
+              <div className="bg-gradient-to-r from-green-600 to-teal-500 px-6 py-4 flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-white flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Grade Reports
+                </h2>
+                <button
+                  onClick={() => setShowGradeReportModal(false)}
+                  className="text-white hover:text-gray-200 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              <div className="p-6 overflow-auto max-h-[calc(90vh-80px)]">
+                <GradeReports internshipId={selectedInternshipId} />
+              </div>
+              <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-end">
+                <button
+                  onClick={() => setShowGradeReportModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="fixed bottom-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg shadow-lg">
+            {successMessage}
           </div>
         )}
       </div>

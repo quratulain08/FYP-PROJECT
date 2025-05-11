@@ -160,7 +160,8 @@ const VocalPerson: React.FC = () => {
         placeholder="cnic"
         value={profile?.cnic || ""}
         readOnly
-        className="w-full p-3 border mb-3 rounded-lg bg-gray-200 cursor-not-allowed"
+        className="w।
+-full p-3 border mb-3 rounded-lg bg-gray-200 cursor-not-allowed"
       />
       <input
         type="text"
@@ -187,10 +188,18 @@ const VocalPerson: React.FC = () => {
     </form>
   );
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto p-6">
-    {loading ? <p>Loading...</p> : editMode ? renderForm() : renderDisplay()}
-  </div>
+      {editMode ? renderForm() : renderDisplay()}
+    </div>
   );
 };
 
