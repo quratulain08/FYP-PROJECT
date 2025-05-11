@@ -16,11 +16,13 @@ const FacultyLayout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
     const role = localStorage.getItem('role'); // Retrieve role from local storage
-
+    const email = localStorage.getItem('email');
+    setEmail(email);    
     if (token) {
         setIsAuthenticated(true); // User is authenticated
           if (role === 'Faculty') {
-          setIsFaculty(true); // User has admin role
+          setIsFaculty(true);
+           // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin
         }
