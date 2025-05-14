@@ -12,10 +12,11 @@ function getErrorMessage(error: unknown): string {
 
 export async function GET(
   req: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: { depId: string; uniId: string } }
 ) {
-  const depId = params.slug;
-
+  const { depId, uniId } = params;
+  
+const universityId=uniId; 
   try {
     if (!depId) {
       return NextResponse.json(
@@ -31,7 +32,8 @@ export async function GET(
     };
 
     // Step 1: Get all assigned student IDs
-    const internships = await InternshipModel.find({ department: depId });
+    const internships = await InternshipModel.find({ universityId });
+
 
     const assignedStudentIds = internships
       .flatMap(i => i.assignedStudents.map(id => id.toString()));
