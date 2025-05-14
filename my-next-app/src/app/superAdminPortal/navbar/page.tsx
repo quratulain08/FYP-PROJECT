@@ -10,25 +10,23 @@ const navbar = () => {
   const [activeButton, setActiveButton] = useState<string>("")
 
   useEffect(() => {
-    
-
-    // Set initial active button based on current path
     if (pathname?.startsWith("/superAdminPortal/makeAdmin")) {
-      setActiveButton("MakeAdmin")
-    } else if (pathname?.startsWith("/superAdminPortal/Industry")) {
-      setActiveButton("Industry")
+      setActiveButton("makeAdmin")
+    } else if (pathname?.startsWith("/superAdminPortal/makeIndustry")) {
+      setActiveButton("industry")
     } else if (
       pathname?.startsWith("/superAdminPortal/internshipdisplay") ||
       pathname?.startsWith("/superAdminPortal/internships") ||
       pathname?.startsWith("/superAdminPortal/createinternship")
     ) {
-      setActiveButton("industry")
+      setActiveButton("internship")
     } else if (pathname?.startsWith("/superAdminPortal/students")) {
       setActiveButton("students")
     } else if (pathname?.startsWith("/superAdminPortal/faculty")) {
       setActiveButton("faculty")
     }
   }, [pathname])
+  
 
  
 
@@ -54,30 +52,30 @@ const navbar = () => {
       <nav className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto">
           <div className="flex overflow-x-auto hide-scrollbar">
-            <button
-              onClick={() => handleNavigation("/superAdminPortal/makeAdmin", "makeAdmin")}
-              className={`flex items-center px-4 py-3 ${
-                activeButton === "makeAdmin"
-                  ? "border-b-2 border-green-600 text-green-600"
-                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
-              }`}
-            >
-              <Home className="h-5 w-5 mr-2" />
-              <span>MakeAdmin</span>
-            </button>
+          <button
+  onClick={() => handleNavigation("/superAdminPortal/makeAdmin", "makeAdmin")}
+  className={`flex items-center px-4 py-3 ${
+    activeButton === "makeAdmin"
+      ? "border-b-2 border-green-600 text-green-600"
+      : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+  }`}
+>
+  <Home className="h-5 w-5 mr-2" />
+  <span>MakeAdmin</span>
+</button>
 
-            <button
-              onClick={() => handleNavigation("/superAdminPortal/makeIndustry", "Industry")}
-              className={`flex items-center px-4 py-3 ${
-                activeButton === "Industry"
-                  ? "border-b-2 border-green-600 text-green-600"
-                  : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
-              }`}
-            >
-              <Building2 className="h-5 w-5 mr-2" />
-              <span>MakeIndustry</span>
-            </button>
-
+<button
+  onClick={() => handleNavigation("/superAdminPortal/makeIndustry", "industry")}
+  className={`flex items-center px-4 py-3 ${
+    activeButton === "industry"
+      ? "border-b-2 border-green-600 text-green-600"
+      : "text-gray-600 hover:text-green-600 hover:border-b-2 hover:border-green-200"
+  }`}
+>
+  <Building2 className="h-5 w-5 mr-2" />
+  <span>MakeIndustry</span>
+</button>
+{/* 
             <button
               onClick={() => handleNavigation("/Superadmin/Industry", "industry")}
               className={`flex items-center px-4 py-3 ${
@@ -112,7 +110,7 @@ const navbar = () => {
             >
               <Users className="h-5 w-5 mr-2" />
               <span>Faculty</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>

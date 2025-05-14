@@ -68,6 +68,9 @@ const Login: React.FC = () => {
           case "enterprisecell":
             router.push("/InterpriseCell/dashboard");
             break;
+          case "superadmin":
+            router.push("/superAdminPortal/makeIndustry");
+            break;
           default:
             
             router.push("/dashboard");
