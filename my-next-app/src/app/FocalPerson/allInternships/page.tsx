@@ -111,29 +111,16 @@ const Internships: React.FC = () => {
 
       const data = await response.json()
       setFaculties(data)
-      fetchStudents()
+      fetchStudents(deptId)
     } catch (err) {
       setError("Error fetching faculties.")
     }
   }
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (deptId: string) => {
     try {
-      const email = localStorage.getItem("email");
-      const response2 = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
       
-     
-if (!response2.ok) {
-  throw new Error(`Failed to fetch university ID for ${email}`);
-}
-
-const dataa = await response2.json();
-const universityId = dataa.universityId; // Access the correct property
-      
-      const res = await fetch(`/api/studentNoInternship/${universityId}`, {
+      const res = await fetch(`/api/studentsByDepartment/${deptId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }, // Missing comma here
       });

@@ -79,7 +79,10 @@ const universityId = data.universityId; // Access the correct property
       const department = await departmentRes.json()
       setDepartment(department)
 
-      const departmentStudents = students.filter((student) => student.department === department.name)
+      const departmentStudents = students.filter(
+        (student) => Array.isArray(student.department) && student.department.includes(department._id)
+      );
+      
 
       const batchSummary = departmentStudents.reduce(
         (acc, student) => {

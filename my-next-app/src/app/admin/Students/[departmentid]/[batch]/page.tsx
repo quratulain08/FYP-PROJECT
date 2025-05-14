@@ -123,8 +123,10 @@ const StudentsPage: React.FC = () => {
       const departmentData: Department = await ress.json()
       setDepartment(departmentData)
 
-      const filteredByDepartment = data.filter((student) => student.department === departmentData.name)
-      setStudents(filteredByDepartment)
+      const filteredByDepartment = data.filter((student) =>
+      Array.isArray(student.department) && student.department.includes(departmentData._id)
+    );
+          setStudents(filteredByDepartment)
       setFilteredStudents(filteredByDepartment)
 
       const uniqueSections = Array.from(new Set(filteredByDepartment.map((student) => student.section)))
@@ -187,7 +189,7 @@ const StudentsPage: React.FC = () => {
     setUploading(true)
     try {
       const batch = currentBatch
-      const departmentName = department?.name || "Unknown Department"
+      const departmentName = department?._id || "Unknown Department"
       await handleFileUpload(file, batch, departmentName,universityId )
     } catch (error) {
       console.error("Upload error:", error)

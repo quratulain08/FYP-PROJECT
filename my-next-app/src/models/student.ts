@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 // Define the interface for a student document
 export interface IStudent extends Document {
   name: string;
-  department: string;
+  department:  mongoose.Types.ObjectId[];
   batch: string;
   section: string; // New field for section
   didInternship: boolean;
@@ -16,7 +16,12 @@ export interface IStudent extends Document {
 // Define the schema for the student model
 const studentSchema: Schema<IStudent> = new Schema({
   name: { type: String, required: true },
-  department: { type: String, required: true },
+  department:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department", // Reference to the Student model
+    },
+  ],
   batch: { type: String, required: true },
   section: { type: String, required: true }, // Add section to schema
   didInternship: { type: Boolean, required: true },
