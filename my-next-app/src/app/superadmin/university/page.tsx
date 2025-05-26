@@ -106,10 +106,10 @@ export default function UniversitiesPage() {
 
   return (
     <SuperAdminLayout>
-      if(loading || error){}
+     
        <div className="min-h-screen bg-gray-50 pb-12">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
+      <div className="bg-green-600 from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div>
@@ -167,7 +167,7 @@ export default function UniversitiesPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Type
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -178,7 +178,7 @@ export default function UniversitiesPage() {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Contact
-                    </th>
+                    </th> */}
                     {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th> */}
@@ -198,7 +198,7 @@ export default function UniversitiesPage() {
                           </div>
                         </td>
                         
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <div className="space-y-1">
                             <div className="flex items-center text-sm">
                               <Mail className="h-3 w-3 text-gray-400 mr-1" />
@@ -206,7 +206,7 @@ export default function UniversitiesPage() {
                             </div>
                             
                           </div>
-                        </td>
+                        </td> */}
                         {/* <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
                             className="text-teal-600 border border-teal-200 hover:bg-teal-50 hover:text-teal-700 px-3 py-1 rounded-md text-sm"

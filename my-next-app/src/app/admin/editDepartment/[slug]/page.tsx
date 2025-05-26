@@ -114,9 +114,7 @@ const DepartmentDashboard: React.FC = () => {
 
   return (
     <Layout>
-      if(loading || error || err){
-
-      }
+     
     <div className="max-w-8xl mx-auto w-full">
       <div className="flex justify-between items-center mb-4">
         <h1 className=" text-lg font-semibold text-green-600">Edit The Department</h1>

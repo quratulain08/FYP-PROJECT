@@ -88,7 +88,6 @@ const Internships: React.FC = () => {
         throw new Error("Department ID not found");
       }
     
-      setDepartmentId(departmentId);
     
       const res = await fetch(`/api/internshipByDepartment/${departmentId}`);
       if (!res.ok) {
@@ -288,7 +287,6 @@ const res = await fetch(`/api/studentsByDepartment/${deptId}/${universityId}`, {
 
   return (
     <FocalPersonLayout>
-      if(err || error){}
       <div className="max-w-7xl mx-auto p-6">
         {notification && (
           <div

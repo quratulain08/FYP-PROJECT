@@ -247,9 +247,7 @@ const AllInternships: React.FC = () => {
 
   return (
     <FocalPersonLayout>
-      if(err){
-        
-      }
+
       <div className="max-w-7xl mx-auto p-6">
         {notification && (
           <div

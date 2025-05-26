@@ -143,7 +143,6 @@ const BatchSummary: React.FC = () => {
 
     
       <div className="max-w-6xl mx-auto p-6">
-        if(err){}
         <h1 className="text-3xl font-semibold text-green-600 mb-8">
           Batch Summary for Department
         </h1>

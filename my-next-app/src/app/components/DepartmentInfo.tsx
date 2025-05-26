@@ -228,7 +228,6 @@ const DepartmentInfo: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
-          if(err){}
 
       <div className="flex justify-between items-center mb-8">
         <button

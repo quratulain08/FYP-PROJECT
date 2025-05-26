@@ -92,7 +92,7 @@ const navbar = () => {
               <span>Industry</span>
             </button>
 
-            <button
+            {/* <button
               onClick={() => handleNavigation("/superadmin/student", "students")}
               className={`flex items-center px-4 py-3 ${
                 activeButton === "students"
@@ -114,7 +114,7 @@ const navbar = () => {
             >
               <Users className="h-5 w-5 mr-2" />
               <span>Faculty</span>
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>

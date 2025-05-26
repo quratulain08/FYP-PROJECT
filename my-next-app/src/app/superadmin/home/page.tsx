@@ -85,7 +85,7 @@ export default function HomePage() {
       </header> */}
 
       {/* Hero Section */}
-      <section className="pt-20 pb-32 bg-gradient-to-br from-teal-700 via-teal-600 to-emerald-500 text-white relative overflow-hidden">
+      <section className="pt-20 pb-32 bg-green-600   from-teal-700 via-teal-600 to-emerald-500 text-white relative overflow-hidden">
         {/* Background pattern */}
         {/* <div className="absolute inset-0 opacity-10">
           <img
@@ -110,17 +110,14 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
-                  onClick={() => router.push("/Register")}
+                  onClick={() => router.push("/superadmin/industry")}
                   className="px-6 py-3 bg-white text-teal-700 font-medium rounded-md hover:bg-gray-100 transition-colors shadow-lg"
                   style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                 >
                   Register
                 </button>
                 <button
-                  onClick={() => {
-                    // // const contactSection = document.getElementById("contact")
-                    // contactSection?.scrollIntoView({ behavior: "smooth" })
-                  }}
+                  onClick={() => router.push("/Login")}
                   className="px-6 py-3 bg-transparent border border-white text-white font-medium rounded-md hover:bg-white/10 transition-colors"
                   style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                 >
@@ -634,9 +631,9 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <img src="/placeholder.svg?height=300&width=400" alt="Campus Map" className="rounded-lg shadow-md" />
-              </div>
+              </div> */}
             </div>
 
             <div>
@@ -738,7 +735,7 @@ export default function HomePage() {
                   <div>
                     <button
                       type="submit"
-                      className="w-full px-6 py-3 bg-gradient-to-r from-teal-600 to-emerald-500 text-white font-medium rounded-lg hover:from-teal-700 hover:to-emerald-600 transition-colors flex items-center justify-center shadow-lg"
+                      className="w-full px-6 py-3 bg-green-600 from-teal-600 to-emerald-500 text-white font-medium rounded-lg hover:from-teal-700 hover:to-emerald-600 transition-colors flex items-center justify-center shadow-lg"
                       style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                       disabled={submitting}
                     >

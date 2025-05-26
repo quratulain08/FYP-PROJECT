@@ -17,7 +17,7 @@ export default function StudentPage() {
     <SuperAdminLayout>
       <div className="min-h-screen bg-gray-50 pb-12">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
+        <div className="bg-green-600 from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
           <div className="container mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div>
@@ -104,7 +104,7 @@ export default function StudentPage() {
                     <span className="text-sm font-medium text-gray-700">92%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-teal-600 h-2.5 rounded-full" style={{ width: "92%" }}></div>
+                    <div className="bg-green-600 h-2.5 rounded-full" style={{ width: "92%" }}></div>
                   </div>
                 </div>
                 <div>
@@ -113,7 +113,7 @@ export default function StudentPage() {
                     <span className="text-sm font-medium text-gray-700">85%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-teal-600 h-2.5 rounded-full" style={{ width: "85%" }}></div>
+                    <div className="bg-green-600 h-2.5 rounded-full" style={{ width: "85%" }}></div>
                   </div>
                 </div>
                 <div>
@@ -122,7 +122,7 @@ export default function StudentPage() {
                     <span className="text-sm font-medium text-gray-700">78%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-teal-600 h-2.5 rounded-full" style={{ width: "78%" }}></div>
+                    <div className="bg-green-600 h-2.5 rounded-full" style={{ width: "78%" }}></div>
                   </div>
                 </div>
                 <div>
@@ -131,7 +131,7 @@ export default function StudentPage() {
                     <span className="text-sm font-medium text-gray-700">70%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-teal-600 h-2.5 rounded-full" style={{ width: "70%" }}></div>
+                    <div className="bg-green-600 h-2.5 rounded-full" style={{ width: "70%" }}></div>
                   </div>
                 </div>
                 <div>
@@ -140,7 +140,7 @@ export default function StudentPage() {
                     <span className="text-sm font-medium text-gray-700">65%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-teal-600 h-2.5 rounded-full" style={{ width: "65%" }}></div>
+                    <div className="bg-green-600 h-2.5 rounded-full" style={{ width: "65%" }}></div>
                   </div>
                 </div>
               </div>
@@ -152,26 +152,26 @@ export default function StudentPage() {
                 Internship Completion Timeline
               </h2>
               <div className="space-y-6">
-                <div className="relative pl-8 pb-6 border-l-2 border-teal-500">
-                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-teal-500"></div>
+                <div className="relative pl-8 pb-6 border-l-2 border-green-600">
+                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-green-600"></div>
                   <h3 className="text-lg font-medium text-gray-800">Summer 2023</h3>
                   <p className="text-gray-600">1,250 students completed internships</p>
                   <p className="text-sm text-gray-500 mt-1">92% satisfaction rate</p>
                 </div>
-                <div className="relative pl-8 pb-6 border-l-2 border-teal-500">
-                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-teal-500"></div>
+                <div className="relative pl-8 pb-6 border-l-2 border-green-600">
+                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-green-600"></div>
                   <h3 className="text-lg font-medium text-gray-800">Winter 2022-23</h3>
                   <p className="text-gray-600">850 students completed internships</p>
                   <p className="text-sm text-gray-500 mt-1">88% satisfaction rate</p>
                 </div>
-                <div className="relative pl-8 pb-6 border-l-2 border-teal-500">
-                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-teal-500"></div>
+                <div className="relative pl-8 pb-6 border-l-2 border-green-600">
+                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-green-600"></div>
                   <h3 className="text-lg font-medium text-gray-800">Summer 2022</h3>
                   <p className="text-gray-600">1,100 students completed internships</p>
                   <p className="text-sm text-gray-500 mt-1">90% satisfaction rate</p>
                 </div>
                 <div className="relative pl-8">
-                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-teal-500"></div>
+                  <div className="absolute -left-2 top-0 w-5 h-5 rounded-full bg-green-600"></div>
                   <h3 className="text-lg font-medium text-gray-800">Winter 2021-22</h3>
                   <p className="text-gray-600">750 students completed internships</p>
                   <p className="text-sm text-gray-500 mt-1">85% satisfaction rate</p>

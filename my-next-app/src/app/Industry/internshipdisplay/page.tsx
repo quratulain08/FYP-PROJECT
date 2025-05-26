@@ -446,7 +446,6 @@ setIncompleteInternships(incomplete);
     <div className="container mx-auto px-4 py-8">
       <style>{fadeInAnimation}</style>
       <IndustryLayout>
-        if(e){}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1

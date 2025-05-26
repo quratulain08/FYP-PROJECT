@@ -146,7 +146,7 @@ export default function IndustryPage() {
     <SuperAdminLayout>
       <div className="min-h-screen bg-gray-50 pb-12">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
+        <div className="bg-green-600 from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">
           <div className="container mx-auto">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div>
@@ -207,12 +207,12 @@ export default function IndustryPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Contact
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Size
-                    </th>
+                    </th> */}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -234,7 +234,7 @@ export default function IndustryPage() {
                             {industry.location}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <div className="flex items-center">
                             <Mail className="h-4 w-4 text-gray-400 mr-1" />
                             {industry.contactEmail}
@@ -242,7 +242,7 @@ export default function IndustryPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {industry.employeeCount}
-                        </td>
+                        </td> */}
                       </tr>
                     ))
                   ) : (

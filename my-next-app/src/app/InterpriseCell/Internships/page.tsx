@@ -340,12 +340,11 @@ const Internships: React.FC = () => {
 
   return (
     <InterpriseCellLayout>
-      if(err || e){}
       <style>{fadeInAnimation}</style>
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <h1
-            className="text-3xl font-bold text-green-600 mb-4 md:mb-0"
+            className="text-3xl font-bold    mb-4 md:mb-0"
             style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
           >
             Internship Management

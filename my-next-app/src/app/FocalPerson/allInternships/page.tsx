@@ -287,7 +287,6 @@ const universityId = dataa.universityId; // Access the correct property
 
   return (
     <FocalPersonLayout>
-      if(err || error){}
       <div className="max-w-7xl mx-auto p-6">
         {notification && (
           <div

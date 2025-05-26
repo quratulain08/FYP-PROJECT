@@ -60,7 +60,6 @@ export default function AddInternship() {
   return (
     <CoordinatorLayout>
     <div className="max-w-6xl mx-auto p-6">
-      <p>{departmentID}</p>
       <h1 className="text-2xl font-semibold text-blue-600 mb-6">Add New Internship</h1>
       
       <div className="bg-white rounded-lg shadow-lg p-8 border border-blue-500">
