@@ -7,7 +7,6 @@ import {
   Pencil,
   Trash2,
   Mail,
-  ChevronRight,
   Users,
   BookOpen,
   Calendar,
@@ -216,7 +215,7 @@ export default function DepartmentDetail() {
     return () => {
       mounted = false
     }
-  }, [id])
+  }, [id,fetchWithErrorHandling])
 
   const handleAddFaculty = () => {
     if (department) {

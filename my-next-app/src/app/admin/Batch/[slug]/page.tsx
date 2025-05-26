@@ -192,6 +192,7 @@ const universityId = data.universityId; // Access the correct property
 
   return (
     <Layout>
+      if(err){}
       <div className="max-w-7xl mx-auto p-6">
         {/* Breadcrumb */}
         <div className="flex items-center text-sm text-gray-500 mb-4">

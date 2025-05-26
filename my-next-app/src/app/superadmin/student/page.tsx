@@ -2,9 +2,9 @@
 
 import type React from "react"
 
-import { useState } from "react"
+// import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Users, GraduationCap, Briefcase, Building, Award, Clock, LogIn, X } from "lucide-react"
+import { Users, GraduationCap, Briefcase, Building, Award, Clock, LogIn } from "lucide-react"
 import SuperAdminLayout from "../SuperAdminLayout"
 
 export default function StudentPage() {

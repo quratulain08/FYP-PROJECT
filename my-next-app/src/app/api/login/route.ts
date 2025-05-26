@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     );
 
     // Send response with token and user details (excluding sensitive fields)
-    const { password: _, ...userDetails } = user.toObject(); // Omit the password from the response
+    const { password: userDetails } = user.toObject(); // Omit the password from the response
     return NextResponse.json({ 
       token, 
       user: {

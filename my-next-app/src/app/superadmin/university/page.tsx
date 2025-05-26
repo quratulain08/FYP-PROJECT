@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Building2, Search, Plus, MapPin, Mail, Phone, User, Calendar, CheckCircle, X, ChevronDown,LogIn } from "lucide-react"
+import { Building2, Search, Plus, MapPin, Mail,  User, Calendar, CheckCircle, X,LogIn } from "lucide-react"
 import SuperAdminLayout from "../SuperAdminLayout"
 
 interface University {
@@ -106,6 +106,7 @@ export default function UniversitiesPage() {
 
   return (
     <SuperAdminLayout>
+      if(loading || error){}
        <div className="min-h-screen bg-gray-50 pb-12">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-teal-700 to-teal-600 text-white py-12 px-4 md:px-8">

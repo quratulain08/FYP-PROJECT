@@ -248,6 +248,9 @@ const InternshipDetails: React.FC = () => {
 
   return (
     <IndustryLayout>
+      if(loading){
+        <p><loading styleName=""></loading></p>
+      }
       <div className="max-w-4xl mx-auto p-6">
         {/* Tabs Navigation */}
         <div className="flex justify-between border-b mb-6">
@@ -389,7 +392,7 @@ const InternshipDetails: React.FC = () => {
 
               {/* Submit Button */}
               {internship?.isComplete && (
-                <p className="text-red-600 font-medium mb-2">⚠️ Can't assign task after internship is completed.</p>
+                <p className="text-red-600 font-medium mb-2">⚠️ Can not assign task after internship is completed.</p>
               )}
               <button
                 type="submit"

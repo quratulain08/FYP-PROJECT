@@ -65,7 +65,7 @@ export async function POST(req: Request) {
 // PUT: Update the Vocal Person profile in the database.
 export async function PUT(req: Request) {
   try {
-    const { name, email, phone,cnic , designation } = await req.json();
+    const { name, email, phone , designation } = await req.json();
 
     await connectToDatabase();
 

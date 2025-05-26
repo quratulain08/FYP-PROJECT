@@ -50,7 +50,7 @@ interface FacultyData {
 const InternshipDisplay = () => {
   const [internships, setInternships] = useState<Internship[]>([])
   const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
-  const [faculty, setFaculty] = useState<FacultyData | null>(null)
+  // const [faculty, setFaculty] = useState<FacultyData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
@@ -79,7 +79,7 @@ const InternshipDisplay = () => {
       if (!facultyResponse.ok) throw new Error("Failed to fetch faculty details")
 
       const facultyData = await facultyResponse.json()
-      setFaculty(facultyData)
+      // setFaculty(facultyData)
 
       if (!facultyData || !facultyData._id) {
         throw new Error("No faculty found with the provided email")
@@ -148,7 +148,8 @@ setIncompleteInternships(incomplete);
         day: "numeric",
       }
       return new Date(dateString).toLocaleDateString(undefined, options)
-    } catch (e) {
+    } 
+    catch (e) {
       return dateString
     }
   }

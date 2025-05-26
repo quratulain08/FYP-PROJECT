@@ -3,7 +3,7 @@ import connectToDatabase from "@/lib/mongodb";
 import Batch from "@/models/Batch";
 
 // GET: Fetch all batches
-export async function GET(req: Request) {
+export async function GET() {
   try {
     await connectToDatabase();
     const batches = await Batch.find();

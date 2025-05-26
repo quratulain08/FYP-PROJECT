@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Eye, Plus, BookOpen, Users, CheckCircle, XCircle, ChevronRight } from 'lucide-react';
+import { Eye, Plus, BookOpen, Users, CheckCircle, ChevronRight } from 'lucide-react';
 import CoordinatorLayout from "../../CoordinatorLayout";
 
 interface Student {
@@ -35,7 +35,6 @@ const BatchSummary: React.FC = () => {
   const [showAddBatchModal, setShowAddBatchModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [universityId, setUniversityId] = useState(''); // State to store universityId
 
   const router = useRouter();
   const params = useParams();
@@ -61,7 +60,6 @@ if (!response.ok) {
 const dataa= await response.json();
 // Assuming the response is an object with the universityId property
 const universityId = dataa.universityId; // Access the correct property
-setUniversityId(universityId); // Set the universityId in state
 
      const res = await fetch(`/api/studentByUniversity/${universityId}`, {
        method: "GET",
@@ -109,8 +107,6 @@ setUniversityId(universityId); // Set the universityId in state
           totalSections: batch.sections.length,
         }))
       );
-    } catch (err) {
-      setError("Error fetching batch data.");
     } finally {
       setLoading(false);
     }

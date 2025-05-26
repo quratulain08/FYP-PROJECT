@@ -45,7 +45,7 @@ export default function FacultyForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [message, setMessage] = useState<string>("")
   const [messageType, setMessageType] = useState<"success" | "error">("error")
-  const [error, setError] = useState("")
+  // const [error, setError] = useState("")
 
   const handleProvinceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedProvince(event.target.value)
@@ -81,24 +81,25 @@ export default function FacultyForm() {
         ...prevState,
         university: universityId || prevState.university, // Ensure existing value remains if universityId is undefined
       }));
-    } catch (err) {
-      setError("Error fetching university information.");
-    } finally {
+    // } catch (err) {
+    //   setError("Error fetching university information.");
+    // } 
+    }finally {
       setLoading(false);
     }
   };
 
 
-  // Get faculty initials (up to 2 characters)
-  const getFacultyInitials = () => {
-    if (!name) return "FT"
+  // // Get faculty initials (up to 2 characters)
+  // const getFacultyInitials = () => {
+  //   if (!name) return "FT"
 
-    const words = name.split(" ")
-    if (words.length > 1) {
-      return (words[0][0] + words[1][0]).toUpperCase()
-    }
-    return name.substring(0, 2).toUpperCase()
-  }
+  //   const words = name.split(" ")
+  //   if (words.length > 1) {
+  //     return (words[0][0] + words[1][0]).toUpperCase()
+  //   }
+  //   return name.substring(0, 2).toUpperCase()
+  // }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -151,7 +152,7 @@ export default function FacultyForm() {
         throw new Error("Failed to create faculty member")
       }
 
-      const data = await response.json()
+      // const data = await response.json()
       setMessage("Faculty member created successfully!")
       setMessageType("success")
 

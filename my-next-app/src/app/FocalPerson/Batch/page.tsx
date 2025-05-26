@@ -128,9 +128,11 @@ const universityId = data.universityId; // Access the correct property
           totalSections: batch.sections.length,
         })),
       )
-    } catch (err) {
-      setError("Error fetching batch data.")
-    } finally {
+    } 
+    // catch (err) {
+    //   setError("Error fetching batch data.")
+    // } 
+    finally {
       setLoading(false)
     }
   }

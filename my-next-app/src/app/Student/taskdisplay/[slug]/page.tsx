@@ -192,6 +192,7 @@ const TaskDisplay = () => {
 
   return (
     <StudentLayout>
+      if(e){}
       <div className="container mx-auto px-4 py-8">
         <button
           onClick={handleGoBack}
@@ -278,7 +279,7 @@ const TaskDisplay = () => {
                       className="mt-2 text-sm text-gray-500"
                       style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                     >
-                      Your industry supervisor hasn't assigned any tasks yet
+                      Your industry supervisor has not assigned any tasks yet
                     </p>
                   </div>
                 ) : (
@@ -359,7 +360,7 @@ const TaskDisplay = () => {
                       className="mt-2 text-sm text-gray-500"
                       style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                     >
-                      Your faculty supervisor hasn't assigned any tasks yet
+                      Your faculty supervisor has not assigned any tasks yet
                     </p>
                   </div>
                 ) : (
@@ -427,7 +428,7 @@ const TaskDisplay = () => {
                       className="mt-2 text-sm text-gray-500"
                       style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
                     >
-                      This internship doesn't have any other students assigned yet
+                      This internship does not have any other students assigned yet
                     </p>
                   </div>
                 ) : (

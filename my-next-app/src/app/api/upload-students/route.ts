@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb'; // Adjust the path if necessary
 import Student from '@/models/student'; // Adjust the path if necessary
-import * as XLSX from 'xlsx';
+// import * as XLSX from 'xlsx';
 
 // Helper to safely extract error message
 function getErrorMessage(error: unknown): string {

@@ -48,9 +48,11 @@ const VocalPerson: React.FC = () => {
           const errorData = await response.json();
           setError(errorData.error || "Failed to fetch profile.");
         }
-      } catch (err) {
-        setError("Network error: Unable to fetch profile.");
-      } finally {
+      }
+      //  catch (err) {
+      //   setError("Network error: Unable to fetch profile.");
+      // } 
+      finally {
         setLoading(false);
       }
     };

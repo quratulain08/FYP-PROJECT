@@ -209,6 +209,7 @@ const universityId = dataa.universityId;
 
   return (
     <InterpriseCellLayout>
+      if(err){}
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <h1

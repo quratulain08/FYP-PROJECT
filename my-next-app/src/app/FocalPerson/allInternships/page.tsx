@@ -60,7 +60,7 @@ const Internships: React.FC = () => {
     message: string
   } | null>(null)
   const router = useRouter()
-  const [departmentId, setDepartmentId] = useState(null);
+  // const [departmentId, setDepartmentId] = useState(null);
 
   useEffect(() => {
     fetchInternships()
@@ -87,7 +87,7 @@ const Internships: React.FC = () => {
         throw new Error("Department ID not found");
       }
     
-      setDepartmentId(departmentId);
+      // setDepartmentId(departmentId);
     
       const res = await fetch(`/api/internshipByDepartment/${departmentId}`);
       if (!res.ok) {
@@ -287,6 +287,7 @@ const universityId = dataa.universityId; // Access the correct property
 
   return (
     <FocalPersonLayout>
+      if(err || error){}
       <div className="max-w-7xl mx-auto p-6">
         {notification && (
           <div

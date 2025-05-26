@@ -128,15 +128,15 @@ export default function AddProgram() {
   }
 
   // Get program initials (up to 2 characters)
-  const getProgramInitials = () => {
-    if (!program.name) return "NP"
+  // const getProgramInitials = () => {
+  //   if (!program.name) return "NP"
 
-    const words = program.name.split(" ")
-    if (words.length > 1) {
-      return (words[0][0] + words[1][0]).toUpperCase()
-    }
-    return program.name.substring(0, 2).toUpperCase()
-  }
+  //   const words = program.name.split(" ")
+  //   if (words.length > 1) {
+  //     return (words[0][0] + words[1][0]).toUpperCase()
+  //   }
+  //   return program.name.substring(0, 2).toUpperCase()
+  // }
 
   return (
     <Layout>

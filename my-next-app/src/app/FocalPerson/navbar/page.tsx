@@ -4,7 +4,9 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { LogOut, User, Home, BookOpen, Users, Briefcase, ClipboardList, Building, ChevronDown } from "lucide-react"
+import { LogOut, User, Home,
+  //  BookOpen, Users, Briefcase,  Building,
+   ClipboardList, ChevronDown } from "lucide-react"
 
 const FocalPersonNavbar = ({ children }: { children: React.ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null)

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Program from '@/models/Program';
-import { IProgram } from '@/models/Program';
+// import { IProgram } from '@/models/Program';
 
 // Helper function to extract error messages
 function getErrorMessage(error: unknown): string {

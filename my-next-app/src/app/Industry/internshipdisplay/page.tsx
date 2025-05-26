@@ -132,7 +132,7 @@ const InternshipPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [internships, setInternships] = useState<Internship[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+  // const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [showForm, setShowForm] = useState(false)
   const [universityName, setUniversityName] = useState<string>("")
   const [filteredInternships, setFilteredInternships] = useState<Internship[]>([])
@@ -140,7 +140,7 @@ const InternshipPage = () => {
   const [universities, setUniversities] = useState<University[]>([])
   const [showRejectionModal, setShowRejectionModal] = useState(false)
   const [activeRejection, setActiveRejection] = useState<Internship | null>(null)
-  const [ObjectID, setObjectID] = useState<string>("")
+  // const [ObjectID, setObjectID] = useState<string>("")
   const [completedInternships, setCompletedInternships] = useState<Internship[]>([]);
 const [incompleteInternships, setIncompleteInternships] = useState<Internship[]>([]);
 
@@ -202,7 +202,7 @@ const [incompleteInternships, setIncompleteInternships] = useState<Internship[]>
     }
 
     const data = await res.json();
-    setObjectID(data._id);
+    // setObjectID(data._id);
     fetchInternships(data._id);
 
   
@@ -446,6 +446,7 @@ setIncompleteInternships(incomplete);
     <div className="container mx-auto px-4 py-8">
       <style>{fadeInAnimation}</style>
       <IndustryLayout>
+        if(e){}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1

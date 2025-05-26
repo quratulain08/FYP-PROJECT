@@ -29,9 +29,9 @@ interface Department {
 
 const FacultyPage = () => {
     const router = useRouter();
-    const [profile, setProfile] = useState<Department | null>(null);
+    // const [profile, setProfile] = useState<Department | null>(null);
     const [loading, setLoading] = useState(true); // Track loading state
-    const [error, setError] = useState<string | null>(null); // Track errors
+    // const [error, setError] = useState<string | null>(null); // Track errors
     useEffect(() => {
         const fetchAndNavigate = async () => {
             const CoordinatorEmail = localStorage.getItem("email") || "default@example.com"; 
@@ -39,7 +39,7 @@ const FacultyPage = () => {
                 const response = await fetch(`/api/ProfileForCoordinator?CoordinatorEmail=${CoordinatorEmail}`);
                 if (response.ok) {
                   const data: Department = await response.json();
-                  setProfile(data);
+                //   setProfile(data);
                   
                     if (data && data._id) { 
                         // Navigate directly to the department detail page
@@ -70,13 +70,13 @@ const FacultyPage = () => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <p className="text-red-500">{error}</p>
-            </div>
-        );
-    }
+    // if (error) {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center">
+    //             <p className="text-red-500">{error}</p>
+    //         </div>
+    //     );
+    // }
 
     return null; // No UI is rendered if redirected successfully
 };

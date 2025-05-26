@@ -1,7 +1,7 @@
 // pages/StudentsPage.js
 
 import Layout from '@/app/components/Layout';
-import InstituteProfile from '@/app/components/InstituteProfileForm';
+// import InstituteProfile from '@/app/components/InstituteProfileForm';
 import DepartmentListiInStudents from '@/app/components/departmentInStudents'
 
 const StudentsPagee = () => {

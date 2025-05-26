@@ -4,7 +4,9 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { LogOut, User, BookOpen, Home, FileText, Users } from "lucide-react"
+import { LogOut, User, BookOpen,
+  // Home, FileText, Users
+ } from "lucide-react"
 
 const FacultyLayout = ({ children }: { children: React.ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null)

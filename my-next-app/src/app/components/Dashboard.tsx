@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Line, Pie, Bar } from "react-chartjs-2"
+import { Line, Pie } from "react-chartjs-2"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -147,25 +147,25 @@ const StudentDashboard: React.FC = () => {
   }
 
   // Data for Bar Chart (Batch-wise internship status)
-  const barChartData = {
-    labels: Object.keys(batchCounts),
-    datasets: [
-      {
-        label: "Total Students",
-        data: Object.values(batchCounts).map((v) => v.total),
-        backgroundColor: "rgba(33, 150, 243, 0.7)",
-        borderColor: "rgba(33, 150, 243, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: "With Internship",
-        data: Object.values(batchCounts).map((v) => v.withInternship),
-        backgroundColor: "rgba(76, 175, 80, 0.7)",
-        borderColor: "rgba(76, 175, 80, 1)",
-        borderWidth: 1,
-      },
-    ],
-  }
+  // const barChartData = {
+  //   labels: Object.keys(batchCounts),
+  //   datasets: [
+  //     {
+  //       label: "Total Students",
+  //       data: Object.values(batchCounts).map((v) => v.total),
+  //       backgroundColor: "rgba(33, 150, 243, 0.7)",
+  //       borderColor: "rgba(33, 150, 243, 1)",
+  //       borderWidth: 1,
+  //     },
+  //     {
+  //       label: "With Internship",
+  //       data: Object.values(batchCounts).map((v) => v.withInternship),
+  //       backgroundColor: "rgba(76, 175, 80, 0.7)",
+  //       borderColor: "rgba(76, 175, 80, 1)",
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // }
 
   const chartOptions = {
     responsive: true,

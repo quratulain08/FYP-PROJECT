@@ -11,7 +11,7 @@ interface IndustryLayoutProps {
 const IndustryLayout: React.FC<IndustryLayoutProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter(); // Initialize router for navigation
-  const [isIndustry, setIsIndustry] = useState<boolean>(false); // State to track admin role
+  // const [isIndustry, setIsIndustry] = useState<boolean>(false); // State to track admin role
 
   useEffect(() => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
@@ -20,7 +20,7 @@ const IndustryLayout: React.FC<IndustryLayoutProps> = ({ children }) => {
     if (token) {
         setIsAuthenticated(true); // User is authenticated
           if (role === 'industry') {
-          setIsIndustry(true); // User has admin role
+          // setIsIndustry(true); // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin
         }

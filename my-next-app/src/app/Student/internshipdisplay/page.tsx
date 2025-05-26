@@ -32,7 +32,7 @@ const InternshipDisplay = () => {
   const [internship, setInternship] = useState<Internship | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [student, setStudent] = useState<Student | null>(null)
+  // const [student, setStudent] = useState<Student | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const InternshipDisplay = () => {
       if (!studentResponse.ok) throw new Error("Failed to fetch student details")
 
       const studentData = await studentResponse.json()
-      setStudent(studentData)
+      // setStudent(studentData)
 
       if (!studentData || !studentData._id) {
         throw new Error("No student found with the provided email")
@@ -117,7 +117,7 @@ const InternshipDisplay = () => {
       </StudentLayout>
     )
 
-  if (error)
+  if (error || e)
     return (
       <StudentLayout>
         <div className="container mx-auto px-4 py-8">
@@ -147,7 +147,7 @@ const InternshipDisplay = () => {
               No internship assigned
             </h3>
             <p className="mt-2 text-gray-500" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
-              You haven't been assigned to any internship yet.
+              You have not been assigned to any internship yet.
             </p>
           </div>
         ) : (

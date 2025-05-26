@@ -11,7 +11,7 @@ cloudinary.config({
 
 // Configure Multer
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// const upload = multer({ storage });
 
 // Helper function to upload to Cloudinary
 const uploadToCloudinary = (fileBuffer: Buffer) => {

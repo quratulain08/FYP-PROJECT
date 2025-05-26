@@ -107,9 +107,9 @@ const DepartmentList: React.FC = () => {
 
       const data = await response.json()
       setDepartments(data)
-    } catch (err) {
-      setError("Error fetching department information.")
-    } finally {
+    } 
+    // 
+    finally {
       setLoading(false)
     }
   }

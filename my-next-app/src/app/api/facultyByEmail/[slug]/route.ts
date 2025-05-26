@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
-import Student from '@/models/student';
+// import Student from '@/models/student';
 import FacultyModel from '@/models/faculty';
 // GET: Fetch a single student by registration number
 export async function GET(

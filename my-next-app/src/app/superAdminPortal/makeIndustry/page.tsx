@@ -53,7 +53,7 @@ const MakeAdmin = () => {
             });
             setMessageType("success");
 
-            const result2 = await Response2.json();
+            // const result2 = await Response2.json();
         //      if (Response2.status !== 200 && Response2.status !== 201)
         //   throw new Error(result2.error || "Failed to register industry ");
 

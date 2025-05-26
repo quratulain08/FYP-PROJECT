@@ -11,8 +11,8 @@ interface SuperAdminPortalLayoutProps {
 const SuperAdminPortalLayout: React.FC<SuperAdminPortalLayoutProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter(); // Initialize router for navigation
-  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false); // State to track admin role
-    const role = localStorage.getItem('role'); // Retrieve role from local storage
+  // const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false); // State to track admin role
+    // const role = localStorage.getItem('role'); // Retrieve role from local storage
 
   useEffect(() => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
@@ -22,7 +22,7 @@ const SuperAdminPortalLayout: React.FC<SuperAdminPortalLayoutProps> = ({ childre
         setIsAuthenticated(true); // User is authenticated
 
          if (role === 'superadmin') {
-          setIsSuperAdmin(true); // User has admin role
+          // setIsSuperAdmin(true); // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin
         }

@@ -60,7 +60,7 @@ const Internships: React.FC = () => {
     message: string
   } | null>(null)
   const router = useRouter()
-  const [departmentId, setDepartmentId] = useState(null);
+  // const [departmentId, setDepartmentId] = useState(null);
 
   useEffect(() => {
     fetchInternships()
@@ -288,6 +288,7 @@ const res = await fetch(`/api/studentsByDepartment/${deptId}/${universityId}`, {
 
   return (
     <FocalPersonLayout>
+      if(err || error){}
       <div className="max-w-7xl mx-auto p-6">
         {notification && (
           <div

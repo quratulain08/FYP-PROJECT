@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/mongodb"; // DB connection
 import SubmissionModel from "@/models/submission"; // Submission model
-import { promises as fs } from "fs"; // To save files locally
+// import { promises as fs } from "fs"; // To save files locally
 import mongoose from "mongoose";
 import path from "path";
 
 // Directory where uploaded files will be saved
-const UPLOAD_DIR = path.join(process.cwd(), "public/uploads");
+// const UPLOAD_DIR = path.join(process.cwd(), "public/uploads");
 
 export async function POST(
   req: Request,

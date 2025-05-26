@@ -397,7 +397,7 @@ const InternshipDetails: React.FC = () => {
            {/* Submit Button */}
            {internship?.isComplete && (
       <p className="text-red-600 font-medium mb-2">
-        ⚠️ Can't assign task after internship is completed.
+        ⚠️ Can not assign task after internship is completed.
       </p>
     )}
     <button

@@ -5,7 +5,9 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import FocalPersonLayout from "../FocalPersonLayout"
-import { Mail, Phone, Calendar, Tag, User, Plus } from "lucide-react"
+import { Mail, Phone, Calendar, Tag, User, 
+  // Plus
+ } from "lucide-react"
 
 // Custom notification component
 const Notification = ({

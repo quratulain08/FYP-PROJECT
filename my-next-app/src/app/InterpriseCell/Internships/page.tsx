@@ -44,7 +44,7 @@ type Department = {
 const Internships: React.FC = () => {
   // Add this style tag
   const [isPopupVisible, setPopupVisible] = useState(false)
-  const [visibleInternshipId, setVisibleInternshipId] = useState<string | null>(null)
+  // const [visibleInternshipId, setVisibleInternshipId] = useState<string | null>(null)
   const [showGradeReportModal, setShowGradeReportModal] = useState(false)
   const [selectedInternshipId, setSelectedInternshipId] = useState<string | null>(null)
   const [selectedInternship, setSelectedInternship] = useState<Internship | null>(null)
@@ -69,7 +69,7 @@ const Internships: React.FC = () => {
   const [error, setError] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState<"all" | "approved" | "pending">("all")
-  const router = useRouter()
+  // const router = useRouter()
 
   useEffect(() => {
     fetchInternships()
@@ -340,6 +340,7 @@ const Internships: React.FC = () => {
 
   return (
     <InterpriseCellLayout>
+      if(err || e){}
       <style>{fadeInAnimation}</style>
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">

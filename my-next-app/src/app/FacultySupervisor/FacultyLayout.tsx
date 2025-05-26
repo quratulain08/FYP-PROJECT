@@ -4,14 +4,16 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { LogOut, User, BookOpen, Home, FileText, Users } from "lucide-react"
+import { LogOut, User, BookOpen,
+  //  Home, FileText, Users 
+  } from "lucide-react"
 
 const FacultyLayout = ({ children }: { children: React.ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null)
   const router = useRouter()
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const pathname = usePathname()
-  const [isIFaculty, setIsFaculty] = useState<boolean>(false); // State to track admin role
+  // const [isIFaculty, setIsFaculty] = useState<boolean>(false); // State to track admin role
 
   useEffect(() => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
@@ -19,9 +21,9 @@ const FacultyLayout = ({ children }: { children: React.ReactNode }) => {
     const email = localStorage.getItem('email');
     setEmail(email);    
     if (token) {
-        setIsAuthenticated(true); // User is authenticated
+        // setIsAuthenticated(true); // User is authenticated
           if (role === 'Faculty') {
-          setIsFaculty(true);
+          // setIsFaculty(true);
            // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin

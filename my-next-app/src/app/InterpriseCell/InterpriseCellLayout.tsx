@@ -11,7 +11,7 @@ interface InterpriseCellLayoutProps {
 const InterpriseCellLayout: React.FC<InterpriseCellLayoutProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter(); // Initialize router for navigation
-  const [isInterpriseCell, setIsInterpriseCell] = useState<boolean>(false); // State to track admin role
+  // const [isInterpriseCell, setIsInterpriseCell] = useState<boolean>(false); // State to track admin role
 
   useEffect(() => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
@@ -20,7 +20,7 @@ const InterpriseCellLayout: React.FC<InterpriseCellLayoutProps> = ({ children })
     if (token) {
         setIsAuthenticated(true); // User is authenticated
          if (role === 'EnterpriseCell') {
-          setIsInterpriseCell(true); // User has admin role
+          // setIsInterpriseCell(true); // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin
         }

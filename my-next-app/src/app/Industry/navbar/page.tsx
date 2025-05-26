@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { Building2, Briefcase, LogOut, User, BarChart3, Users, Home, FileText } from "lucide-react"
+import { Briefcase,LogOut, User, 
+  // Building2,   BarChart3, Users, Home, FileText 
+} from "lucide-react"
 
 const IndustryNavbar = () => {
   const [email, setEmail] = useState<string | null>(null)

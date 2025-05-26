@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import mongoose, { Types } from 'mongoose';
+import { Types } from 'mongoose';
 import FacultyModel from '@/models/faculty';
 import connectToDatabase from '@/lib/mongodb';
 

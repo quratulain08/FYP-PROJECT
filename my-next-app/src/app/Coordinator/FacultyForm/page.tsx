@@ -75,7 +75,7 @@ export default function FacultyForm() {
     const isEdit = searchParams.get('edit') === 'true';
     const facultyId = searchParams.get('facultyId');
     const [errors, setErrors] = useState<ValidationErrors>({});
-    const [isCheckingCNIC, setIsCheckingCNIC] = useState(false);
+    // const [isCheckingCNIC, setIsCheckingCNIC] = useState(false);
     const [selectedProvince, setSelectedProvince] = useState<string>('');
     const [selectedCity, setSelectedCity] = useState<string>('');
     const [honorific, setHonorific] = useState<string>('Mr');
@@ -214,26 +214,26 @@ export default function FacultyForm() {
         }
 
         // Ensure that the function name matches throughout your code
-const handleCNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
+// const handleCNICChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     let value = e.target.value.replace(/[^0-9]/g, ''); // Remove any non-numeric characters
 
-    // Limit the length of the CNIC to 13 digits (without dashes)
-    if (value.length > 13) {
-        value = value.slice(0, 13);
-    }
+//     // Limit the length of the CNIC to 13 digits (without dashes)
+//     if (value.length > 13) {
+//         value = value.slice(0, 13);
+//     }
 
-    // Add the first dash after 5 digits
-    if (value.length > 5) {
-        value = value.slice(0, 5) + '-' + value.slice(5);
-    }
+//     // Add the first dash after 5 digits
+//     if (value.length > 5) {
+//         value = value.slice(0, 5) + '-' + value.slice(5);
+//     }
 
-    // Add the second dash after 13 digits
-    if (value.length > 12) {
-        value = value.slice(0, 13) + '-' + value.slice(13);
-    }
+//     // Add the second dash after 13 digits
+//     if (value.length > 12) {
+//         value = value.slice(0, 13) + '-' + value.slice(13);
+//     }
 
-    setCnic(value);
-};
+//     setCnic(value);
+// };
 
         // Date validations
         if (leavingDate && new Date(leavingDate) <= new Date(joiningDate)) {

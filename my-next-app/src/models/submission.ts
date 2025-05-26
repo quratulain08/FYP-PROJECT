@@ -7,7 +7,7 @@ interface IScheme extends Document {
   studentName: string;
   fileUrl: string;
   submittedAt: Date;
-  grade: Number;
+  grade: number;
 }
 
 const SubmissionSchema = new mongoose.Schema({

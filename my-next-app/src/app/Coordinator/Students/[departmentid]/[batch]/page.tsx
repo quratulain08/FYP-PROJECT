@@ -5,7 +5,9 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import * as XLSX from "xlsx"
-import { Edit, Mail, Trash2, Upload, ChevronRight, Users, CheckCircle, XCircle } from "lucide-react"
+import { Edit, Mail, Trash2, Upload,
+  //  ChevronRight,
+    Users, CheckCircle, XCircle } from "lucide-react"
 import Layout from "@/app/Coordinator/CoordinatorLayout"
 
 interface Student {
@@ -71,7 +73,7 @@ const StudentsPage: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([])
   const [filteredStudents, setFilteredStudents] = useState<Student[]>([])
   const [selectedInternshipStatus, setSelectedInternshipStatus] = useState<string>("All")
-  const [batches, setBatches] = useState<string[]>([])
+  // const [batches, setBatches] = useState<string[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [selectedSection, setSelectedSection] = useState<string>("All")
   const [error, setError] = useState<string | null>(null)
@@ -83,7 +85,7 @@ const StudentsPage: React.FC = () => {
   const [universityId, setUniversityId] = useState(''); // State to store universityId
 
   const params = useParams()
-  const router = useRouter()
+  // const router = useRouter()
   const departmentId = params.departmentid as string
   const currentBatch = params.batch as string
 
@@ -129,11 +131,13 @@ const StudentsPage: React.FC = () => {
       const uniqueSections = Array.from(new Set(filteredByDepartment.map((student) => student.section)))
       // Extract unique batches for filter options
       const uniqueBatches = Array.from(new Set(filteredByDepartment.map((student) => student.batch)))
-      setBatches(uniqueBatches)
+      // setBatches(uniqueBatches)
       setSections(uniqueSections) // Set sections for filter
-    } catch (err) {
-      setError(`Error fetching data ${departmentId}`)
-    } finally {
+    } 
+    // catch (err) {
+    //   setError(`Error fetching data ${departmentId}`)
+    // } 
+    finally {
       setLoading(false)
     }
   }

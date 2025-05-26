@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import Layout from "@/app/components/Layout";
 
 interface Student {
   _id: string;
@@ -27,8 +26,8 @@ const BatchSummary: React.FC = () => {
   const [newBatchName, setNewBatchName] = useState<string>("");
   const [showAddBatchModal, setShowAddBatchModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [error] = useState<string | null>(null);
+  //const [showModal, setShowModal] = useState<boolean>(false);
 
   const router = useRouter();
   const params = useParams();
@@ -135,13 +134,16 @@ const BatchSummary: React.FC = () => {
 
   useEffect(() => {
     fetchBatchData();
-  }, [departmentId]);
+  }, [fetchBatchData]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
   return (
+
+    
       <div className="max-w-6xl mx-auto p-6">
+        if(err){}
         <h1 className="text-3xl font-semibold text-green-600 mb-8">
           Batch Summary for Department
         </h1>

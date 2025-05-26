@@ -183,15 +183,15 @@ export default function FacultyForm() {
   }
 
   // Get faculty initials (up to 2 characters)
-  const getFacultyInitials = () => {
-    if (!name) return "FT"
+  // const getFacultyInitials = () => {
+  //   if (!name) return "FT"
 
-    const words = name.split(" ")
-    if (words.length > 1) {
-      return (words[0][0] + words[1][0]).toUpperCase()
-    }
-    return name.substring(0, 2).toUpperCase()
-  }
+  //   const words = name.split(" ")
+  //   if (words.length > 1) {
+  //     return (words[0][0] + words[1][0]).toUpperCase()
+  //   }
+  //   return name.substring(0, 2).toUpperCase()
+  // }
 
   // Validate form before submission
   const validateForm = () => {
@@ -293,6 +293,7 @@ export default function FacultyForm() {
 
   return (
     <Layout>
+      if(error || err){}
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center mb-6">
           <button onClick={() => router.back()} className="mr-4 text-gray-600 hover:text-green-600 transition-colors">

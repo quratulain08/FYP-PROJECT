@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
   const [internships, setInternships] = useState<Internship[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-  const [universityId, setUniversityId] = useState(null);
+ s // const [universityId, setUniversityId] = useState(null);
 
   useEffect(() => {
     const fetchInternships = async () => {
@@ -207,6 +207,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <FocalPersonLayout>
+      if(err){}
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <h1

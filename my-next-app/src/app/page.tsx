@@ -3,9 +3,9 @@ import './globals.css'; // Make sure this import is correct
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Use Next.js router for redirects
-import Login from './Login/page'; // Login component
-import Dashboard from '@/app/components/Dashboard'; // Dashboard component
-import Navbar from './admin/navbar/page';
+//import Login from './Login/page'; // Login component
+//import Dashboard from '@/app/components/Dashboard'; // Dashboard component
+//import Navbar from './admin/navbar/page';
 import Home from './superadmin/home/page';
 
 const Page: React.FC = () => {

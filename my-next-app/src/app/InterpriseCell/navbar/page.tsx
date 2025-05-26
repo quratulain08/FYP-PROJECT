@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { LogOut, User, BookOpen, Briefcase, Home, FileText, Users } from "lucide-react";
+import { LogOut, User ,Briefcase, Home,
+  // BookOpen, FileText, Users
+ } from "lucide-react";
 import Link from 'next/link';
-import { FaHome, FaUniversity, FaFolder, FaUsers, FaChalkboardTeacher, FaUser } from 'react-icons/fa';
-import { MdKeyboardArrowDown } from 'react-icons/md';
+// import { FaHome, FaUniversity, FaFolder, FaUsers, FaChalkboardTeacher, FaUser } from 'react-icons/fa';
+// import { MdKeyboardArrowDown } from 'react-icons/md';
 
 const Navbar: React.FC = () => {
   const [email, setEmail] = useState<string | null>(null);

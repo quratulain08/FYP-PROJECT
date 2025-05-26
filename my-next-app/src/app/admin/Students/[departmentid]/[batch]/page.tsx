@@ -133,6 +133,7 @@ const StudentsPage: React.FC = () => {
       // Extract unique batches for filter options
       const uniqueBatches = Array.from(new Set(filteredByDepartment.map((student) => student.batch)))
       setBatches(uniqueBatches)
+      batches
       setSections(uniqueSections) // Set sections for filter
     } catch (err) {
       setError(`Error fetching data ${departmentId}`)
@@ -337,6 +338,7 @@ const StudentsPage: React.FC = () => {
 
   return (
     <Layout>
+      if(err){}
       <div className="max-w-7xl mx-auto p-6">
         {/* Breadcrumb */}
         <div className="flex items-center text-sm text-gray-500 mb-4">

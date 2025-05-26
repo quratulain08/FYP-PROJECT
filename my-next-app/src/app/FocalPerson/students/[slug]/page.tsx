@@ -5,7 +5,9 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import * as XLSX from "xlsx"
-import { Users, CheckCircle, XCircle, Upload, Mail, LayoutGrid } from "lucide-react"
+import { Users, CheckCircle, XCircle,
+  //  Upload, Mail,
+    LayoutGrid } from "lucide-react"
 import FocalPersonLayout from "../../FocalPersonLayout"
 
 interface Student {
@@ -133,9 +135,9 @@ const StudentsPage: React.FC = () => {
     router.push(`/FocalPerson/InternshipsForStudent/${id}`)
   }
 
-  const openUploadModal = () => {
-    setShowModal(true)
-  }
+  // const openUploadModal = () => {
+  //   setShowModal(true)
+  // }
 
   const closeModal = () => {
     setShowModal(false)
@@ -195,59 +197,59 @@ const StudentsPage: React.FC = () => {
     }
   }
 
-  const sendMailToAll = async () => {
-    if (window.confirm("Are you sure you want to send emails to all students in this batch?")) {
-      const studentsInSelectedBatch = filteredStudents.filter((student) => student.batch === batch)
+  // const sendMailToAll = async () => {
+  //   if (window.confirm("Are you sure you want to send emails to all students in this batch?")) {
+  //     const studentsInSelectedBatch = filteredStudents.filter((student) => student.batch === batch)
 
-      for (const student of studentsInSelectedBatch) {
-        const email = student.email
+  //     for (const student of studentsInSelectedBatch) {
+  //       const email = student.email
 
-        if (email) {
-          try {
-            const generateRandomPassword = () => {
-              return Math.random().toString(36).slice(-8)
-            }
+  //       if (email) {
+  //         try {
+  //           const generateRandomPassword = () => {
+  //             return Math.random().toString(36).slice(-8)
+  //           }
 
-            const StudentPassword = generateRandomPassword()
+  //           const StudentPassword = generateRandomPassword()
 
-            const studentResponse = await fetch("/api/register", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                email: email,
-                password: StudentPassword,
-                role: "Student",
-              }),
-            })
+  //           const studentResponse = await fetch("/api/register", {
+  //             method: "POST",
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //             body: JSON.stringify({
+  //               email: email,
+  //               password: StudentPassword,
+  //               role: "Student",
+  //             }),
+  //           })
 
-            if (!studentResponse.ok) {
-              throw new Error("Error registering Student")
-            }
+  //           if (!studentResponse.ok) {
+  //             throw new Error("Error registering Student")
+  //           }
 
-            const emailResponse = await fetch("/api/sendEmail-Student", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                StudentEmail: email,
-                StudentPassword: StudentPassword,
-              }),
-            })
+  //           const emailResponse = await fetch("/api/sendEmail-Student", {
+  //             method: "POST",
+  //             headers: {
+  //               "Content-Type": "application/json",
+  //             },
+  //             body: JSON.stringify({
+  //               StudentEmail: email,
+  //               StudentPassword: StudentPassword,
+  //             }),
+  //           })
 
-            if (!emailResponse.ok) {
-              throw new Error("Error sending email")
-            }
-          } catch (error) {
-            console.error(error instanceof Error ? error.message : String(error))
-          }
-        }
-      }
-      alert("Emails sent successfully!")
-    }
-  }
+  //           if (!emailResponse.ok) {
+  //             throw new Error("Error sending email")
+  //           }
+  //         } catch (error) {
+  //           console.error(error instanceof Error ? error.message : String(error))
+  //         }
+  //       }
+  //     }
+  //     alert("Emails sent successfully!")
+  //   }
+  // }
 
   // Get initials from student name
   const getInitials = (name: string) => {

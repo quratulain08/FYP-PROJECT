@@ -152,15 +152,15 @@ const DepartmentDashboard: React.FC = () => {
   }
 
   // Get department initials (up to 2 characters)
-  const getDepartmentInitials = () => {
-    if (!department.name) return "DP"
+  // const getDepartmentInitials = () => {
+  //   if (!department.name) return "DP"
 
-    const words = department.name.split(" ")
-    if (words.length > 1) {
-      return (words[0][0] + words[1][0]).toUpperCase()
-    }
-    return department.name.substring(0, 2).toUpperCase()
-  }
+  //   const words = department.name.split(" ")
+  //   if (words.length > 1) {
+  //     return (words[0][0] + words[1][0]).toUpperCase()
+  //   }
+  //   return department.name.substring(0, 2).toUpperCase()
+  // }
 
   // Validate all fields before submission
   const validateForm = () => {

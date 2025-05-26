@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Building, Search, Plus, MapPin, Mail, Briefcase, User, Calendar, CheckCircle, X, LogIn } from 'lucide-react'
 import SuperAdminLayout from "../SuperAdminLayout"
@@ -18,7 +18,7 @@ export default function IndustryPage() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
+  // const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
   const [industries, setIndustries] = useState<Industry[]>([
     { 
       id: "1", 
@@ -97,7 +97,9 @@ export default function IndustryPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+      if(response.ok){
+        <p>data got</p>
+      }
       // Add new industry to the list (in a real app, this would come from the API)
       const newIndustry = {
         id: (industries.length + 1).toString(),

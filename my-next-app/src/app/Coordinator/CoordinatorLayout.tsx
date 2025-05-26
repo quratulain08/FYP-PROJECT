@@ -10,7 +10,6 @@ interface CoordinatorLayoutProps {
 const CoordinatorLayout: React.FC<CoordinatorLayoutProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter(); // Initialize router for navigation
-  const [isCoordinator, setIsCoordinator] = useState<boolean>(false); // State to track admin role
 
   useEffect(() => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
@@ -21,7 +20,6 @@ const CoordinatorLayout: React.FC<CoordinatorLayoutProps> = ({ children }) => {
 
 
         if (role === 'Coordinator') {
-          setIsCoordinator(true); // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin
         }

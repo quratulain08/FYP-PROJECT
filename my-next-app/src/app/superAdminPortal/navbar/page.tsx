@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { Building2, Briefcase, LogOut, User, Users, Home } from "lucide-react"
+import { Building2,
+  //  Briefcase, LogOut, User, Users,
+    Home } from "lucide-react"
 
 const navbar = () => {
   const pathname = usePathname()

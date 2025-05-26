@@ -1,6 +1,6 @@
 // pages/StudentsPage.js
 "use client";
-import CoordinatorLayout from './../CoordinatorLayout';
+//import CoordinatorLayout from './../CoordinatorLayout';
 import { useRouter } from 'next/navigation';
 import { useEffect,useState } from 'react';
     
@@ -29,8 +29,9 @@ interface Department {
   }
 const StudentsPagee = () => {
     const router = useRouter();
-    const [profile, setProfile] = useState<Department | null>(null);
-    const [loading, setLoading] = useState(true); // Track loading state
+    // const [profile, setProfile] = useState<Department | null>(null);
+    // const [loading, setLoading] = useState(true); // Track loading state
+    const loading = useState(true);
     const [error, setError] = useState<string | null>(null); // Track errors
     useEffect(() => {
         const fetchAndNavigate = async () => {
@@ -40,7 +41,7 @@ const StudentsPagee = () => {
                 const response = await fetch(`/api/ProfileForCoordinator?CoordinatorEmail=${CoordinatorEmail}`);
                 if (response.ok) {
                   const data: Department = await response.json();
-                  setProfile(data);
+                //   setProfile(data);
                   
                     if (data && data._id) { 
                         // Navigate directly to the department detail page

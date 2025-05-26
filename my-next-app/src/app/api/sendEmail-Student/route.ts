@@ -5,7 +5,7 @@ import connectToDatabase from '@/lib/mongodb'; // Adjust the path as necessary
 // Define the interface for the incoming request data
 interface SendEmailRequest {
   StudentEmail: string;
-  StudentPassword:String;
+  StudentPassword:string;
 }
 
 // POST: Send emails for Coordinator and Focal Person registration

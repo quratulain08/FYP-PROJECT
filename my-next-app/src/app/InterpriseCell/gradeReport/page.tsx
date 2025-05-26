@@ -20,7 +20,7 @@ interface GradeReportsProps {
 const GradeReports: React.FC<GradeReportsProps> = ({ internshipId }) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [involvement, setInvolvement] = useState<InternshipInvolvement[]>([]);
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  // const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [isError, setError] = useState<boolean>(false);
 
@@ -83,7 +83,7 @@ const GradeReports: React.FC<GradeReportsProps> = ({ internshipId }) => {
           className="mb-4 border rounded"
           onToggle={(e: React.SyntheticEvent<HTMLElement>) => {
             if ((e.target as HTMLDetailsElement).open) {
-              setSelectedStudentId(student._id);
+              // setSelectedStudentId(student._id);
             }
           }}
         >

@@ -82,36 +82,36 @@ export default function FacultyForm() {
     }
   });
 
-  const fetchUniversity = async () => {
-    try {
-      const email = localStorage.getItem("email")
-      if (!email) {
-        throw new Error("Email not found in localStorage.")
-      }
+  // const fetchUniversity = async () => {
+  //   try {
+  //     const email = localStorage.getItem("email")
+  //     if (!email) {
+  //       throw new Error("Email not found in localStorage.")
+  //     }
 
-      const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      })
+  //     const res = await fetch(`/api/UniversityByEmailAdmin/${email}`, {
+  //       method: "GET",
+  //       headers: { "Content-Type": "application/json" },
+  //     })
 
-      if (!res.ok) {
-        throw new Error(`Failed to fetch university ID for ${email}`)
-      }
+  //     if (!res.ok) {
+  //       throw new Error(`Failed to fetch university ID for ${email}`)
+  //     }
 
-      const data = await res.json()
-      const universityId = data.universityId
+  //     const data = await res.json()
+  //     const universityId = data.universityId
 
-      // Set the universityId in the department state
-      setFaculty((prevState) => ({
-        ...prevState,
-        university: universityId || prevState.university, // Ensure existing value remains if universityId is undefined
-      }))
-    } catch (err) {
-      setError("Error fetching university information.")
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     // Set the universityId in the department state
+  //     setFaculty((prevState) => ({
+  //       ...prevState,
+  //       university: universityId || prevState.university, // Ensure existing value remains if universityId is undefined
+  //     }))
+  //   } catch (err) {
+  //     setError("Error fetching university information.")
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -165,7 +165,7 @@ export default function FacultyForm() {
         throw new Error("Failed to update faculty member")
       }
 
-      const data = await response.json()
+      // const data = await response.json()
       setMessage("Faculty member updated successfully!")
       setMessageType("success")
 
@@ -230,6 +230,7 @@ export default function FacultyForm() {
 
   return (
     <Layout>
+      if(error || err){}
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex items-center mb-6">
           <button onClick={() => router.back()} className="mr-4 text-gray-600 hover:text-green-600 transition-colors">

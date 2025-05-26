@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { LogOut, User, BookOpen, Home, Users, Briefcase, Settings } from "lucide-react"
-import Navbar from "@/app/admin/navbar/page"
+// import Navbar from "@/app/admin/navbar/page"
 
 const navbar = ({ children }: { children: React.ReactNode }) => {
   const [email, setEmail] = useState<string | null>(null)

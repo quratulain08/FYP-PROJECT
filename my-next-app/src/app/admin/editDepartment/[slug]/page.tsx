@@ -37,11 +37,11 @@ const DepartmentDashboard: React.FC = () => {
     city: '',
   });
 
-    const [departments, setDepartments] = useState<Department[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const params = useParams();
-    const router = useRouter();
+    // const [departments, setDepartments] = useState<Department[]>([]);
+     const [loading, setLoading] = useState(true);
+     const [error, setError] = useState("");
+     const params = useParams();
+    // const router = useRouter();
     const DepartmentID = params.slug as string;
 
     useEffect(() => {
@@ -114,6 +114,9 @@ const DepartmentDashboard: React.FC = () => {
 
   return (
     <Layout>
+      if(loading || error || err){
+
+      }
     <div className="max-w-8xl mx-auto w-full">
       <div className="flex justify-between items-center mb-4">
         <h1 className=" text-lg font-semibold text-green-600">Edit The Department</h1>

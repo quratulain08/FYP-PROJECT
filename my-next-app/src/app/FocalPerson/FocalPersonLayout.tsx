@@ -10,7 +10,7 @@ interface FocalPersonLayoutProps {
 const FocalPersonLayout: React.FC<FocalPersonLayoutProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter(); // Initialize router for navigation
-  const [isFocalPerson, setIsFocalPerson] = useState<boolean>(false); // State to track admin role
+  // const [isFocalPerson, setIsFocalPerson] = useState<boolean>(false); // State to track admin role
 
   useEffect(() => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
@@ -19,7 +19,7 @@ const FocalPersonLayout: React.FC<FocalPersonLayoutProps> = ({ children }) => {
     if (token) {
         setIsAuthenticated(true); // User is authenticated
         if (role === 'FocalPerson') {
-          setIsFocalPerson(true); // User has admin role
+          // setIsFocalPerson(true); // User has admin role
         } else {
           router.push('/Unauthorized'); // Redirect if user is not an admin
         }

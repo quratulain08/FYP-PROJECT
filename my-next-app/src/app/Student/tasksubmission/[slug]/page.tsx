@@ -198,7 +198,7 @@ const TaskSubmission = () => {
     )
   }
 
-  if (error || !task) {
+  if (error || !task ) {
     return (
       <StudentLayout>
         <div className="container mx-auto px-4 py-8">
@@ -223,6 +223,7 @@ const TaskSubmission = () => {
 
   return (
     <StudentLayout>
+      if(e){}
       <div className="container mx-auto px-4 py-8">
         <button
           onClick={handleGoBack}
@@ -414,7 +415,7 @@ const TaskSubmission = () => {
                 <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
                   <FileText className="mx-auto h-10 w-10 text-gray-400 mb-2" />
                   <p className="text-gray-600" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
-                    You haven't submitted anything yet
+                    You have not submitted anything yet
                   </p>
                 </div>
               ) : (

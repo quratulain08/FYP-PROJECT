@@ -2,7 +2,7 @@
 
 import Layout from '@/app/components/Layout';
 import VocalPerson from '@/app/components/profileForm';
-import InstituteProfile from '@/app/components/profileForm';
+// import InstituteProfile from '@/app/components/profileForm';
 
 const FacultyPage = () => {
     return (

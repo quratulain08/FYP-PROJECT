@@ -69,9 +69,9 @@ const Internships: React.FC = () => {
         const departmentId = dataa.departmentId;
         
         const res = await fetch(`/api/internshipByDepartment/${departmentId}`)
-      if (!response.ok) throw new Error("Failed to fetch internships")
+      if (!res.ok) throw new Error("Failed to fetch internships")
 
-      const data = await response.json()
+      const data = await res.json()
       setInternships(data)
       setFilteredInternships(data)
     } catch (err) {
@@ -144,7 +144,8 @@ const Internships: React.FC = () => {
         day: "numeric",
       }
       return new Date(dateString).toLocaleDateString(undefined, options)
-    } catch (e) {
+    }
+     catch (e) {
       return dateString
     }
   }
