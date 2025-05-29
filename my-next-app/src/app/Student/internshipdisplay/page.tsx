@@ -27,15 +27,28 @@ interface Student {
   section: string
   email: string
 }
+interface Announcement {
+  _id: string;
+  title: string;
+  content: string;
+  expiresAt: string;
+  isActive: boolean;
+
+  // Add any other fields your announcement has
+}
 
 const InternshipDisplay = () => {
   const [internship, setInternship] = useState<Internship | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   // const [student, setStudent] = useState<Student | null>(null)
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
+
   const router = useRouter()
 
   useEffect(() => {
+    fetchAnnouncements()
     fetchInternships()
   }, [])
 
@@ -58,7 +71,6 @@ const InternshipDisplay = () => {
       }
 
       const studentId = studentData._id
-      console.log("Student ID:", studentId)
 
       // Fetch internships by assigned student ID
       const response = await fetch(`/api/InternshipsByAssignedStudents/${studentId}`)
@@ -106,6 +118,41 @@ const InternshipDisplay = () => {
     return category ? category.label : categoryValue
   }
 
+
+const fetchAnnouncements = async () => {
+  try {
+
+    const email = localStorage.getItem("email");
+    const studentResponse = await fetch(`/api/StudentByemail/${email}`)
+    if (!studentResponse.ok) throw new Error("Failed to fetch student details")
+
+    const studentData = await studentResponse.json()
+    // setStudent(studentData)
+
+    if (!studentData || !studentData._id) {
+      throw new Error("No student found with the provided email")
+    }
+
+    const uniId = studentData.university;
+
+   
+
+    const res = await fetch(`/api/Announcements/${uniId}`);
+    const data: Announcement[] = await res.json();
+    const now = new Date();
+
+    const data2 = data.filter(
+      (a) => a.isActive && (!a.expiresAt || new Date(a.expiresAt) > now)
+    );
+
+    setAnnouncements(data2)
+  } catch (e) {
+    console.error(e)
+  } finally {
+    setLoadingAnnouncements(false)
+  }
+}
+
   if (loading)
     return (
       <StudentLayout>
@@ -132,6 +179,24 @@ const InternshipDisplay = () => {
     <StudentLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
+        <div className="mt-10">
+  <h2 className="text-2xl font-semibold text-green-600 mb-4">Announcements</h2>
+  {loadingAnnouncements ? (
+    <p>Loading announcements...</p>
+  ) : announcements.length === 0 ? (
+    <p>No announcements available.</p>
+  ) : (
+    <ul className="space-y-4">
+      {announcements.map((a) => (
+        <li key={a._id} className="p-4 bg-white border rounded shadow hover:shadow-lg cursor-pointer" onClick={() => router.push(`/Student/announcement/${a._id}`)}>
+          <h3 className="text-lg font-bold">{a.title}</h3>
+          <p className="text-gray-600 line-clamp-2">{a.content}</p>
+          <p className="text-sm text-gray-400 mt-1">Expires at: {new Date(a.expiresAt).toLocaleDateString()}</p>
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
           <h1 className="text-3xl font-bold text-green-600" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
             My Internship
           </h1>

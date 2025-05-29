@@ -144,8 +144,8 @@ const AdminNavbar = ({ children }: { children: React.ReactNode }) => {
               <ChevronDown className="h-4 w-4 ml-1" />
             </button>
 
-            {/* <button
-              onClick={() => router.push("/admin/internships")}
+            <button
+              onClick={() => router.push("/admin/Announcements")}
               className={`flex items-center px-4 py-3 ${
                 isActive("/admin/internships")
                   ? "border-b-2 border-green-600 text-green-600"
@@ -154,8 +154,8 @@ const AdminNavbar = ({ children }: { children: React.ReactNode }) => {
               style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
             >
               <Briefcase className="h-5 w-5 mr-2" />
-              <span>Internships</span>
-            </button> */}
+              <span>Annoucements</span>
+            </button>
           </div>
         </div>
       </nav>
