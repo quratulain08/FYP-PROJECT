@@ -4,7 +4,13 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Briefcase, Calendar, MapPin, Building, ChevronRight } from "lucide-react"
 import StudentLayout from "../StudentLayout"
+import { useForm } from "react-hook-form"
+import { Dialog } from "@headlessui/react"
 
+interface PopupFormData {
+  cgpa: number
+  cv: FileList
+}
 interface Internship {
   _id: string
   title: string
@@ -44,7 +50,10 @@ const InternshipDisplay = () => {
   // const [student, setStudent] = useState<Student | null>(null)
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
 const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
-
+const [showPopup, setShowPopup] = useState(false)
+const [studentId, setStudentId] = useState<string | null>(null)
+const { register, handleSubmit, reset } = useForm<PopupFormData>()
+const [email, setemail] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -56,7 +65,7 @@ const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
           const email = localStorage.getItem("email");
 
     //const email = "ammar33@gmail.com"; // Replace with actual logic to get the email
-  
+  setemail(email);
     try {
       setLoading(true)
       // Fetch student data by email
@@ -69,6 +78,10 @@ const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
       if (!studentData || !studentData._id) {
         throw new Error("No student found with the provided email")
       }
+         if (!studentData.cgpa || !studentData.cv) {
+      setShowPopup(true)
+    }
+
 
       const studentId = studentData._id
 
@@ -313,6 +326,62 @@ const fetchAnnouncements = async () => {
             </div>
           </div>
         )}
+
+        {showPopup && (
+  <Dialog open={showPopup} onClose={() => {}} className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <Dialog.Panel className="bg-white p-6 rounded shadow-md w-full max-w-md">
+      <Dialog.Title className="text-xl font-bold mb-4">Complete Your Profile</Dialog.Title>
+      <form
+     onSubmit={handleSubmit(async (data) => {
+  const formData = new FormData()
+  formData.append("cgpa", String(data.cgpa))
+  formData.append("cv", data.cv[0]) // ✅ Correct reference to the uploaded file
+  formData.append("email", email)
+
+  const res = await fetch(`/api/update-cv-cgpa`, {
+    method: "POST",
+    body: formData,
+  })
+
+          if (res.ok) {
+            setShowPopup(false)
+            reset()
+            fetchInternships()
+          } else {
+            alert("Failed to update profile.")
+          }
+        })}
+        className="space-y-4"
+      >
+        <div>
+          <label className="block font-medium mb-1">CGPA</label>
+          <input
+            type="number"
+            step="0.01"
+            {...register("cgpa", { required: true, min: 0, max: 4 })}
+            className="border p-2 w-full rounded"
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Upload CV (PDF)</label>
+          <input
+            type="file"
+            accept=".pdf"
+            {...register("cv", { required: true })}
+            className="border p-2 w-full rounded"
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+        >
+          Submit
+        </button>
+      </form>
+    </Dialog.Panel>
+  </Dialog>
+)}
+
       </div>
     </StudentLayout>
   )

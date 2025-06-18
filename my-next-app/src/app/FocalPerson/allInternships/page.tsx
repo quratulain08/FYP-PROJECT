@@ -47,6 +47,7 @@ interface Student {
   didInternship: boolean
   registrationNumber: string
   section: string
+  cgpa: number
 }
 
 const Internships: React.FC = () => {
@@ -462,7 +463,7 @@ const universityId = dataa.universityId; // Access the correct property
                               )
                               .map((student) => (
                                 <option key={student._id} value={student._id}>
-                                  {student.registrationNumber} - {student.name}
+                                  {student.registrationNumber} - {student.name} - {student.cgpa}
                                 </option>
                               ))}
                           </select>

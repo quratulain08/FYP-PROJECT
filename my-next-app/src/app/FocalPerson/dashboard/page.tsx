@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
   const [internships, setInternships] = useState<Internship[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
- s // const [universityId, setUniversityId] = useState(null);
+  // const [universityId, setUniversityId] = useState(null);
 
   useEffect(() => {
     const fetchInternships = async () => {

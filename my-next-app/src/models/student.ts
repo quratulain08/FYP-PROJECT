@@ -9,6 +9,8 @@ export interface IStudent extends Document {
   didInternship: boolean;
   registrationNumber: string;
   email: string;
+  cv: string;
+  cgpa:Number; 
   university: mongoose.Schema.Types.ObjectId; // University reference
 
 }
@@ -28,7 +30,8 @@ const studentSchema: Schema<IStudent> = new Schema({
   email: { type: String, required: true, unique: true }, // Add email to schema
   registrationNumber: { type: String, required: true },
   university: { type: mongoose.Schema.Types.ObjectId, ref: "University", required: true }, // University reference
-
+cv: { type: String },  
+  cgpa: { type: Number },
 });
 
 // Create the model, using an existing model if already compiled

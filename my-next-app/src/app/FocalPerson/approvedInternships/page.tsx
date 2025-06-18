@@ -47,6 +47,8 @@ interface Student {
   didInternship: boolean
   registrationNumber: string
   section: string
+  cgpa:number
+  cv:string
 }
 
 const Internships: React.FC = () => {
@@ -462,10 +464,12 @@ const res = await fetch(`/api/studentsByDepartment/${deptId}/${universityId}`, {
                               )
                               .map((student) => (
                                 <option key={student._id} value={student._id}>
-                                  {student.registrationNumber} - {student.name}
+                                  {student.registrationNumber} - {student.name} - {student.cgpa}
                                 </option>
+                                
                               ))}
                           </select>
+                         
                         </div>
                       ))}
                     </div>
