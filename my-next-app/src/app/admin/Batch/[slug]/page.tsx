@@ -46,7 +46,56 @@ const BatchSummary: React.FC = () => {
     router.push(`/admin/Students/${departmentId}/${batch}`)
   }
 
-  const fetchBatchData = async () => {
+ 
+
+  const handleAddBatch = async () => {
+    if (!newBatchName.trim()) {
+      alert("Batch name cannot be empty.")
+      return
+    }
+
+    try {
+      const response = await fetch("/api/Batch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          batchName: newBatchName,
+          departmentId: departmentId,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add batch")
+      }
+
+      // Add the new batch to the table if the API call is successful
+      setBatches((prevBatches) => [
+        ...prevBatches,
+        {
+          batch: newBatchName,
+          total: 0,
+          didInternship: 0,
+          missingInternship: 0,
+          totalSections: 0,
+        },
+      ])
+
+      // Reset modal state
+      setNewBatchName("")
+      setShowAddBatchModal(false)
+    } catch (error) {
+      console.error("Error adding batch:", error)
+      alert("Error adding batch. Please try again.")
+    }
+  }
+
+
+  useEffect(() => {
+     const fetchBatchData = async () => {
     try {
 
       const email = localStorage.getItem("email")
@@ -121,55 +170,11 @@ const universityId = data.universityId; // Access the correct property
       setLoading(false)
     }
   }
-
-  const handleAddBatch = async () => {
-    if (!newBatchName.trim()) {
-      alert("Batch name cannot be empty.")
-      return
-    }
-
-    try {
-      const response = await fetch("/api/Batch", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          batchName: newBatchName,
-          departmentId: departmentId,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to add batch")
-      }
-
-      // Add the new batch to the table if the API call is successful
-      setBatches((prevBatches) => [
-        ...prevBatches,
-        {
-          batch: newBatchName,
-          total: 0,
-          didInternship: 0,
-          missingInternship: 0,
-          totalSections: 0,
-        },
-      ])
-
-      // Reset modal state
-      setNewBatchName("")
-      setShowAddBatchModal(false)
-    } catch (error) {
-      console.error("Error adding batch:", error)
-      alert("Error adding batch. Please try again.")
-    }
+  if (departmentId) {
+    fetchBatchData();
   }
+}, [departmentId]);
 
-  useEffect(() => {
-    fetchBatchData()
-  }, [departmentId])
 
   if (loading)
     return (

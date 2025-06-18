@@ -44,7 +44,6 @@ export default function FacultyForm() {
   const [loading, setLoading] = useState<boolean>(false)
   const [message, setMessage] = useState<string>("")
   const [messageType, setMessageType] = useState<"success" | "error">("error")
-  const [error, setError] = useState<string>(""); 
 
 
   // Handler to handle province selection change
@@ -219,13 +218,13 @@ export default function FacultyForm() {
         }
       })
     } catch (error) {
-      setError("Failed to fetch faculty data.")
     }
   }
 
-  useEffect(() => {
-    fetchFacultyData()
-  }, [id])
+ useEffect(() => {
+  fetchFacultyData();
+}, [id, fetchFacultyData]);
+
 
 
   return (

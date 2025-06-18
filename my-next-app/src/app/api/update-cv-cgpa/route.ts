@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { v2 as cloudinary } from 'cloudinary'
 import mongoose from 'mongoose'
-import Student from '@/models/Student' // Update this path to your actual Student model
+import Student from '@/models/student' // Update this path to your actual Student model
 
 // Cloudinary Config
 cloudinary.config({

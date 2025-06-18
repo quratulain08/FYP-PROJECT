@@ -480,20 +480,21 @@ const Internships: React.FC = () => {
               <span>
                 {student.registrationNumber} - {student.name} - {student.cgpa}
               </span>
-              <button
-                type="button"
-                className="text-blue-600 text-sm underline ml-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (student.cv) {
-                    window.open(student.cv, "_blank");
-                  } else {
-                    alert("CV not uploaded for this student.");
-                  }
-                }}
-              >
-                View CV
-              </button>
+            <button
+  type="button"
+  className="text-blue-600 text-sm underline ml-2"
+  onClick={(e) => {
+    e.stopPropagation();
+    if (student.cv) {
+      // Open PDF in new tab with correct MIME handling
+      window.open(student.cv, "_blank", "noopener,noreferrer");
+    } else {
+      alert("CV not uploaded for this student.");
+    }
+  }}
+>
+  View CV
+</button>
             </Listbox.Option>
           ))}
         </Listbox.Options>

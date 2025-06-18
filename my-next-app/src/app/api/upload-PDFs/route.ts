@@ -17,7 +17,14 @@ const storage = multer.memoryStorage();
 const uploadToCloudinary = (fileBuffer: Buffer) => {
   return new Promise<string>((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
-      { resource_type: 'raw' }, // Use 'raw' for non-image files like PDFs
+      {
+        resource_type: 'raw',
+        flags: 'attachment:false', // ✅ Enables inline viewing
+        use_filename: true,
+        unique_filename: false,
+        public_id: 'student-cv', // Will generate `student-cv.pdf` if your file is .pdf
+
+      },
       (error, result) => {
         if (error) {
           reject(error);

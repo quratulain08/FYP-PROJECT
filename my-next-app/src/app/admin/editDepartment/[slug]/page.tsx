@@ -2,23 +2,9 @@
 
 import { useEffect,useState } from 'react';
 import Layout from "@/app/components/Layout";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
-interface Department {
-    _id: string;
-    name: string;
-    startDate: string;
-    category: string;
-    hodName: string;
-    honorific: string;
-    cnic: string;
-    email: string;
-    phone: string;
-    landLine?: string;
-    address: string;
-    province: string;
-    city: string;
-  }
+
   
 
 const DepartmentDashboard: React.FC = () => {
@@ -38,8 +24,7 @@ const DepartmentDashboard: React.FC = () => {
   });
 
     // const [departments, setDepartments] = useState<Department[]>([]);
-     const [loading, setLoading] = useState(true);
-     const [error, setError] = useState("");
+    
      const params = useParams();
     // const router = useRouter();
     const DepartmentID = params.slug as string;
@@ -56,9 +41,7 @@ const DepartmentDashboard: React.FC = () => {
             const data = await response.json();
             setDepartment(data);  // Assume data contains a single department object
         } catch (err) {
-            setError("Error fetching department information.");
         } finally {
-            setLoading(false);
         }
     };
   

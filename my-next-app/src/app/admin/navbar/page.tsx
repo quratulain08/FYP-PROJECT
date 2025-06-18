@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import Image from 'next/image';
 
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
@@ -33,8 +34,13 @@ const AdminNavbar = ({ children }: { children: React.ReactNode }) => {
       <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/air-university-logo-1.png" alt="Air University Logo" className="h-12 mr-3" />
-            <h1
+<Image
+  src="/air-university-logo-1.png"
+  alt="Air University Logo"
+  width={48}
+  height={48}
+  className="h-12 mr-3"
+/>            <h1
               className="text-lg md:text-xl text-gray-800 font-medium"
               style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
             >

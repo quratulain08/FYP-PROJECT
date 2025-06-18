@@ -19,9 +19,15 @@ export async function GET(req: Request) {
     const category = searchParams.get("category");
     const location = searchParams.get("location");
 
-    const filter: Record<string, any> = {};
-    if (category) filter.category = category;
-    if (location) filter.location = location;
+   
+    type FilterType = {
+  category?: string;
+  location?: string;
+};
+
+const filter: FilterType = {};
+if (category) filter.category = category;
+if (location) filter.location = location;
 
     const internships = await Internship.find(filter);
     return NextResponse.json(internships);

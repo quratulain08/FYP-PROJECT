@@ -79,7 +79,7 @@ export async function POST(
     const err = error as Error;
     if (err.name === 'ValidationError') {
       return NextResponse.json(
-        { message: 'Validation error', details: (err as any).errors },
+        { message: 'Validation error' },
         { status: 400 }
       );
     }
@@ -140,7 +140,7 @@ export async function PUT(
     const err = error as Error;
     if (err.name === 'ValidationError') {
       return NextResponse.json(
-        { message: 'Validation error', details: (err as any).errors },
+        { message: 'Validation error' },
         { status: 400 }
       );
     }
