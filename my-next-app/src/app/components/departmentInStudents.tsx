@@ -87,9 +87,6 @@ const response = await fetch(`/api/departmentByUniversity/${universityId}`, {
 
   return (
       <div className="max-w-7xl mx-auto w-full p-6">
-        <h3 className="text-1xl mb-4">Click on Department to view details</h3>
-    if(err){}
-        {error && <p className="text-red-600">{error}</p>} {/* Display error message */}
     
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {departments.length === 0 ? ( 

@@ -39,9 +39,9 @@ const universityId=uniId;
       .flatMap(i => i.assignedStudents.map(id => id.toString()));
 
     // Step 2: Exclude students already assigned
-    if (assignedStudentIds.length > 0) {
-      filter._id = { $nin: assignedStudentIds };
-    }
+    // if (assignedStudentIds.length > 0) {
+    //   filter._id = { $nin: assignedStudentIds };
+    // }
 
     const students = await Student.find(filter);
     return NextResponse.json(students);

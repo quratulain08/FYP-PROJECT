@@ -5,6 +5,8 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import FocalPersonLayout from "../FocalPersonLayout"
+import { Listbox } from '@headlessui/react'
+
 import {
   Briefcase,
   Building,
@@ -48,6 +50,7 @@ interface Student {
   registrationNumber: string
   section: string
   cgpa: number
+  cv: string
 }
 
 const Internships: React.FC = () => {
@@ -76,20 +79,20 @@ const Internships: React.FC = () => {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-    
+
       if (!response1.ok) {
         throw new Error(`Failed to fetch department ID for ${email}`);
       }
-    
+
       const dataa = await response1.json();
       const departmentId = dataa._id;
-    
+
       if (!departmentId) {
         throw new Error("Department ID not found");
       }
-    
+
       // setDepartmentId(departmentId);
-    
+
       const res = await fetch(`/api/internshipByDepartment/${departmentId}`);
       if (!res.ok) {
         throw new Error("Failed to fetch internships");
@@ -105,8 +108,8 @@ const Internships: React.FC = () => {
     }
   }
 
-  const fetchFaculties = async (deptId: string) => { 
-       try {
+  const fetchFaculties = async (deptId: string) => {
+    try {
       const response = await fetch(`/api/faculty/department/${deptId}`)
       if (!response.ok) throw new Error("Failed to fetch faculties")
 
@@ -125,20 +128,20 @@ const Internships: React.FC = () => {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
-      
-     
-if (!response2.ok) {
-  throw new Error(`Failed to fetch university ID for ${email}`);
-}
 
-const dataa = await response2.json();
-const universityId = dataa.universityId; // Access the correct property
-      
+
+      if (!response2.ok) {
+        throw new Error(`Failed to fetch university ID for ${email}`);
+      }
+
+      const dataa = await response2.json();
+      const universityId = dataa.universityId; // Access the correct property
+
       const res = await fetch(`/api/studentsByDepartment/${deptId}/${universityId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }, // Missing comma here
       });
-       if (!res.ok) throw new Error("Failed to fetch students")
+      if (!res.ok) throw new Error("Failed to fetch students")
 
       const data = await res.json()
       setStudents(data)
@@ -291,9 +294,8 @@ const universityId = dataa.universityId; // Access the correct property
       <div className="max-w-7xl mx-auto p-6">
         {notification && (
           <div
-            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
-              notification.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+            className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${notification.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+              }`}
           >
             <div className="flex items-center">
               {notification.type === "success" ? (
@@ -444,33 +446,66 @@ const universityId = dataa.universityId; // Access the correct property
                     <h3 className="font-medium text-gray-700 mb-2">
                       Assigned Students ({internship.numberOfStudents} positions)
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {Array.from({ length: internship.numberOfStudents }).map((_, index) => (
-                        <div key={index}>
-                          <select
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                            value={internship.assignedStudents?.[index] || ""}
-                            onChange={(e) => handleAssignStudent(internship._id, e.target.value)}
-                          >
-                            <option value="" disabled>
-                              Select Student
-                            </option>
-                            {students
-                              .filter(
-                                (student) =>
-                                  !allAssignedStudents.includes(student._id) ||
-                                  internship.assignedStudents?.includes(student._id),
-                              )
-                              .map((student) => (
-                                <option key={student._id} value={student._id}>
-                                  {student.registrationNumber} - {student.name} - {student.cgpa}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-                      ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {Array.from({ length: internship.numberOfStudents }).map((_, index) => {
+  const selectedStudentId = internship.assignedStudents?.[index] || "";
+  const selectedStudent = students.find((s) => s._id === selectedStudentId);
+
+  // Only allow students not already assigned, or the one currently assigned
+  const availableStudents = students.filter(
+    (student) =>
+      !allAssignedStudents.includes(student._id) ||
+      internship.assignedStudents?.includes(student._id)
+  );
+
+  return (
+    <div key={index} className="flex flex-col gap-1">
+      <Listbox
+        value={selectedStudentId}
+        onChange={(value) => handleAssignStudent(internship._id, value)}
+      >
+        <Listbox.Button className="w-full border border-gray-300 rounded-md px-3 py-2 text-left">
+          {selectedStudent
+            ? `${selectedStudent.registrationNumber} - ${selectedStudent.name}`
+            : "Select Student"}
+        </Listbox.Button>
+
+        <Listbox.Options className="mt-1 border rounded-md shadow-lg bg-white max-h-60 overflow-auto z-50">
+          {availableStudents.map((student) => (
+            <Listbox.Option
+              key={student._id}
+              value={student._id}
+              className="flex justify-between items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+            >
+              <span>
+                {student.registrationNumber} - {student.name} - {student.cgpa}
+              </span>
+              <button
+                type="button"
+                className="text-blue-600 text-sm underline ml-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (student.cv) {
+                    window.open(student.cv, "_blank");
+                  } else {
+                    alert("CV not uploaded for this student.");
+                  }
+                }}
+              >
+                View CV
+              </button>
+            </Listbox.Option>
+          ))}
+        </Listbox.Options>
+      </Listbox>
+    </div>
+  );
+})}
+
                     </div>
                   </div>
+
+
                 </div>
               </div>
             ))}

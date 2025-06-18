@@ -248,9 +248,7 @@ const InternshipDetails: React.FC = () => {
 
   return (
     <IndustryLayout>
-      if(loading){
-        <p><loading styleName=""></loading></p>
-      }
+    
       <div className="max-w-4xl mx-auto p-6">
         {/* Tabs Navigation */}
         <div className="flex justify-between border-b mb-6">

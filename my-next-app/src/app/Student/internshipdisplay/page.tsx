@@ -177,16 +177,16 @@ const fetchAnnouncements = async () => {
       </StudentLayout>
     )
 
-  if (error )
-    return (
-      <StudentLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <p style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{error}</p>
-          </div>
-        </div>
-      </StudentLayout>
-    )
+  // if (error )
+  //   return (
+  //     <StudentLayout>
+  //       <div className="container mx-auto px-4 py-8">
+  //         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+  //           <p style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>{error}</p>
+  //         </div>
+  //       </div>
+  //     </StudentLayout>
+  //   )
 
   return (
     <StudentLayout>
@@ -332,52 +332,68 @@ const fetchAnnouncements = async () => {
     <Dialog.Panel className="bg-white p-6 rounded shadow-md w-full max-w-md">
       <Dialog.Title className="text-xl font-bold mb-4">Complete Your Profile</Dialog.Title>
       <form
-     onSubmit={handleSubmit(async (data) => {
-  const formData = new FormData()
-  formData.append("cgpa", String(data.cgpa))
-  formData.append("cv", data.cv[0]) // ✅ Correct reference to the uploaded file
-  formData.append("email", email)
+  onSubmit={handleSubmit(async (data) => {
+    if (parseFloat(data.cgpa) > 4.0) {
+      alert("CGPA cannot be more than 4.0");
+      return;
+    }
 
-  const res = await fetch(`/api/update-cv-cgpa`, {
-    method: "POST",
-    body: formData,
-  })
+    const formData = new FormData();
+    formData.append("cgpa", String(data.cgpa));
+    formData.append("cv", data.cv[0]);
+    formData.append("email", email);
 
-          if (res.ok) {
-            setShowPopup(false)
-            reset()
-            fetchInternships()
-          } else {
-            alert("Failed to update profile.")
-          }
-        })}
-        className="space-y-4"
-      >
-        <div>
-          <label className="block font-medium mb-1">CGPA</label>
-          <input
-            type="number"
-            step="0.01"
-            {...register("cgpa", { required: true, min: 0, max: 4 })}
-            className="border p-2 w-full rounded"
-          />
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Upload CV (PDF)</label>
-          <input
-            type="file"
-            accept=".pdf"
-            {...register("cv", { required: true })}
-            className="border p-2 w-full rounded"
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-        >
-          Submit
-        </button>
-      </form>
+    const res = await fetch(`/api/update-cv-cgpa`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      setShowPopup(false);
+      reset();
+      fetchInternships();
+    } else {
+      alert("Failed to update profile.");
+    }
+  })}
+  className="space-y-4"
+>
+  <div>
+    <label className="block font-medium mb-1">CGPA</label>
+    <input
+      type="number"
+      step="0.01"
+      {...register("cgpa", {
+        required: true,
+        min: {
+          value: 0,
+          message: "CGPA must be at least 0.0",
+        },
+        max: {
+          value: 4,
+          message: "CGPA cannot exceed 4.0",
+        },
+      })}
+      className="border p-2 w-full rounded"
+    />
+  </div>
+  <div>
+    <label className="block font-medium mb-1">Upload CV (PDF)</label>
+    <input
+      type="file"
+      accept=".pdf"
+      {...register("cv", { required: true })}
+      className="border p-2 w-full rounded"
+    />
+  </div>
+  <button
+    type="submit"
+    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+  >
+    Submit
+  </button>
+</form>
+
     </Dialog.Panel>
   </Dialog>
 )}
