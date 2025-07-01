@@ -79,35 +79,35 @@ const Dashboard: React.FC = () => {
     )
   }
 
-  if (error) {
-    return (
-      <FocalPersonLayout>
-        <div className="max-w-6xl mx-auto p-6">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3
-                className="text-base font-semibold text-red-700 mb-1"
-                style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-              >
-                Error Loading Dashboard
-              </h3>
-              <p className="text-red-600 text-sm" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
-                {error}
-              </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-xs"
-                style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
-              >
-                Retry
-              </button>
-            </div>
-          </div>
-        </div>
-      </FocalPersonLayout>
-    )
-  }
+  // if (error) {
+  //   return (
+  //     <FocalPersonLayout>
+  //       <div className="max-w-6xl mx-auto p-6">
+  //         <div className="bg-red-50 border border-red-200 rounded-lg p-6 flex items-start">
+  //           <AlertCircle className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
+  //           <div>
+  //             <h3
+  //               className="text-base font-semibold text-red-700 mb-1"
+  //               style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+  //             >
+  //               Error Loading Dashboard
+  //             </h3>
+  //             <p className="text-red-600 text-sm" style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+  //               {error}
+  //             </p>
+  //             <button
+  //               onClick={() => window.location.reload()}
+  //               className="mt-3 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-xs"
+  //               style={{ fontFamily: "'Segoe UI', system-ui, sans-serif" }}
+  //             >
+  //               Retry
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </FocalPersonLayout>
+  //   )
+  // }
 
   // Calculate Missing Assignments
   const missingStudents = internships.filter((i) => i.assignedStudents.length === 0).length
