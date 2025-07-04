@@ -1,10 +1,10 @@
-// pages/faculty.js
+
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation'; // Import useRouter for navigation
-import StudentDashboard from '@/app/components/Dashboard'; // Import the dashboard component
-import Layout from '../../components/Layout'; // Import layout component
+import { useRouter } from 'next/navigation'; 
+import StudentDashboard from '@/app/components/Dashboard'; 
+import Layout from '../../components/Layout'; 
 
 const FacultyPage = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
